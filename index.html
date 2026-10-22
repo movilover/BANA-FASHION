@@ -688,7 +688,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 </div>
 
 <!-- CHECKOUT MODAL -->
-<div id="checkoutModal" class="fixed inset-0 z-[55] hidden bg-slate-50 overflow-y-auto">
+<div id="checkoutModal" class="fixed inset-0 z-[95] hidden bg-slate-50 overflow-y-auto">
   <div onclick="closeCheckout()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
   <div class="relative min-h-screen">
     <div class="w-full max-w-5xl mx-auto bg-white min-h-screen shadow-xl">
@@ -790,8 +790,13 @@ if (FIREBASE_READY) {
 
 /* ===== ADMIN-LINKED: visit tracking, signup counter ===== */
 const dk=()=>new Date().toLocaleDateString('en-CA');
-async function bump(f){ if(!FIREBASE_READY) return; try{ await setDoc(doc(db,'stats',dk()),{[f]:increment(1)},{merge:true}); }catch(e){} }
-try{ if(!sessionStorage.getItem('bf_v')){ sessionStorage.setItem('bf_v','1'); bump('views'); } }catch(e){}
+async function bump(f){ if(!FIREBASE_READY) return; try{ await setDoc(doc(db,'stats',dk()),{[f]:increment(1)},{merge:true}); await setDoc(doc(db,'stats','total'),{[f]:increment(1)},{merge:true}); }catch(e){} }
+(async()=>{ if(!FIREBASE_READY) return; try{ if(sessionStorage.getItem('bf_v')) return; sessionStorage.setItem('bf_v','1');
+  const d=dk(), first=localStorage.getItem('bf_vd')!==d, neu=!localStorage.getItem('bf_seen'); localStorage.setItem('bf_vd',d); localStorage.setItem('bf_seen','1');
+  await setDoc(doc(db,'stats',d),{views:increment(1),...(first?{visitors:increment(1)}:{})},{merge:true});
+  await setDoc(doc(db,'stats','total'),{views:increment(1),...(neu?{visitors:increment(1)}:{})},{merge:true});
+  let ref='Direct'; try{ if(document.referrer) ref=new URL(document.referrer).hostname; }catch(e){}
+  await addDoc(collection(db,'visits'),{d,t:serverTimestamp(),dev:/Mobi|Android/i.test(navigator.userAgent)?'Mobile':'Desktop',ref,new:neu}); }catch(e){} })();
 async function ensureUser(u){ try{ const r=doc(db,'users',u.uid); if(!(await getDoc(r)).exists()){ await setDoc(r,{name:u.displayName||'',email:u.email||'',createdAt:serverTimestamp()}); bump('signups'); } }catch(e){} }
 /* ================= DATA ================= */
 const CATEGORIES = [
@@ -874,7 +879,7 @@ function renderProducts(){
         </div>
         <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
           <div><span class="font-extrabold text-base sm:text-lg">${money(p.price)}</span>${p.oldPrice?`<span class="text-[11px] text-slate-400 line-through ml-1">${money(p.oldPrice)}</span>`:''}</div>
-          <button onclick="event.stopPropagation();addToCart('${p.id}',1,'M')" class="w-9 h-9 rounded-xl bg-ink-900 text-white hover:bg-gold-500 hover:text-black transition-all"><i class="fa-solid fa-plus text-xs"></i></button>
+          <button onclick="event.stopPropagation();addToCart('${p.id}',1,'${(p.sizes&&p.sizes[0])||'M'}')" class="w-9 h-9 rounded-xl bg-ink-900 text-white hover:bg-gold-500 hover:text-black transition-all"><i class="fa-solid fa-plus text-xs"></i></button>
         </div>
       </div>
     </div>`;
@@ -904,6 +909,11 @@ async function loadSite(){
     if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:x.label}))); buildCatRow(); renderTabs(); } }catch(e){}
   const st=state.site||{}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
   { const o=$('coArea').options; o[0].text='Inside Dhaka (৳'+SHIP.dhaka+')'; o[1].text='Outside Dhaka (৳'+SHIP.outside+')'; }
+  try{ const bs=await getDocs(collection(db,'banners')); const a=[]; bs.forEach(d=>a.push(d.data())); a.sort((x,y)=>(x.order||0)-(y.order||0));
+    if(a.length){ const hero=$('hero'), anchor=hero.querySelector(':scope > button'), first=hero.querySelector('.hero-slide');
+      a.forEach(b=>first.insertAdjacentHTML('beforebegin',`<div class="hero-slide absolute inset-0 flex items-center"><img class="hero-img absolute inset-0 w-full h-full object-cover" src="${esc(b.image)}" alt=""><div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent"></div><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full"><div class="max-w-xl space-y-3"><h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">${esc(b.title)}</h1>${b.sub?`<p class="a a3 text-silver-300 text-sm sm:text-base">${esc(b.sub)}</p>`:''}<div class="a a4"><a href="#shop" onclick="filterCategory('${esc(b.cat||'all')}')" class="btn-gold inline-block px-6 py-3 rounded-xl font-extrabold text-sm shadow-xl">${esc(b.cta||'SHOP NOW')} <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a></div></div></div></div>`));
+      hero.querySelectorAll('.hero-slide').forEach((x,i)=>x.classList.toggle('active',i===0));
+      $('heroDots').innerHTML=Array.from(hero.querySelectorAll('.hero-slide'),(_,i)=>`<button aria-label="Slide ${i+1}" onclick="goToHeroSlide(${i})" class="hero-dot h-1.5 w-5 sm:w-9 rounded-full bg-white/25 overflow-hidden"><span class="hero-bar block h-full bg-gold-500"></span></button>`).join(''); showHero(0); } }catch(e){}
   const d=st.colsDesktop||4, m=st.colsMobile||2;
   let el=$('gridStyle'); if(!el){ el=document.createElement('style'); el.id='gridStyle'; document.head.appendChild(el); }
   el.textContent=`#productGrid{grid-template-columns:repeat(${m},minmax(0,1fr))!important}@media(min-width:640px){#productGrid{grid-template-columns:repeat(${Math.min(d,3)},minmax(0,1fr))!important}}@media(min-width:1024px){#productGrid{grid-template-columns:repeat(${d},minmax(0,1fr))!important}}`;
@@ -932,7 +942,7 @@ async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY
 /* ================= PRODUCT MODAL ================= */
 function openProduct(id){
   const p=state.products.find(x=>x.id===id); if(!p) return;
-  state.pm={id,size:'M',qty:1};
+  state.pm={id,size:(p.sizes&&p.sizes[0])||'M',qty:1};
   $('pmImage').style.opacity=1; $('pmImage').src=p.image; $('pmCategory').textContent=p.category; $('pmTitle').textContent=p.title;
   $('pmRating').textContent=`${p.rating||4.5} (${p.reviews||0} reviews)`; $('pmPrice').textContent=money(p.price);
   $('pmOld').textContent=p.oldPrice?money(p.oldPrice):''; const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0;
@@ -940,7 +950,7 @@ function openProduct(id){
   renderSizes();
   const m=$('productModal'); m.classList.remove('hidden'); setTimeout(()=>m.classList.remove('opacity-0'),10);
 }
-function renderSizes(){ $('pmSizes').innerHTML=SIZES.map(s=>`<button onclick="pmSize('${s}')" class="px-4 py-2 rounded-lg border text-xs font-extrabold transition-all ${state.pm.size===s?'bg-ink-900 text-gold-400 border-ink-900':'border-slate-200 hover:border-ink-900'}">${s}</button>`).join(''); }
+function renderSizes(){ const pp=state.products.find(x=>x.id===state.pm.id), SL=(pp&&pp.sizes&&pp.sizes.length)?pp.sizes:SIZES; $('pmSizes').innerHTML=SL.map(s=>`<button onclick="pmSize('${s}')" class="px-4 py-2 rounded-lg border text-xs font-extrabold transition-all ${state.pm.size===s?'bg-ink-900 text-gold-400 border-ink-900':'border-slate-200 hover:border-ink-900'}">${s}</button>`).join(''); }
 function pmSize(s){ state.pm.size=s; renderSizes(); }
 function pmQty(d){ state.pm.qty=Math.max(1,state.pm.qty+d); $('pmQty').textContent=state.pm.qty; }
 function pmAdd(order){ addToCart(state.pm.id,state.pm.qty,state.pm.size,order); closeProduct(); if(order) startCheckout(); }
@@ -1060,9 +1070,9 @@ function openCheckout(){
   const u=state.user; $('coUser').textContent=u.email||u.name;
   if(!$('coName').value) $('coName').value=u.name||'';
   $('coItems').innerHTML=state.cart.map(i=>`<div class="flex items-center gap-2"><img src="${esc(i.image)}" class="w-10 h-10 rounded-lg object-cover bg-ink-800"><div class="flex-1 min-w-0"><div class="font-bold truncate">${esc(i.title)}</div><div class="text-slate-400">Size ${esc(i.size)} × ${i.qty}</div></div><div class="font-bold">${money(i.price*i.qty)}</div></div>`).join('');
-  updateCheckoutTotals(); $('checkoutModal').classList.remove('hidden');
+  updateCheckoutTotals(); $('checkoutModal').classList.remove('hidden'); $('checkoutModal').scrollTop=0; document.body.style.overflow='hidden';
 }
-function closeCheckout(){ $('checkoutModal').classList.add('hidden'); }
+function closeCheckout(){ $('checkoutModal').classList.add('hidden'); document.body.style.overflow=''; }
 function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value]; }
 function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; $('coTotal').textContent=money(s+sh); }
 async function placeOrder(e){
