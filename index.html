@@ -663,7 +663,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
       <!-- Signed-in view -->
       <div id="profileView" class="hidden p-7 text-center space-y-4">
         <div id="profileAvatar" class="w-20 h-20 mx-auto rounded-full btn-gold flex items-center justify-center text-3xl font-extrabold"></div>
-        <div><div id="profileName" class="font-bold text-lg"></div><div id="profileEmail" class="text-xs text-silver-400"></div></div>
+        <div><div id="profileName" class="font-bold text-lg"></div><div id="profileEmail" class="text-xs text-silver-400"></div></div><div class="text-[11px] font-bold text-silver-300 uppercase tracking-wider text-left">My Orders</div><div id="myOrders" class="text-left text-xs space-y-2 max-h-60 overflow-auto"></div>
         <button onclick="doSignOut()" class="w-full py-3 rounded-xl border border-white/20 hover:bg-white/10 text-sm font-bold"><i class="fa-solid fa-right-from-bracket mr-2"></i>Sign Out</button>
       </div>
 
@@ -688,12 +688,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 </div>
 
 <!-- CHECKOUT MODAL -->
-<div id="checkoutModal" class="fixed inset-0 z-[55] hidden">
+<div id="checkoutModal" class="fixed inset-0 z-[55] hidden bg-slate-50 overflow-y-auto">
   <div onclick="closeCheckout()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-  <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-    <div class="pointer-events-auto w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden max-h-[94vh] overflow-y-auto">
+  <div class="relative min-h-screen">
+    <div class="w-full max-w-5xl mx-auto bg-white min-h-screen shadow-xl">
       <div class="bg-ink-900 text-white p-5 flex items-center justify-between sticky top-0 z-10">
-        <div><h3 class="font-display font-extrabold text-xl">Confirm Your Order</h3><p class="text-[11px] text-silver-400">Cash on Delivery · Pay when you receive</p></div>
+        <div><h3 class="font-display font-extrabold text-xl">Confirm Your Order</h3><p class="text-[11px] text-silver-400">Choose your payment method & confirm</p></div>
         <button onclick="closeCheckout()"><i class="fa-solid fa-xmark text-lg text-silver-300"></i></button>
       </div>
       <form id="checkoutForm" onsubmit="placeOrder(event)" class="grid md:grid-cols-5 gap-0">
@@ -702,11 +702,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
           <div><label class="text-xs font-bold">Mobile Number *</label><input id="coPhone" required inputmode="tel" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="01XXXXXXXXX"></div>
           <div><label class="text-xs font-bold">Delivery Area *</label>
             <select id="coArea" onchange="updateCheckoutTotals()" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white">
-              <option value="gazipur">Gazipur (৳60)</option><option value="dhaka">Dhaka (৳80)</option><option value="outside">Outside Dhaka / Gazipur (৳120)</option>
+              <option value="dhaka">Inside Dhaka (৳80)</option><option value="outside">Outside Dhaka (৳150)</option>
             </select></div>
           <div><label class="text-xs font-bold">Full Address *</label><textarea id="coAddress" required rows="3" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="House, road, area, thana, district"></textarea></div>
           <div><label class="text-xs font-bold">Order Note (optional)</label><input id="coNote" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Any special instruction"></div>
-          <div class="flex items-center gap-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold"><i class="fa-solid fa-money-bill-wave text-gold-600 text-lg"></i>Payment Method: Cash on Delivery</div>
+          <div id="coPayBox" class="space-y-3"><div class="text-xs font-bold">Payment Method *</div><div id="coPayOpts" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+<div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="Your sender number (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)"></div></div>
         </div>
         <div class="md:col-span-2 p-6 bg-slate-50 border-t md:border-t-0 md:border-l border-slate-200 flex flex-col">
           <h4 class="font-extrabold text-sm mb-3">Order Summary</h4>
@@ -767,17 +768,17 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 <script type="module">
 /* ================= FIREBASE (v10 Web SDK) ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp, doc, getDoc, setDoc, increment, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 /* >>> Replace the YOUR_... values with the keys from Firebase Console > Project Settings > Your apps (Web) <<< */
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
+  apiKey: "AIzaSyBwMWJ-OMMVR-aeiP9mrwGCqpGzxuranFI",
   authDomain: "bana-fashion.firebaseapp.com",
   projectId: "bana-fashion",
-  storageBucket: "bana-fashion.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  storageBucket: "bana-fashion.firebasestorage.app",
+  messagingSenderId: "143663802409",
+  appId: "1:143663802409:web:fe1ceb33a3dfa33fe0d438"
 };
 const FIREBASE_READY = !String(firebaseConfig.apiKey).startsWith("YOUR_");
 let db = null, auth = null;
@@ -787,6 +788,11 @@ if (FIREBASE_READY) {
   auth = getAuth(app);
 }
 
+/* ===== ADMIN-LINKED: visit tracking, signup counter ===== */
+const dk=()=>new Date().toLocaleDateString('en-CA');
+async function bump(f){ if(!FIREBASE_READY) return; try{ await setDoc(doc(db,'stats',dk()),{[f]:increment(1)},{merge:true}); }catch(e){} }
+try{ if(!sessionStorage.getItem('bf_v')){ sessionStorage.setItem('bf_v','1'); bump('views'); } }catch(e){}
+async function ensureUser(u){ try{ const r=doc(db,'users',u.uid); if(!(await getDoc(r)).exists()){ await setDoc(r,{name:u.displayName||'',email:u.email||'',createdAt:serverTimestamp()}); bump('signups'); } }catch(e){} }
 /* ================= DATA ================= */
 const CATEGORIES = [
   {id:'all',label:'All Products'},{id:'shirts',label:'Shirts'},{id:'tshirts',label:'T-Shirts & Polo'},
@@ -807,8 +813,8 @@ const LOCAL_PRODUCTS = [
   {id:'p12',title:'Everyday Basic Tee (Pack Look)',category:'tshirts',price:590,oldPrice:790,rating:4.6,reviews:188,badge:'VALUE',image:'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=700&q=80',description:'Soft 180GSM cotton basic tee for daily wear. Regular fit, available in multiple colours.'}
 ];
 const SIZES = ['M','L','XL','XXL'];
-const FREE_SHIP = 3000;
-const SHIP = {gazipur:60,dhaka:80,outside:120};
+let FREE_SHIP = 3000;
+const SHIP = {dhaka:80,outside:150};
 
 const state = { products:[...LOCAL_PRODUCTS], cart:[], wishlist:[], cat:'all', q:'', sort:'default', hero:0, user:null, pm:{id:null,size:'M',qty:1}, pendingCheckout:false, authTab:'login' };
 const $ = id => document.getElementById(id);
@@ -848,6 +854,7 @@ function renderProducts(){
   if(state.sort==='low') list.sort((a,b)=>a.price-b.price);
   if(state.sort==='high') list.sort((a,b)=>b.price-a.price);
   if(state.sort==='rating') list.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  { const mx=(state.site&&state.site.maxProducts)||0; if(mx&&state.cat==='all'&&!state.q) list=list.slice(0,mx); }
   $('emptyState').classList.toggle('hidden',list.length>0);
   grid.classList.toggle('hidden',list.length===0);
   grid.innerHTML=list.map((p,i)=>{
@@ -888,6 +895,40 @@ async function loadFirestoreProducts(){
   }catch(e){ console.warn('Firestore products not loaded, using local data:',e.message); }
 }
 
+/* ===== ADMIN-LINKED: site settings, categories, payment ===== */
+async function loadSite(){
+  if(!FIREBASE_READY) return;
+  try{ const s=await getDoc(doc(db,'settings','site')); if(s.exists()) state.site=s.data(); }catch(e){}
+  try{ const p=await getDoc(doc(db,'settings','payment')); if(p.exists()) state.payCfg=p.data(); }catch(e){}
+  try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
+    if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:x.label}))); buildCatRow(); renderTabs(); } }catch(e){}
+  const st=state.site||{}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
+  { const o=$('coArea').options; o[0].text='Inside Dhaka (৳'+SHIP.dhaka+')'; o[1].text='Outside Dhaka (৳'+SHIP.outside+')'; }
+  const d=st.colsDesktop||4, m=st.colsMobile||2;
+  let el=$('gridStyle'); if(!el){ el=document.createElement('style'); el.id='gridStyle'; document.head.appendChild(el); }
+  el.textContent=`#productGrid{grid-template-columns:repeat(${m},minmax(0,1fr))!important}@media(min-width:640px){#productGrid{grid-template-columns:repeat(${Math.min(d,3)},minmax(0,1fr))!important}}@media(min-width:1024px){#productGrid{grid-template-columns:repeat(${d},minmax(0,1fr))!important}}`;
+  renderProducts();
+}
+function buildCatRow(){ const r=$('catRow'); if(!r||!state.cats) return;
+  r.innerHTML=state.cats.slice(0,8).map((c,i)=>`<div onclick="goShop('${esc(c.id)}')" style="--d:${(i*.22).toFixed(2)}s" class="cat-card lit group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg"><img src="${esc(c.image)}" alt="${esc(c.label)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()"><div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left"><h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">${esc(c.label)}</h3></div></div>`).join(''); }
+const PCOL={bkash:['#E2136E','bKash'],nagad:['#F6921E','Nagad'],rocket:['#8C3494','Rocket']};
+function payIcon(k,m){ if(k==='cod') return '<span class="w-9 h-9 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-money-bill-wave"></i></span>';
+  if(m&&m.logo) return `<img src="${esc(m.logo)}" class="w-9 h-9 rounded-lg object-contain bg-white shrink-0">`;
+  const c=PCOL[k]; return `<span class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold text-[9px] shrink-0" style="background:${c[0]}">${c[1]}</span>`; }
+function renderPay(){ const cfg=state.payCfg||{}, act=['bkash','nagad','rocket'].filter(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false), ship=shipCost();
+  const mob=ship>0?act:[]; if(state.payM&&state.payM!=='cod'&&!mob.includes(state.payM)) state.payM='cod';
+  const req=state.site&&state.site.requireAdvance&&mob.length; if(req&&(!state.payM||state.payM==='cod')) state.payM=mob[0];
+  state.payM=state.payM||'cod';
+  $('coPayOpts').innerHTML=(req?[]:['cod']).concat(mob).map(k=>{ const on=state.payM===k; return `<button type="button" onclick="setPayM('${k}')" class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'Cash on Delivery':PCOL[k][1]}</span></button>`; }).join('');
+  const adv=state.payM!=='cod'; $('coPayInfo').classList.toggle('hidden',!adv);
+  if(adv) $('coPayMsg').innerHTML=`Please <b>Send Money</b> the delivery charge <b>${money(ship)}</b> to ${PCOL[state.payM][1]}: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b>, then enter your number and TrxID below. The rest is Cash on Delivery.`;
+  else $('coPayMsg').innerHTML='';
+}
+function setPayM(k){ state.payM=k; renderPay(); }
+async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY||!state.user) return; box.innerHTML='<div class="text-silver-400">Loading...</div>';
+  try{ const s=await getDocs(query(collection(db,'orders'),where('uid','==',state.user.uid))); const a=[]; s.forEach(d=>a.push(d.data())); a.sort((x,y)=>(y.createdAt?.seconds||0)-(x.createdAt?.seconds||0));
+    box.innerHTML=a.map(o=>`<div class="p-3 rounded-xl bg-white/5 border border-white/10"><div class="flex justify-between font-bold"><span>${esc(o.orderId)}</span><span class="text-gold-400 uppercase">${esc(o.status)}</span></div><div class="text-silver-400">${money(o.total)}${o.deliveryPaid?' · Delivery charge paid ✔':''}</div>${o.courier&&o.courier.tracking?`<a target="_blank" rel="noopener" class="text-gold-400 underline" href="https://steadfast.com.bd/t/${encodeURIComponent(o.courier.tracking)}">${esc(o.courier.name||'Courier')}: ${esc(o.courier.tracking)} — Track</a>`:''}</div>`).join('')||'<div class="text-silver-400">No orders yet</div>';
+  }catch(e){ box.innerHTML=''; } }
 /* ================= PRODUCT MODAL ================= */
 function openProduct(id){
   const p=state.products.find(x=>x.id===id); if(!p) return;
@@ -962,7 +1003,7 @@ function setUser(u){
   if(u && state.pendingCheckout){ state.pendingCheckout=false; closeAuth(); openCheckout(); }
 }
 if(FIREBASE_READY){
-  onAuthStateChanged(auth,u=>setUser(u?{uid:u.uid,name:u.displayName||(u.email||'').split('@')[0],email:u.email}:null));
+  onAuthStateChanged(auth,u=>{ setUser(u?{uid:u.uid,name:u.displayName||(u.email||'').split('@')[0],email:u.email}:null); if(u) ensureUser(u); });
 } else {
   setUser(load('bana_user',null));
 }
@@ -972,7 +1013,7 @@ function openAccount(){
   $('profileView').classList.toggle('hidden',!u); $('signinView').classList.toggle('hidden',!!u);
   if(u){ $('authTitle').textContent='My Account'; $('authSub').textContent='You are signed in.'; $('profileName').textContent=u.name||'Customer'; $('profileEmail').textContent=u.email||''; $('profileAvatar').textContent=(u.name||'U')[0].toUpperCase(); }
   else { $('authTitle').textContent = state.pendingCheckout ? 'Sign in to confirm your order' : 'Welcome to BANA FASHION'; $('authSub').textContent='Sign in or create an account to complete your purchase.'; }
-  $('authModal').classList.remove('hidden');
+  $('authModal').classList.remove('hidden'); if(u) loadMyOrders();
 }
 function closeAuth(){ $('authModal').classList.add('hidden'); state.pendingCheckout=false; }
 function setAuthTab(t){
@@ -1023,15 +1064,17 @@ function openCheckout(){
 }
 function closeCheckout(){ $('checkoutModal').classList.add('hidden'); }
 function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value]; }
-function updateCheckoutTotals(){ const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; $('coTotal').textContent=money(s+sh); }
+function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; $('coTotal').textContent=money(s+sh); }
 async function placeOrder(e){
   e.preventDefault();
   const phone=$('coPhone').value.replace(/[\s-]/g,'').replace(/^\+?88/,'');
   if(!/^01[3-9]\d{8}$/.test(phone)){ toast('Enter a valid Bangladeshi mobile number (01XXXXXXXXX)',false); return; }
+  let pay=null; if(state.payM&&state.payM!=='cod'&&shipCost()>0){ const sender=$('coSender').value.replace(/[\s-]/g,''), trx=$('coTrx').value.trim().toUpperCase();
+    if(!/^01[3-9]\d{8}$/.test(sender)||trx.length<6){ toast('Enter your sender number and TrxID',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
   const btn=$('coSubmit'); btn.disabled=true; btn.textContent='PLACING ORDER...';
   const sub=subtotal(), ship=shipCost(), orderId='BF-'+Date.now().toString(36).toUpperCase();
   const order={orderId,uid:state.user.uid,email:state.user.email||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,address:$('coAddress').value.trim(),note:$('coNote').value.trim(),
-    items:state.cart.map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,delivery:ship,total:sub+ship,payment:'Cash on Delivery',status:'pending',currency:'BDT'};
+    items:state.cart.map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,delivery:ship,total:sub+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
   try{
     if(FIREBASE_READY) await addDoc(collection(db,'orders'),{...order,createdAt:serverTimestamp()});
     else { const all=load('bana_orders',[]); all.push({...order,createdAt:new Date().toISOString()}); save('bana_orders',all); }
@@ -1134,11 +1177,11 @@ function runSplash(){
 runSplash(); buildPromos();
 
 /* expose handlers to inline onclick */
-Object.assign(window,{showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,pmSize,pmQty,pmAdd,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,updateCheckoutTotals,placeOrder});
+Object.assign(window,{showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,pmSize,pmQty,pmAdd,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,updateCheckoutTotals,placeOrder});
 
 /* init */
 state.cart=load('bana_cart',[]); state.wishlist=load('bana_wish',[]);
-buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); showHero(0); setupReveal(); loadFirestoreProducts();
+buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); showHero(0); setupReveal(); loadFirestoreProducts(); loadSite();
 { const t0=performance.now(); const done=()=>{ const w=Math.max(0,2700-(performance.now()-t0)); setTimeout(()=>{ const p=$('preloader'); if(!p) return; p.classList.add('out'); setTimeout(()=>p.remove(),550); },w); }; if(document.readyState==='complete') done(); else window.addEventListener('load',done); }
 </script>
 </body>
