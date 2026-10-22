@@ -574,7 +574,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
           <h3 id="pmTitle" class="font-display font-extrabold text-2xl text-ink-900 mt-1"></h3>
           <div class="flex items-center gap-2 mt-2"><span class="text-gold-500 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span><span id="pmRating" class="text-xs font-bold text-slate-500"></span></div>
           <div class="flex items-center gap-2.5 mt-3"><span id="pmPrice" class="font-extrabold text-2xl text-ink-900"></span><span id="pmOld" class="text-xs text-slate-400 line-through"></span><span id="pmOff" class="px-2 py-0.5 rounded-md bg-gold-500/15 text-gold-600 text-[10px] font-extrabold"></span></div>
-          <p id="pmDesc" class="text-xs text-slate-500 mt-3 leading-relaxed"></p>
+          <div class="mt-4 pt-3 border-t border-slate-100"><div class="text-xs font-extrabold text-ink-900 mb-1.5"><i class="fa-solid fa-circle-info text-gold-500 mr-1.5"></i>Product Details</div><p id="pmDesc" class="text-[13px] text-slate-600 leading-relaxed whitespace-pre-line"></p></div>
+          <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-bold text-slate-600 mt-3"><div class="p-2 rounded-xl bg-slate-50"><i class="fa-solid fa-medal text-gold-500 block text-base mb-1"></i>Original Quality</div><div class="p-2 rounded-xl bg-slate-50"><i class="fa-solid fa-money-bill-wave text-gold-500 block text-base mb-1"></i>Cash on Delivery</div><div class="p-2 rounded-xl bg-slate-50"><i class="fa-solid fa-rotate text-gold-500 block text-base mb-1"></i>Easy Exchange</div></div>
+          <div id="pmShip" class="text-[11px] text-slate-500 mt-2"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i></div>
         </div>
         <div>
           <label class="text-xs font-bold block mb-1.5">Select Size</label>
@@ -700,14 +702,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
         <div class="md:col-span-3 p-6 space-y-4">
           <div><label class="text-xs font-bold">Full Name *</label><input id="coName" required class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Your name"></div>
           <div><label class="text-xs font-bold">Mobile Number *</label><input id="coPhone" required inputmode="tel" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="01XXXXXXXXX"></div>
-          <div><label class="text-xs font-bold">Delivery Area *</label>
-            <select id="coArea" onchange="updateCheckoutTotals()" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white">
-              <option value="dhaka">Inside Dhaka (৳80)</option><option value="outside">Outside Dhaka (৳150)</option>
-            </select></div>
-          <div><label class="text-xs font-bold">Full Address *</label><textarea id="coAddress" required rows="3" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="House, road, area, thana, district"></textarea></div>
+          <div class="grid sm:grid-cols-2 gap-4"><div><label class="text-xs font-bold">District (জেলা) *</label><select id="coDist" required onchange="onDist()" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">Select district</option></select></div>
+            <div id="coUpBox" class="hidden"><label class="text-xs font-bold">Upazila / Thana *</label><select id="coUp" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">Select upazila / thana</option></select></div></div>
+          <input type="hidden" id="coArea" value="dhaka">
+          <div><label class="text-xs font-bold">Full Address *</label><textarea id="coAddress" required rows="3" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="House no, road, village / area"></textarea></div>
           <div><label class="text-xs font-bold">Order Note (optional)</label><input id="coNote" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Any special instruction"></div>
           <div id="coPayBox" class="space-y-3"><div class="text-xs font-bold">Payment Method *</div><div id="coPayOpts" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
-<div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="Your sender number (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)"></div></div>
+<div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="Your sender number (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)"><div class="text-[11px] text-slate-500">Each TrxID can be used only once.</div></div></div>
+<div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs flex gap-3"><i class="fa-solid fa-truck-fast text-sky-500 text-lg mt-0.5"></i><div class="font-bold text-slate-700">Delivery Charge<div class="font-semibold mt-1">Inside Dhaka: <span id="noteIn" class="text-sky-600"></span> &nbsp;|&nbsp; Outside Dhaka: <span id="noteOut" class="text-sky-600"></span></div><div id="noteFree" class="font-normal text-slate-500 mt-1"></div></div></div>
         </div>
         <div class="md:col-span-2 p-6 bg-slate-50 border-t md:border-t-0 md:border-l border-slate-200 flex flex-col">
           <h4 class="font-extrabold text-sm mb-3">Order Summary</h4>
@@ -768,7 +770,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 <script type="module">
 /* ================= FIREBASE (v10 Web SDK) ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp, doc, getDoc, setDoc, increment, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp, doc, getDoc, setDoc, increment, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 /* >>> Replace the YOUR_... values with the keys from Firebase Console > Project Settings > Your apps (Web) <<< */
@@ -896,7 +898,7 @@ async function loadFirestoreProducts(){
   try{
     const snap=await getDocs(collection(db,'products'));
     const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()}));
-    if(items.length){ state.products=items.map(p=>({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); renderProducts(); }
+    if(items.length){ state.products=items.map(p=>({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); renderProducts(); } else { try{ const sd=await getDoc(doc(db,'settings','site')); if(sd.exists()&&sd.data().seeded){ state.products=[]; renderProducts(); } }catch(e){} }
   }catch(e){ console.warn('Firestore products not loaded, using local data:',e.message); }
 }
 
@@ -908,7 +910,7 @@ async function loadSite(){
   try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
     if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:x.label}))); buildCatRow(); renderTabs(); } }catch(e){}
   const st=state.site||{}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
-  { const o=$('coArea').options; o[0].text='Inside Dhaka (৳'+SHIP.dhaka+')'; o[1].text='Outside Dhaka (৳'+SHIP.outside+')'; }
+  updateCheckoutTotals();
   try{ const bs=await getDocs(collection(db,'banners')); const a=[]; bs.forEach(d=>a.push(d.data())); a.sort((x,y)=>(x.order||0)-(y.order||0));
     if(a.length){ const hero=$('hero'), anchor=hero.querySelector(':scope > button'), first=hero.querySelector('.hero-slide');
       a.forEach(b=>first.insertAdjacentHTML('beforebegin',`<div class="hero-slide absolute inset-0 flex items-center"><img class="hero-img absolute inset-0 w-full h-full object-cover" src="${esc(b.image)}" alt=""><div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent"></div><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full"><div class="max-w-xl space-y-3"><h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">${esc(b.title)}</h1>${b.sub?`<p class="a a3 text-silver-300 text-sm sm:text-base">${esc(b.sub)}</p>`:''}<div class="a a4"><a href="#shop" onclick="filterCategory('${esc(b.cat||'all')}')" class="btn-gold inline-block px-6 py-3 rounded-xl font-extrabold text-sm shadow-xl">${esc(b.cta||'SHOP NOW')} <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a></div></div></div></div>`));
@@ -925,14 +927,14 @@ const PCOL={bkash:['#E2136E','bKash'],nagad:['#F6921E','Nagad'],rocket:['#8C3494
 function payIcon(k,m){ if(k==='cod') return '<span class="w-9 h-9 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-money-bill-wave"></i></span>';
   if(m&&m.logo) return `<img src="${esc(m.logo)}" class="w-9 h-9 rounded-lg object-contain bg-white shrink-0">`;
   const c=PCOL[k]; return `<span class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold text-[9px] shrink-0" style="background:${c[0]}">${c[1]}</span>`; }
-function renderPay(){ const cfg=state.payCfg||{}, act=['bkash','nagad','rocket'].filter(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false), ship=shipCost();
-  const mob=ship>0?act:[]; if(state.payM&&state.payM!=='cod'&&!mob.includes(state.payM)) state.payM='cod';
-  const req=state.site&&state.site.requireAdvance&&mob.length; if(req&&(!state.payM||state.payM==='cod')) state.payM=mob[0];
+function renderPay(){ const cfg=state.payCfg||{}, act=['bkash','nagad','rocket'].filter(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false), ship=shipCost(), free=ship===0;
+  if(free&&state.payM&&state.payM!=='cod') state.payM='cod';
+  const req=!!(state.site&&state.site.requireAdvance&&act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
+  if(state.payM&&state.payM!=='cod'&&!act.includes(state.payM)) state.payM='cod';
   state.payM=state.payM||'cod';
-  $('coPayOpts').innerHTML=(req?[]:['cod']).concat(mob).map(k=>{ const on=state.payM===k; return `<button type="button" onclick="setPayM('${k}')" class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'Cash on Delivery':PCOL[k][1]}</span></button>`; }).join('');
+  $('coPayOpts').innerHTML=(req?[]:['cod']).concat(act).map(k=>{ const on=state.payM===k, dis=free&&k!=='cod'; return `<button type="button" ${dis?'disabled':`onclick="setPayM('${k}')"`} class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'} ${dis?'opacity-40':''}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'Cash on Delivery':PCOL[k][1]}</span></button>`; }).join('');
   const adv=state.payM!=='cod'; $('coPayInfo').classList.toggle('hidden',!adv);
-  if(adv) $('coPayMsg').innerHTML=`Please <b>Send Money</b> the delivery charge <b>${money(ship)}</b> to ${PCOL[state.payM][1]}: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b>, then enter your number and TrxID below. The rest is Cash on Delivery.`;
-  else $('coPayMsg').innerHTML='';
+  $('coPayMsg').innerHTML=adv?`Please <b>Send Money</b> the delivery charge <b>${money(ship)}</b> to ${PCOL[state.payM][1]}: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b>, then enter your number and TrxID below. The rest is Cash on Delivery.`:'';
 }
 function setPayM(k){ state.payM=k; renderPay(); }
 async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY||!state.user) return; box.innerHTML='<div class="text-silver-400">Loading...</div>';
@@ -943,10 +945,10 @@ async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY
 function openProduct(id){
   const p=state.products.find(x=>x.id===id); if(!p) return;
   state.pm={id,size:(p.sizes&&p.sizes[0])||'M',qty:1};
-  $('pmImage').style.opacity=1; $('pmImage').src=p.image; $('pmCategory').textContent=p.category; $('pmTitle').textContent=p.title;
+  $('pmImage').style.opacity=1; $('pmImage').src=p.image; $('pmCategory').textContent=(CATEGORIES.find(c=>c.id===p.category)||{}).label||p.category; $('pmShip').innerHTML='<i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>Delivery: Inside Dhaka '+money(SHIP.dhaka)+' · Outside Dhaka '+money(SHIP.outside); $('pmTitle').textContent=p.title;
   $('pmRating').textContent=`${p.rating||4.5} (${p.reviews||0} reviews)`; $('pmPrice').textContent=money(p.price);
   $('pmOld').textContent=p.oldPrice?money(p.oldPrice):''; const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0;
-  $('pmOff').textContent=off?`${off}% OFF`:''; $('pmOff').classList.toggle('hidden',!off); $('pmDesc').textContent=p.description||''; $('pmQty').textContent=1;
+  $('pmOff').textContent=off?`${off}% OFF`:''; $('pmOff').classList.toggle('hidden',!off); $('pmDesc').textContent=p.description||'Premium quality product from BANA FASHION.'; $('pmQty').textContent=1;
   renderSizes();
   const m=$('productModal'); m.classList.remove('hidden'); setTimeout(()=>m.classList.remove('opacity-0'),10);
 }
@@ -1070,29 +1072,35 @@ function openCheckout(){
   const u=state.user; $('coUser').textContent=u.email||u.name;
   if(!$('coName').value) $('coName').value=u.name||'';
   $('coItems').innerHTML=state.cart.map(i=>`<div class="flex items-center gap-2"><img src="${esc(i.image)}" class="w-10 h-10 rounded-lg object-cover bg-ink-800"><div class="flex-1 min-w-0"><div class="font-bold truncate">${esc(i.title)}</div><div class="text-slate-400">Size ${esc(i.size)} × ${i.qty}</div></div><div class="font-bold">${money(i.price*i.qty)}</div></div>`).join('');
-  updateCheckoutTotals(); $('checkoutModal').classList.remove('hidden'); $('checkoutModal').scrollTop=0; document.body.style.overflow='hidden';
+  initDist(); updateCheckoutTotals(); $('checkoutModal').classList.remove('hidden'); $('checkoutModal').scrollTop=0; document.body.style.overflow='hidden';
 }
 function closeCheckout(){ $('checkoutModal').classList.add('hidden'); document.body.style.overflow=''; }
 function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value]; }
-function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; $('coTotal').textContent=money(s+sh); }
+function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; $('coTotal').textContent=money(s+sh);
+  $('noteIn').textContent=money(SHIP.dhaka); $('noteOut').textContent=money(SHIP.outside); $('noteFree').textContent=sh===0?'Your delivery is FREE - no advance payment needed.':(FREE_SHIP<99999999?'Free delivery on orders over '+money(FREE_SHIP)+'.':''); }
+const BD={"Dhaka":"Adabor,Badda,Banani,Bangshal,Bimanbandar,Cantonment,Chawkbazar,Dakshinkhan,Darus Salam,Demra,Dhamrai,Dhanmondi,Dohar,Gendaria,Gulshan,Hazaribagh,Jatrabari,Kadamtali,Kafrul,Kalabagan,Kamrangirchar,Keraniganj,Khilgaon,Khilkhet,Kotwali,Lalbagh,Mirpur,Mohammadpur,Motijheel,Nawabganj,New Market,Pallabi,Paltan,Ramna,Rampura,Sabujbagh,Savar,Shahbagh,Shyampur,Sutrapur,Tejgaon,Turag,Uttara,Uttar Khan,Wari","Gazipur":"Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur,Tongi","Narayanganj":"Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon","Narsingdi":"Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur","Manikganj":"Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair","Munshiganj":"Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari","Faridpur":"Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha","Gopalganj":"Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara","Madaripur":"Kalkini,Madaripur Sadar,Rajoir,Shibchar","Rajbari":"Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar","Shariatpur":"Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira","Tangail":"Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar","Kishoreganj":"Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail","Chattogram":"Anwara,Banshkhali,Boalkhali,Chandanaish,Chattogram City,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda","Cox's Bazar":"Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia","Cumilla":"Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Cumilla Sadar,Cumilla Sadar Dakshin,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohorgonj,Muradnagar,Nangalkot,Titas","Feni":"Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi","Brahmanbaria":"Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail","Noakhali":"Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar","Lakshmipur":"Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati","Chandpur":"Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti","Khagrachhari":"Dighinala,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh","Rangamati":"Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar","Bandarban":"Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi","Rajshahi":"Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Rajshahi City,Tanore","Chapainawabganj":"Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj","Naogaon":"Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar","Natore":"Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra","Pabna":"Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar","Sirajganj":"Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara","Bogura":"Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatola","Joypurhat":"Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi","Khulna":"Batiaghata,Dacope,Dighalia,Dumuria,Khulna City,Koyra,Paikgachha,Phultala,Rupsha,Terokhada","Bagerhat":"Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola","Satkhira":"Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala","Jashore":"Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha","Jhenaidah":"Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa","Magura":"Magura Sadar,Mohammadpur,Shalikha,Sreepur","Narail":"Kalia,Lohagara,Narail Sadar","Kushtia":"Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur","Chuadanga":"Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar","Meherpur":"Gangni,Meherpur Sadar,Mujibnagar","Barishal":"Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gournadi,Hizla,Mehendiganj,Muladi,Wazirpur","Bhola":"Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin","Jhalokati":"Jhalokati Sadar,Kathalia,Nalchity,Rajapur","Patuakhali":"Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali","Pirojpur":"Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar","Barguna":"Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali","Sylhet":"Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj","Moulvibazar":"Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal","Habiganj":"Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj","Sunamganj":"Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur","Rangpur":"Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj","Dinajpur":"Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Fulbari,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur","Kurigram":"Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur","Lalmonirhat":"Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram","Nilphamari":"Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur","Gaibandha":"Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj","Thakurgaon":"Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar","Panchagarh":"Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia","Mymensingh":"Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal","Jamalpur":"Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari","Netrokona":"Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala","Sherpur":"Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi"};
+function initDist(){ const el=$('coDist'); if(el.options.length>1) return; el.innerHTML='<option value="">Select district</option>'+Object.keys(BD).sort().map(d=>`<option>${d}</option>`).join(''); }
+function onDist(){ const d=$('coDist').value, box=$('coUpBox'), up=$('coUp'); $('coArea').value=(d==='Dhaka')?'dhaka':'outside';
+  if(!d){ box.classList.add('hidden'); up.required=false; } else { up.innerHTML='<option value="">Select upazila / thana</option>'+BD[d].split(',').map(x=>`<option>${x}</option>`).join(''); box.classList.remove('hidden'); up.required=true; }
+  updateCheckoutTotals(); }
 async function placeOrder(e){
   e.preventDefault();
   const phone=$('coPhone').value.replace(/[\s-]/g,'').replace(/^\+?88/,'');
   if(!/^01[3-9]\d{8}$/.test(phone)){ toast('Enter a valid Bangladeshi mobile number (01XXXXXXXXX)',false); return; }
   let pay=null; if(state.payM&&state.payM!=='cod'&&shipCost()>0){ const sender=$('coSender').value.replace(/[\s-]/g,''), trx=$('coTrx').value.trim().toUpperCase();
-    if(!/^01[3-9]\d{8}$/.test(sender)||trx.length<6){ toast('Enter your sender number and TrxID',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
+    if(!/^01[3-9]\d{8}$/.test(sender)||!/^[A-Z0-9]{6,20}$/.test(trx)){ toast('Enter your sender number and TrxID',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
   const btn=$('coSubmit'); btn.disabled=true; btn.textContent='PLACING ORDER...';
   const sub=subtotal(), ship=shipCost(), orderId='BF-'+Date.now().toString(36).toUpperCase();
-  const order={orderId,uid:state.user.uid,email:state.user.email||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,address:$('coAddress').value.trim(),note:$('coNote').value.trim(),
+  const order={orderId,uid:state.user.uid,email:state.user.email||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,district:$('coDist').value,upazila:$('coUp').value,address:$('coAddress').value.trim(),note:$('coNote').value.trim(),
     items:state.cart.map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,delivery:ship,total:sub+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
   try{
-    if(FIREBASE_READY) await addDoc(collection(db,'orders'),{...order,createdAt:serverTimestamp()});
+    if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); if(pay) bt.set(doc(db,'trx',pay.trxId),{uid:state.user.uid,orderId,at:serverTimestamp()}); await bt.commit(); }
     else { const all=load('bana_orders',[]); all.push({...order,createdAt:new Date().toISOString()}); save('bana_orders',all); }
     const lines=order.items.map(i=>`• ${i.title} (${i.size}) x${i.qty}`).join('%0A');
     $('successWa').href=`https://wa.me/8801353808618?text=${encodeURIComponent('')}${'New BANA FASHION order '+orderId}%0A${lines}%0ATotal: ${order.total} BDT%0AName: ${encodeURIComponent(order.customerName)}%0APhone: ${phone}`;
     $('successId').textContent=orderId;
     state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); $('successModal').classList.remove('hidden');
-  }catch(err){ console.error(err); toast('Could not place order: '+(err.message||'try again'),false); }
+  }catch(err){ console.error(err); toast(pay&&err.code==='permission-denied'?'This TrxID is already used or invalid. Please check your TrxID.':'Could not place order: '+(err.message||'try again'),false); }
   btn.disabled=false; btn.textContent='CONFIRM ORDER';
 }
 
@@ -1187,7 +1195,7 @@ function runSplash(){
 runSplash(); buildPromos();
 
 /* expose handlers to inline onclick */
-Object.assign(window,{showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,pmSize,pmQty,pmAdd,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,updateCheckoutTotals,placeOrder});
+Object.assign(window,{showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,pmSize,pmQty,pmAdd,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,updateCheckoutTotals,placeOrder});
 
 /* init */
 state.cart=load('bana_cart',[]); state.wishlist=load('bana_wish',[]);
