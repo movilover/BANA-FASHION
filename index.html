@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="bn" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BANA FASHION | Premium Men's Fashion Brand</title>
+<title>BANA FASHION | প্রিমিয়াম মেনস ফ্যাশন</title>
 <meta name="description" content="BANA FASHION - Premium men's fashion brand from Shafipur Bazar, Kaliakoir, Gazipur. Shirts, T-shirts, Denim, Panjabi & more. Cash on Delivery all over Bangladesh.">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -201,6 +201,35 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 @keyframes cartPop{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-10deg)}70%{transform:scale(.94)}100%{transform:scale(1)}}.cart-pop{animation:cartPop .55s}
 @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 .eid-card{background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(251,191,36,.25);backdrop-filter:blur(6px);transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s}.eid-card:hover{transform:translateY(-6px);border-color:rgba(251,191,36,.7);box-shadow:0 20px 40px -14px rgba(251,191,36,.35)}
+
+/* ---- v4: premium stats, categories, helpline, pencil writing ---- */
+.statc{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border-radius:.9rem;background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.08);transition:transform .3s,border-color .3s,box-shadow .3s,opacity .8s}
+.statc:hover{transform:translateY(-3px)!important;border-color:rgba(245,158,11,.55);box-shadow:0 12px 30px -14px rgba(245,158,11,.5)}
+.stati{width:2rem;height:2rem;flex:none;border-radius:.65rem;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#FFB800;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25)}
+.statn{font-family:Syne,'Hind Siliguri',sans-serif;font-weight:800;font-size:1.15rem;line-height:1.1}
+.statl{font-size:.66rem;color:#9ca3af;margin-top:.15rem;line-height:1.25;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif}
+@media(min-width:640px){.statn{font-size:1.4rem}.statl{font-size:.74rem}.statc{padding:.65rem .9rem}.stati{width:2.2rem;height:2.2rem}}
+#catRow{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+#catRow .cat-card{flex:0 0 calc((100% - 20px)/3);aspect-ratio:4/5}
+@media(min-width:640px){#catRow{gap:16px}#catRow .cat-card{flex-basis:calc((100% - 48px)/4)}}
+@media(min-width:1024px){#catRow .cat-card{flex-basis:calc((100% - 64px)/5)}}
+.hl-ic{width:2rem;height:2rem;flex:none;border-radius:.6rem;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#FFB800;background:rgba(245,158,11,.13)}
+.hl-ic.hl-blue{color:#60a5fa;background:rgba(59,130,246,.15)}.hl-ic.hl-rose{color:#fb7185;background:rgba(244,63,94,.15)}
+.hl-lbl{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:#9ca3af;font-weight:600;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif}
+.hl-num{color:#fff;font-weight:700;font-size:.98rem;letter-spacing:.05em;font-variant-numeric:tabular-nums;line-height:1.25;margin-top:.1rem}
+@media(min-width:640px){.hl-num{font-size:1.08rem}}
+.hl-btn{width:2rem;height:2rem;flex:none;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:.72rem;transition:transform .2s}
+.hl-btn:hover{transform:scale(1.12)}
+.helpline-card:hover{transform:translateY(-3px)!important;box-shadow:0 14px 34px -18px rgba(245,158,11,.45)!important}
+.penw{position:relative;display:inline-block;max-width:100%}
+.pen{display:inline-block;clip-path:inset(-15% 100% -15% -2%);vertical-align:bottom}
+.penc{position:absolute;left:0;bottom:-.1em;font-size:.75em;color:#FFB800;opacity:0;pointer-events:none;transform-origin:left bottom;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.penned.write .pen{animation:penWrite var(--pt,1.5s) cubic-bezier(.45,.05,.3,1) forwards}
+.penned.write .penc{animation:penMove var(--pt,1.5s) cubic-bezier(.45,.05,.3,1) forwards,penWob .28s ease-in-out infinite alternate}
+@keyframes penWrite{to{clip-path:inset(-15% -2% -15% -2%)}}
+@keyframes penMove{0%{left:0;opacity:1}92%{opacity:1}100%{left:100%;opacity:0}}
+@keyframes penWob{from{transform:rotate(-34deg) translateY(0)}to{transform:rotate(-14deg) translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.pen{clip-path:none!important}.penc{display:none}}
 </style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
@@ -225,20 +254,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div id="plWrap"><div class="pl-orbit"></div><div id="plLogo" class="relative" style="width:128px;height:128px;transform:scale(1.25)" data-src="data:image/webp;base64,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"></div></div>
   <div class="pl-name mt-9 font-display text-2xl sm:text-3xl silver-text whitespace-nowrap">BANA <span class="gold-text">FASHION</span></div>
   <div class="pl-line mt-3 h-0.5 bg-gradient-to-r from-transparent via-gold-500 to-transparent rounded"></div>
-  <div class="pl-tag mt-3 text-[9px] sm:text-[10px] text-silver-400 font-bold uppercase">Premium Men's Fashion</div>
+  <div class="pl-tag mt-3 text-[9px] sm:text-[10px] text-silver-400 font-bold uppercase">প্রিমিয়াম মেনস ফ্যাশন</div>
 </div>
 
 <!-- TOP TICKER -->
 <div class="bg-gradient-to-r from-gold-600 via-gold-500 to-gold-600 text-black text-xs font-bold overflow-hidden">
   <div class="marquee py-2 whitespace-nowrap">
-    <span class="mx-8"><i class="fa-solid fa-crown mr-2"></i>BANA FASHION — PREMIUM MEN'S FASHION BRAND</span>
-    <span class="mx-8"><i class="fa-solid fa-truck-fast mr-2"></i>CASH ON DELIVERY ALL OVER BANGLADESH</span>
-    <span class="mx-8"><i class="fa-solid fa-phone mr-2"></i>HELPLINE: 01353-808618</span>
-    <span class="mx-8"><i class="fa-solid fa-gift mr-2"></i>FREE DELIVERY ON ORDERS OVER ৳3000</span>
-    <span class="mx-8"><i class="fa-solid fa-crown mr-2"></i>BANA FASHION — PREMIUM MEN'S FASHION BRAND</span>
-    <span class="mx-8"><i class="fa-solid fa-truck-fast mr-2"></i>CASH ON DELIVERY ALL OVER BANGLADESH</span>
-    <span class="mx-8"><i class="fa-solid fa-phone mr-2"></i>HELPLINE: 01353-808618</span>
-    <span class="mx-8"><i class="fa-solid fa-gift mr-2"></i>FREE DELIVERY ON ORDERS OVER ৳3000</span>
+    <span class="mx-8"><i class="fa-solid fa-crown mr-2"></i>BANA FASHION — প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</span>
+    <span class="mx-8"><i class="fa-solid fa-truck-fast mr-2"></i>সারা বাংলাদেশে ক্যাশ অন ডেলিভারি</span>
+    <span class="mx-8"><i class="fa-solid fa-phone mr-2"></i>হেল্পলাইন: 01353-808618</span>
+    <span class="mx-8"><i class="fa-solid fa-gift mr-2"></i>৩,০০০ টাকার বেশি অর্ডারে ডেলিভারি ফ্রি</span>
+    <span class="mx-8"><i class="fa-solid fa-crown mr-2"></i>BANA FASHION — প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</span>
+    <span class="mx-8"><i class="fa-solid fa-truck-fast mr-2"></i>সারা বাংলাদেশে ক্যাশ অন ডেলিভারি</span>
+    <span class="mx-8"><i class="fa-solid fa-phone mr-2"></i>হেল্পলাইন: 01353-808618</span>
+    <span class="mx-8"><i class="fa-solid fa-gift mr-2"></i>৩,০০০ টাকার বেশি অর্ডারে ডেলিভারি ফ্রি</span>
   </div>
 </div>
 
@@ -254,22 +283,22 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
       </div>
       <div class="flex flex-col">
         <span class="font-display font-extrabold text-xl sm:text-2xl tracking-[.12em] text-white leading-none">BANA <span class="gold-text">FASHION</span></span>
-        <span class="text-[7px] sm:text-[9px] tracking-[.17em] sm:tracking-[.28em] whitespace-nowrap text-silver-400 font-bold uppercase mt-1">Premium Men's Fashion Brand</span>
+        <span class="text-[7px] sm:text-[9px] tracking-[.17em] sm:tracking-[.28em] whitespace-nowrap text-silver-400 font-bold uppercase mt-1">প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</span>
       </div>
     </a>
 
     <nav class="hidden lg:flex items-center gap-7 font-semibold text-sm text-silver-300">
-      <a href="#hero" class="hover:text-gold-400 transition-colors">Home</a>
-      <a href="#shop" onclick="filterCategory('all')" class="hover:text-gold-400 transition-colors">Shop</a>
-      <a href="#shop" onclick="filterCategory('shirts')" class="hover:text-gold-400 transition-colors">Shirts</a>
-      <a href="#shop" onclick="filterCategory('jeans')" class="hover:text-gold-400 transition-colors">Denim</a>
-      <a href="#about" class="hover:text-gold-400 transition-colors">About</a>
-      <a href="#helpline" class="text-gold-400 hover:text-gold-500 font-bold"><i class="fa-solid fa-headset mr-1"></i>Helpline</a>
+      <a href="#hero" class="hover:text-gold-400 transition-colors">হোম</a>
+      <a href="#shop" onclick="filterCategory('all')" class="hover:text-gold-400 transition-colors">শপ</a>
+      <a href="#shop" onclick="filterCategory('shirts')" class="hover:text-gold-400 transition-colors">শার্ট</a>
+      <a href="#shop" onclick="filterCategory('jeans')" class="hover:text-gold-400 transition-colors">ডেনিম</a>
+      <a href="#about" class="hover:text-gold-400 transition-colors">আমাদের কথা</a>
+      <a href="#helpline" class="text-gold-400 hover:text-gold-500 font-bold"><i class="fa-solid fa-headset mr-1"></i>হেল্পলাইন</a>
     </nav>
 
     <div class="flex items-center gap-2 sm:gap-3">
       <div class="relative hidden md:block w-52 xl:w-64">
-        <input id="searchInput" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full bg-white/10 text-white placeholder-silver-400 text-xs rounded-full pl-9 pr-8 py-2.5 border border-transparent transition-all">
+        <input id="searchInput" oninput="handleSearch(this.value)" placeholder="পণ্য খুঁজুন..." class="w-full bg-white/10 text-white placeholder-silver-400 text-xs rounded-full pl-9 pr-8 py-2.5 border border-transparent transition-all">
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-silver-400 text-xs"></i>
       </div>
       
@@ -277,14 +306,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
         <i class="fa-regular fa-heart text-lg"></i>
         <span id="wishlistBadge" class="absolute top-1 right-1 bg-gold-500 text-black font-extrabold text-[10px] w-4 h-4 rounded-full flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
       </button>
-      <button onclick="toggleCartDrawer()" aria-label="Shopping bag" class="relative btn-gold rounded-full shadow-lg shadow-gold-500/30 hover:scale-105 active:scale-95 transition-transform w-12 h-12 flex items-center justify-center mr-1.5">
+      <button onclick="toggleCartDrawer()" aria-label="শপিং ব্যাগ" class="relative btn-gold rounded-full shadow-lg shadow-gold-500/30 hover:scale-105 active:scale-95 transition-transform w-12 h-12 flex items-center justify-center mr-1.5">
         <i class="fa-solid fa-bag-shopping text-lg"></i>
         <span id="cartBadge" class="cart-badge empty absolute -top-2 -right-2 min-w-[22px] h-[22px] px-1 bg-rose-500 text-white font-extrabold text-[12px] leading-none rounded-full flex items-center justify-center ring-2 ring-ink-900 shadow-lg">0</span>
       </button>
     </div>
   </div>
   <div class="px-4 pb-3 md:hidden">
-    <div class="relative"><input id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full bg-white/10 text-white placeholder-silver-400 text-xs rounded-full pl-9 pr-4 py-2.5 border border-transparent"><i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-silver-400 text-xs"></i></div>
+    <div class="relative"><input id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="পণ্য খুঁজুন..." class="w-full bg-white/10 text-white placeholder-silver-400 text-xs rounded-full pl-9 pr-4 py-2.5 border border-transparent"><i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-silver-400 text-xs"></i></div>
   </div>
 </header>
 
@@ -302,11 +331,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
           <span class="brand-letters text-[2.7rem] sm:text-6xl lg:text-8xl text-white" data-w="BANA"></span>
           <span class="brand-letters gold-l text-[2.1rem] sm:text-5xl lg:text-7xl" data-w="FASHION"></span>
         </h1>
-        <div class="a a3 hidden sm:flex items-center justify-center lg:justify-start gap-3"><span class="h-px w-8 bg-gold-500"></span><span class="text-[10px] sm:text-xs text-gold-400 font-bold tracking-[.3em] uppercase">Premium Men's Fashion</span><span class="h-px w-8 bg-gold-500"></span></div>
-        <p class="a a3 hidden sm:block text-silver-300 text-sm sm:text-base max-w-lg mx-auto lg:mx-0 leading-relaxed">Premium men's fashion crafted in Shafipur Bazar, Kaliakoir, Gazipur &mdash; sharp fits, quality fabric and Cash on Delivery all over Bangladesh.</p>
+        <div class="a a3 hidden sm:flex items-center justify-center lg:justify-start gap-3"><span class="h-px w-8 bg-gold-500"></span><span class="text-[10px] sm:text-xs text-gold-400 font-bold tracking-[.3em] uppercase">প্রিমিয়াম মেনস ফ্যাশন</span><span class="h-px w-8 bg-gold-500"></span></div>
+        <p class="a a3 hidden sm:block text-silver-300 text-sm sm:text-base max-w-lg mx-auto lg:mx-0 leading-relaxed">শফিপুর বাজার, কালিয়াকৈর, গাজীপুরে তৈরি প্রিমিয়াম মেনস ফ্যাশন — নিখুঁত ফিটিং, মানসম্মত কাপড় এবং সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।</p>
         <div class="a a4 flex flex-wrap justify-center lg:justify-start gap-3 pt-1">
-          <a href="#shop" onclick="filterCategory('all')" class="btn-gold px-6 py-2.5 sm:py-3.5 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">SHOP NOW <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></a>
-          <a href="#helpline" class="px-6 py-2.5 sm:py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 backdrop-blur-md transition-all"><i class="fa-solid fa-headset mr-2"></i>Helpline</a>
+          <a href="#shop" onclick="filterCategory('all')" class="btn-gold px-6 py-2.5 sm:py-3.5 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">এখনই কিনুন <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></a>
+          <a href="#helpline" class="px-6 py-2.5 sm:py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 backdrop-blur-md transition-all"><i class="fa-solid fa-headset mr-2"></i>হেল্পলাইন</a>
         </div>
       </div>
       <div class="order-1 lg:order-2 flex justify-center a a2">
@@ -325,8 +354,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
     <div class="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10"></div>
     <div class="relative z-10 w-full text-center px-4 pb-9 sm:pb-12">
       <div class="shop-name font-display font-extrabold text-white text-[2.1rem] sm:text-6xl lg:text-7xl tracking-[.08em]"><span class="shatter-letters" data-w="BANA FASHION"></span></div>
-      <div class="a a3 mt-1 text-[10px] sm:text-sm text-gold-400 font-bold tracking-[.35em] uppercase">Premium Men's Fashion</div>
-      <div class="a a4 mt-3"><a href="#shop" onclick="filterCategory('all')" class="btn-gold inline-block px-7 py-2.5 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25">SHOP NOW <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a></div>
+      <div class="a a3 mt-1 text-[10px] sm:text-sm text-gold-400 font-bold tracking-[.35em] uppercase">প্রিমিয়াম মেনস ফ্যাশন</div>
+      <div class="a a4 mt-3"><a href="#shop" onclick="filterCategory('all')" class="btn-gold inline-block px-7 py-2.5 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25">এখনই কিনুন <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a></div>
     </div>
   </div>
   <!-- Banner 2 -->
@@ -335,10 +364,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
     <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-8">
       <div class="max-w-xl space-y-3 sm:space-y-5">
-        <span class="a a1 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 bg-white/10 text-white text-xs font-extrabold tracking-widest uppercase"><i class="fa-solid fa-bolt text-gold-400"></i> Denim Collection 2026</span>
-        <h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">ENGINEERED <br><span class="gold-text">FOR PERFECT FIT</span></h1>
-        <p class="a a3 text-silver-300 text-sm sm:text-base leading-relaxed">Stretch denim, vintage washes and tapered cuts — BANA FASHION denim built to last and made to look sharp.</p>
-        <div class="a a4"><a href="#shop" onclick="filterCategory('jeans')" class="btn-gold inline-block px-6 py-3 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">SHOP DENIM <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></a></div>
+        <span class="a a1 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 bg-white/10 text-white text-xs font-extrabold tracking-widest uppercase"><i class="fa-solid fa-bolt text-gold-400"></i> ডেনিম কালেকশন ২০২৬</span>
+        <h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">নিখুঁত ফিটিংয়ের <br><span class="gold-text">জন্য তৈরি</span></h1>
+        <p class="a a3 text-silver-300 text-sm sm:text-base leading-relaxed">স্ট্রেচ ডেনিম, ভিনটেজ ওয়াশ ও ট্যাপার্ড কাট — টেকসই এবং দেখতে স্মার্ট BANA FASHION ডেনিম।</p>
+        <div class="a a4"><a href="#shop" onclick="filterCategory('jeans')" class="btn-gold inline-block px-6 py-3 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">ডেনিম দেখুন <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></a></div>
       </div>
     </div>
   </div>
@@ -348,10 +377,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
     <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-8">
       <div class="max-w-xl space-y-3 sm:space-y-5">
-        <span class="a a1 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold-500/50 bg-gold-500/10 text-gold-400 text-xs font-extrabold tracking-widest uppercase"><i class="fa-solid fa-gem"></i> Signature Shirts & Tees</span>
-        <h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">DRESS SHARP. <br><span class="gold-text">LIVE BOLD.</span></h1>
-        <p class="a a3 text-silver-300 text-sm sm:text-base leading-relaxed">From formal shirts to heavyweight cotton tees — everyday essentials with a premium finish.</p>
-        <div class="a a4"><a href="#shop" onclick="filterCategory('shirts')" class="btn-gold inline-block px-6 py-3 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">EXPLORE SHIRTS <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></a></div>
+        <span class="a a1 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold-500/50 bg-gold-500/10 text-gold-400 text-xs font-extrabold tracking-widest uppercase"><i class="fa-solid fa-gem"></i> সিগনেচার শার্ট ও টি-শার্ট</span>
+        <h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">স্মার্ট সাজুন। <br><span class="gold-text">সাহসী থাকুন।</span></h1>
+        <p class="a a3 text-silver-300 text-sm sm:text-base leading-relaxed">ফর্মাল শার্ট থেকে হেভিওয়েট কটন টি-শার্ট — প্রিমিয়াম ফিনিশের প্রতিদিনের পোশাক।</p>
+        <div class="a a4"><a href="#shop" onclick="filterCategory('shirts')" class="btn-gold inline-block px-6 py-3 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">শার্ট দেখুন <i class="fa-solid fa-arrow-right ml-2 text-xs"></i></a></div>
       </div>
     </div>
   </div>
@@ -361,12 +390,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
     <div class="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full py-8">
       <div class="max-w-xl space-y-3 sm:space-y-5">
-        <span class="a a1 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 bg-white/10 text-white text-xs font-extrabold tracking-widest uppercase"><i class="fa-solid fa-truck-fast text-gold-400"></i> Delivery All Over Bangladesh</span>
-        <h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">CASH ON <span class="gold-text">DELIVERY</span> <br>& EASY EXCHANGE</h1>
-        <p class="a a3 text-silver-300 text-sm sm:text-base leading-relaxed">Order from home, check your product, then pay. Free delivery on orders over ৳3000.</p>
+        <span class="a a1 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 bg-white/10 text-white text-xs font-extrabold tracking-widest uppercase"><i class="fa-solid fa-truck-fast text-gold-400"></i> সারা বাংলাদেশে ডেলিভারি</span>
+        <h1 class="a a2 font-display font-extrabold text-3xl sm:text-5xl text-white leading-[1.05]">ক্যাশ অন <span class="gold-text">ডেলিভারি</span> <br>ও সহজ এক্সচেঞ্জ</h1>
+        <p class="a a3 text-silver-300 text-sm sm:text-base leading-relaxed">ঘরে বসে অর্ডার করুন, পণ্য দেখে টাকা দিন। ৩,০০০ টাকার বেশি অর্ডারে ডেলিভারি ফ্রি।</p>
         <div class="a a4 flex flex-wrap gap-4">
-          <a href="#shop" onclick="filterCategory('all')" class="btn-gold px-6 py-3 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">ORDER NOW</a>
-          <a href="https://wa.me/8801353808618" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all"><i class="fa-brands fa-whatsapp mr-2 wa-rot"></i>WhatsApp Us</a>
+          <a href="#shop" onclick="filterCategory('all')" class="btn-gold px-6 py-3 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25 hover:scale-105 transition-transform">এখনই অর্ডার করুন</a>
+          <a href="https://wa.me/8801353808618" target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-all"><i class="fa-brands fa-whatsapp mr-2 wa-rot"></i>WhatsApp-এ মেসেজ করুন</a>
         </div>
       </div>
     </div>
@@ -378,54 +407,28 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 </section>
 
 <!-- STATS STRIP -->
-<section class="bg-ink-900 border-y border-white/10">
-  <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-    <div class="reveal"><div class="font-display text-3xl sm:text-4xl gold-text"><span class="counter" data-to="5000">0</span>+</div><div class="text-xs text-silver-400 mt-1 tracking-wider uppercase">Happy Customers</div></div>
-    <div class="reveal"><div class="font-display text-3xl sm:text-4xl gold-text"><span class="counter" data-to="64">0</span></div><div class="text-xs text-silver-400 mt-1 tracking-wider uppercase">Districts Delivered</div></div>
-    <div class="reveal"><div class="font-display text-3xl sm:text-4xl gold-text"><span class="counter" data-to="100">0</span>%</div><div class="text-xs text-silver-400 mt-1 tracking-wider uppercase">Original Quality</div></div>
-    <div class="reveal"><div class="font-display text-3xl sm:text-4xl gold-text">24/7</div><div class="text-xs text-silver-400 mt-1 tracking-wider uppercase">Customer Support</div></div>
+<section class="bg-ink-900 border-y border-white/10 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-gold-500/[.07] to-transparent pointer-events-none"></div>
+  <div class="max-w-5xl mx-auto px-3 sm:px-6 py-3.5 sm:py-5 relative">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+      <div class="statc reveal"><span class="stati"><i class="fa-solid fa-users"></i></span><div class="min-w-0"><div class="statn gold-text"><span class="counter" data-to="5000">০</span>+</div><div class="statl" data-pen>সন্তুষ্ট গ্রাহক</div></div></div>
+      <div class="statc reveal" style="transition-delay:.08s"><span class="stati"><i class="fa-solid fa-map-location-dot"></i></span><div class="min-w-0"><div class="statn gold-text"><span class="counter" data-to="64">০</span></div><div class="statl" data-pen>জেলায় ডেলিভারি</div></div></div>
+      <div class="statc reveal" style="transition-delay:.16s"><span class="stati"><i class="fa-solid fa-shield-halved"></i></span><div class="min-w-0"><div class="statn gold-text"><span class="counter" data-to="100">০</span>%</div><div class="statl" data-pen>অরিজিনাল মান</div></div></div>
+      <div class="statc reveal" style="transition-delay:.24s"><span class="stati"><i class="fa-solid fa-headset"></i></span><div class="min-w-0"><div class="statn gold-text">২৪/৭</div><div class="statl" data-pen>কাস্টমার সাপোর্ট</div></div></div>
+    </div>
   </div>
 </section>
 
 <!-- CATEGORIES -->
-<section id="categories" class="py-12 sm:py-16 bg-ink-900 relative overflow-hidden">
+<section id="categories" class="py-9 sm:py-14 bg-ink-900 relative overflow-hidden">
   <div class="absolute inset-0 grain opacity-40"></div>
   <div class="spot absolute left-1/2 -translate-x-1/2 top-0 w-[30rem] h-40 bg-gold-500/15 blur-3xl rounded-full"></div>
-  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
-    <div class="text-center mb-7 sm:mb-10 reveal">
-      <span class="text-gold-400 font-extrabold text-[10px] sm:text-xs uppercase tracking-[.3em]">BANA FASHION</span>
-      <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-1">Shop By <span class="gold-text">Category</span></h2>
+  <div class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
+    <div class="text-center mb-5 sm:mb-8 reveal">
+      <span data-pen class="block text-gold-400 font-extrabold text-[11px] sm:text-xs">আমাদের কালেকশন</span>
+      <h2 data-pen class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-1">ক্যাটাগরি অনুযায়ী <span class="gold-text">কিনুন</span></h2>
     </div>
-    <div id="catRow" class="grid grid-cols-4 gap-2 sm:gap-6">
-      <div onclick="goShop('shirts')" style="--d:0.0s" class="cat-card group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg">
-        <img src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=600&q=80" alt="Shirts" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left">
-          <span class="hidden sm:block text-gold-400 font-extrabold text-[10px] tracking-wider uppercase">Formal & Casual</span>
-          <h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">Shirts</h3>
-        </div>
-      </div>
-      <div onclick="goShop('tshirts')" style="--d:0.22s" class="cat-card group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg">
-        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80" alt="T-Shirts & Polo" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left">
-          <span class="hidden sm:block text-gold-400 font-extrabold text-[10px] tracking-wider uppercase">Heavy Cotton</span>
-          <h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">T-Shirts & Polo</h3>
-        </div>
-      </div>
-      <div onclick="goShop('jeans')" style="--d:0.44s" class="cat-card group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg">
-        <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=600&q=80" alt="Denim Jeans" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left">
-          <span class="hidden sm:block text-gold-400 font-extrabold text-[10px] tracking-wider uppercase">Top Selling</span>
-          <h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">Denim Jeans</h3>
-        </div>
-      </div>
-      <div onclick="goShop('jackets')" style="--d:0.66s" class="cat-card group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg">
-        <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80" alt="Jackets & Hoodies" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left">
-          <span class="hidden sm:block text-gold-400 font-extrabold text-[10px] tracking-wider uppercase">Winter Essential</span>
-          <h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">Jackets & Hoodies</h3>
-        </div>
-      </div>
-    </div>
+    <div id="catRow"></div>
   </div>
 </section>
 
@@ -434,7 +437,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <i class="fa-solid fa-moon absolute -top-4 right-8 text-[90px] text-gold-400/20"></i>
   <i class="fa-solid fa-star absolute top-10 left-[12%] text-gold-400 text-xs" style="animation:twinkle 2.4s infinite"></i><i class="fa-solid fa-star absolute top-24 left-[40%] text-gold-400 text-[9px]" style="animation:twinkle 3s .6s infinite"></i><i class="fa-solid fa-star absolute top-16 right-[22%] text-gold-400 text-sm" style="animation:twinkle 2.8s 1.1s infinite"></i>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-    <div class="text-center mb-8 reveal"><span class="text-gold-400 font-extrabold text-xs uppercase tracking-[.3em]"><i class="fa-solid fa-moon mr-1"></i> Special Collection</span><h2 id="eidTitle" class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-1">Eid Collection</h2><p id="eidSub" class="text-emerald-100/70 text-sm mt-2"></p></div>
+    <div class="text-center mb-8 reveal"><span class="text-gold-400 font-extrabold text-xs uppercase tracking-[.3em]"><i class="fa-solid fa-moon mr-1"></i> বিশেষ কালেকশন</span><h2 id="eidTitle" class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-1">ঈদ কালেকশন</h2><p id="eidSub" class="text-emerald-100/70 text-sm mt-2"></p></div>
     <div id="eidGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
   </div>
 </section>
@@ -442,21 +445,21 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 <section id="shop" class="py-16 bg-silver-100">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-8 reveal">
-      <span class="text-gold-600 font-extrabold text-xs uppercase tracking-widest">Our Collection</span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-ink-900 mt-1">Featured Products</h2>
-      <p class="text-slate-500 text-sm mt-2">Click any product to see details, choose size and place your Cash on Delivery order.</p>
+      <span class="text-gold-600 font-extrabold text-xs uppercase tracking-widest">আমাদের কালেকশন</span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-ink-900 mt-1">নির্বাচিত পণ্য</h2>
+      <p class="text-slate-500 text-sm mt-2">যেকোনো পণ্যে ক্লিক করে বিস্তারিত দেখুন, সাইজ বেছে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
     </div>
     <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
       <div id="filterTabs" class="flex items-center justify-center gap-2 flex-wrap"></div>
       <select id="sortSelect" onchange="setSort(this.value)" class="bg-white border border-slate-200 rounded-full text-xs font-bold px-4 py-2.5">
-        <option value="default">Sort: Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="rating">Top Rated</option>
+        <option value="default">সাজান: ফিচার্ড</option><option value="low">দাম: কম থেকে বেশি</option><option value="high">দাম: বেশি থেকে কম</option><option value="rating">সর্বোচ্চ রেটিং</option>
       </select>
     </div>
     <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
     <div id="emptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-slate-200 p-8">
       <div class="w-16 h-16 rounded-full bg-gold-500/10 text-gold-600 flex items-center justify-center mx-auto text-2xl mb-4"><i class="fa-solid fa-magnifying-glass"></i></div>
-      <h3 class="font-bold text-lg">No products found</h3>
-      <button onclick="resetFilters()" class="mt-4 px-6 py-2.5 rounded-xl btn-gold font-extrabold text-xs">Reset Filters</button>
+      <h3 class="font-bold text-lg">কোনো পণ্য পাওয়া যায়নি</h3>
+      <button onclick="resetFilters()" class="mt-4 px-6 py-2.5 rounded-xl btn-gold font-extrabold text-xs">ফিল্টার রিসেট করুন</button>
     </div>
   </div>
 </section>
@@ -466,14 +469,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div class="absolute -right-24 -bottom-24 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl"></div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div class="space-y-5 reveal max-w-3xl">
-      <span class="text-gold-400 font-extrabold text-xs uppercase tracking-widest">Our Story</span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-5xl leading-tight">Built In Gazipur. <br><span class="gold-text">Worn With Pride.</span></h2>
-      <p class="text-silver-300 text-sm leading-relaxed">BANA FASHION is a premium men's fashion brand founded by <b class="text-white">Mr. Rahad</b> in Shafipur Bazar, Kaliakoir, Gazipur. We combine quality fabrics, careful stitching and modern design so every man can dress with confidence — at a fair price.</p>
+      <span class="text-gold-400 font-extrabold text-xs uppercase tracking-widest">আমাদের গল্প</span>
+      <h2 class="font-display font-extrabold text-3xl sm:text-5xl leading-tight">গাজীপুরে তৈরি। <br><span class="gold-text">গর্ব নিয়ে পরা।</span></h2>
+      <p class="text-silver-300 text-sm leading-relaxed">BANA FASHION একটি প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড, প্রতিষ্ঠাতা <b class="text-white">জনাব রাহাদ</b> । শফিপুর বাজার, কালিয়াকৈর, গাজীপুরে আমরা মানসম্মত কাপড়, যত্নের সেলাই আর আধুনিক ডিজাইন একসাথে এনেছি — যাতে প্রতিটি পুরুষ আত্মবিশ্বাসের সাথে, ন্যায্য দামে নিজেকে সাজাতে পারেন।</p>
       <div class="grid sm:grid-cols-2 gap-3 pt-2 text-sm text-silver-300">
-        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> Premium quality fabric</div>
-        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> Perfect modern fit</div>
-        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> Cash on Delivery</div>
-        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> Easy size exchange</div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> প্রিমিয়াম মানের কাপড়</div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> নিখুঁত আধুনিক ফিটিং</div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> ক্যাশ অন ডেলিভারি</div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> সহজ সাইজ এক্সচেঞ্জ</div>
       </div>
     </div>
   </div>
@@ -482,54 +485,43 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 <!-- TRUST -->
 <section class="py-12 bg-white border-b border-slate-200">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-truck-fast"></i></div><div><h4 class="font-extrabold text-sm">Fast Delivery</h4><p class="text-[11px] text-slate-500">Free over ৳3000</p></div></div>
-    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-rotate-left"></i></div><div><h4 class="font-extrabold text-sm">Easy Exchange</h4><p class="text-[11px] text-slate-500">7-day size exchange</p></div></div>
-    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-shield-halved"></i></div><div><h4 class="font-extrabold text-sm">100% Original</h4><p class="text-[11px] text-slate-500">Direct from BANA FASHION</p></div></div>
-    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-wallet"></i></div><div><h4 class="font-extrabold text-sm">Cash On Delivery</h4><p class="text-[11px] text-slate-500">Pay when you receive</p></div></div>
+    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-truck-fast"></i></div><div><h4 class="font-extrabold text-sm">দ্রুত ডেলিভারি</h4><p class="text-[11px] text-slate-500">৩,০০০ টাকার বেশি অর্ডারে ফ্রি</p></div></div>
+    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-rotate-left"></i></div><div><h4 class="font-extrabold text-sm">সহজ এক্সচেঞ্জ</h4><p class="text-[11px] text-slate-500">৭ দিনের মধ্যে সাইজ বদল</p></div></div>
+    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-shield-halved"></i></div><div><h4 class="font-extrabold text-sm">১০০% অরিজিনাল</h4><p class="text-[11px] text-slate-500">সরাসরি BANA FASHION থেকে</p></div></div>
+    <div class="reveal flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/70"><div class="w-12 h-12 rounded-xl bg-gold-500/15 text-gold-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-wallet"></i></div><div><h4 class="font-extrabold text-sm">ক্যাশ অন ডেলিভারি</h4><p class="text-[11px] text-slate-500">পণ্য হাতে পেয়ে টাকা দিন</p></div></div>
   </div>
 </section>
 
 <!-- HELPLINE (premium) -->
-<section id="helpline" class="py-20 bg-black relative overflow-hidden">
+<section id="helpline" class="py-12 sm:py-16 bg-black relative overflow-hidden">
   <div class="absolute inset-0 grain opacity-50"></div>
-  <div class="absolute -left-32 top-0 w-[28rem] h-[28rem] bg-gold-500/10 rounded-full blur-3xl"></div>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <div class="text-center max-w-2xl mx-auto mb-8 reveal">
-      <div class="inline-flex w-12 h-12 rounded-full btn-gold items-center justify-center text-lg pulse-ring mb-3"><i class="fa-solid fa-headset"></i></div>
-      <span class="block text-gold-400 font-extrabold text-xs uppercase tracking-[.3em]">Customer Helpline</span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-white mt-2">We're Here To <span class="gold-text">Help You</span></h2>
-      <p class="text-silver-400 text-sm mt-3">Questions about size, order or delivery? Call or message us directly — our team replies fast.</p>
+  <div class="absolute -left-32 top-0 w-[24rem] h-[24rem] bg-gold-500/10 rounded-full blur-3xl"></div>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
+    <div class="text-center mb-6 sm:mb-8 reveal">
+      <div class="inline-flex w-10 h-10 rounded-full btn-gold items-center justify-center text-sm mb-2"><i class="fa-solid fa-headset"></i></div>
+      <span data-pen class="block text-gold-400 font-extrabold text-[11px] sm:text-xs">কাস্টমার হেল্পলাইন</span>
+      <h2 data-pen class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-1.5">আমরা আছি <span class="gold-text">আপনার পাশে</span></h2>
+      <p class="text-silver-400 text-xs sm:text-sm mt-2 max-w-md mx-auto leading-relaxed">সাইজ, অর্ডার বা ডেলিভারি নিয়ে প্রশ্ন? সরাসরি কল বা মেসেজ করুন — আমরা দ্রুত উত্তর দিই।</p>
     </div>
-
-    <div class="grid sm:grid-cols-2 gap-3 max-w-5xl mx-auto">
-      <div class="helpline-card reveal rounded-2xl p-4 transition-all duration-300 flex items-center gap-3">
-        <div class="w-10 h-10 shrink-0 rounded-xl bg-gold-500/15 text-gold-400 flex items-center justify-center"><i class="fa-solid fa-phone-volume"></i></div>
-        <div class="min-w-0 flex-1"><div class="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-silver-400 font-bold">Helpline / Order<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span></div><div class="text-white text-sm font-semibold mt-0.5 tracking-wide">01353-808618</div></div>
-        <a href="tel:+8801353808618" aria-label="Call" class="w-9 h-9 shrink-0 rounded-full btn-gold flex items-center justify-center text-xs"><i class="fa-solid fa-phone"></i></a>
-        <a href="https://wa.me/8801353808618" target="_blank" rel="noopener" aria-label="WhatsApp" class="w-9 h-9 shrink-0 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center"><i class="fa-brands fa-whatsapp text-base wa-rot"></i></a>
+    <div class="grid sm:grid-cols-2 gap-2.5">
+      <div class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3">
+        <span class="hl-ic"><i class="fa-solid fa-phone-volume"></i></span>
+        <div class="min-w-0 flex-1"><div class="hl-lbl">হেল্পলাইন / অর্ডার<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span></div><div class="hl-num">01353-808618</div></div>
+        <a href="tel:+8801353808618" aria-label="কল করুন" title="কল করুন" class="hl-btn btn-gold"><i class="fa-solid fa-phone"></i></a>
+        <a href="https://wa.me/8801353808618" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp" class="hl-btn bg-emerald-500 hover:bg-emerald-600 text-white"><i class="fa-brands fa-whatsapp text-sm"></i></a>
       </div>
-      <div class="helpline-card reveal rounded-2xl p-4 transition-all duration-300 flex items-center gap-3">
-        <div class="w-10 h-10 shrink-0 rounded-xl bg-gold-500/15 text-gold-400 flex items-center justify-center"><i class="fa-solid fa-phone-volume"></i></div>
-        <div class="min-w-0 flex-1"><div class="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-silver-400 font-bold">Support<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span></div><div class="text-white text-sm font-semibold mt-0.5 tracking-wide">01357-317938</div></div>
-        <a href="tel:+8801357317938" aria-label="Call" class="w-9 h-9 shrink-0 rounded-full btn-gold flex items-center justify-center text-xs"><i class="fa-solid fa-phone"></i></a>
-        <a href="https://wa.me/8801357317938" target="_blank" rel="noopener" aria-label="WhatsApp" class="w-9 h-9 shrink-0 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center"><i class="fa-brands fa-whatsapp text-base wa-rot"></i></a>
+      <div class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3">
+        <span class="hl-ic"><i class="fa-solid fa-phone-volume"></i></span>
+        <div class="min-w-0 flex-1"><div class="hl-lbl">সাপোর্ট<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span></div><div class="hl-num">01357-317938</div></div>
+        <a href="tel:+8801357317938" aria-label="কল করুন" title="কল করুন" class="hl-btn btn-gold"><i class="fa-solid fa-phone"></i></a>
+        <a href="https://wa.me/8801357317938" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp" class="hl-btn bg-emerald-500 hover:bg-emerald-600 text-white"><i class="fa-brands fa-whatsapp text-sm"></i></a>
       </div>
     </div>
-
-    <div class="grid sm:grid-cols-3 gap-3 mt-3 max-w-5xl mx-auto">
-<a href="mailto:banafashiongazipur@gmail.com" class="helpline-card reveal rounded-2xl p-5 transition-all duration-300 flex items-start gap-3">
-        <div class="w-10 h-10 shrink-0 rounded-xl bg-gold-500/15 text-gold-400 flex items-center justify-center"><i class="fa-solid fa-envelope"></i></div>
-        <div class="min-w-0"><div class="text-[10px] uppercase tracking-widest text-silver-400 font-bold">Email</div><div class="text-white text-xs font-semibold break-all mt-1">banafashiongazipur@gmail.com</div><div class="text-silver-400 text-xs mt-0.5">Write to us anytime</div></div>
-      </a>
-      <a href="https://www.facebook.com/share/19Sx2Fw56P/" target="_blank" rel="noopener" class="helpline-card reveal rounded-2xl p-5 transition-all duration-300 flex items-start gap-3">
-        <div class="w-10 h-10 shrink-0 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center"><i class="fa-brands fa-facebook-f"></i></div>
-        <div><div class="text-[10px] uppercase tracking-widest text-silver-400 font-bold">Facebook</div><div class="text-white text-xs font-semibold mt-1">facebook.com/BanaFashionBD</div><div class="text-silver-400 text-xs mt-0.5">Message us anytime</div></div>
-      </a>
-      <a href="https://www.google.com/maps/search/?api=1&query=Shafipur+Bazar+Kaliakoir+Gazipur+Bangladesh" target="_blank" rel="noopener" class="helpline-card reveal rounded-2xl p-5 transition-all duration-300 flex items-start gap-3">
-        <div class="w-10 h-10 shrink-0 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center"><i class="fa-solid fa-location-dot"></i></div>
-        <div><div class="text-[10px] uppercase tracking-widest text-silver-400 font-bold">Visit Us</div><div class="text-white text-xs font-semibold mt-1">Shafipur Bazar, Kaliakoir</div><div class="text-silver-400 text-xs mt-0.5">Gazipur, Bangladesh</div></div>
-      </a>
-          </div>
+    <div class="grid sm:grid-cols-3 gap-2.5 mt-2.5">
+      <a href="mailto:banafashiongazipur@gmail.com" class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3"><span class="hl-ic "><i class="fa-solid fa-envelope"></i></span><div class="min-w-0"><div class="hl-lbl">ইমেইল</div><div class="text-white text-[12px] font-semibold truncate">banafashiongazipur@gmail.com</div></div></a>
+      <a href="https://www.facebook.com/share/19Sx2Fw56P/" target="_blank" rel="noopener" class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3"><span class="hl-ic hl-blue"><i class="fa-brands fa-facebook-f"></i></span><div class="min-w-0"><div class="hl-lbl">ফেসবুক</div><div class="text-white text-[12px] font-semibold truncate">facebook.com/BanaFashionBD</div></div></a>
+      <a href="https://www.google.com/maps/search/?api=1&query=Shafipur+Bazar+Kaliakoir+Gazipur+Bangladesh" target="_blank" rel="noopener" class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3"><span class="hl-ic hl-rose"><i class="fa-solid fa-location-dot"></i></span><div class="min-w-0"><div class="hl-lbl">ঠিকানা</div><div class="text-white text-[12px] font-semibold truncate">শফিপুর বাজার, কালিয়াকৈর, গাজীপুর</div></div></a>
+    </div>
   </div>
 </section>
 
@@ -540,9 +532,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
       <div class="space-y-4 lg:col-span-1">
         <a href="#hero" class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-full bg-black border border-white/25 flex items-center justify-center overflow-hidden"><img src="data:image/jpeg;base64,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" class="w-full h-full object-cover" alt=""><svg style="display:none" class="w-8 h-8"><use href="#bfMark"/></svg></div>
-          <div><div class="font-display font-extrabold text-xl text-white tracking-[.12em]">BANA FASHION</div><div class="text-[9px] tracking-[.25em] uppercase text-silver-400">Premium Men's Fashion Brand</div></div>
+          <div><div class="font-display font-extrabold text-xl text-white tracking-[.12em]">BANA FASHION</div><div class="text-[9px] tracking-[.25em] uppercase text-silver-400">প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</div></div>
         </a>
-        <p class="text-xs leading-relaxed">Premium menswear from Shafipur Bazar, Kaliakoir, Gazipur. Founded by Mr. Rahad.</p>
+        <p class="text-xs leading-relaxed">শফিপুর বাজার, কালিয়াকৈর, গাজীপুর থেকে প্রিমিয়াম মেনসওয়্যার। প্রতিষ্ঠাতা: জনাব রাহাদ।</p>
         <div class="flex gap-3">
           <a href="https://www.facebook.com/share/19Sx2Fw56P/" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-gold-500 hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-facebook-f text-xs"></i></a>
           <a href="https://wa.me/8801353808618" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-gold-500 hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-whatsapp text-xs"></i></a>
@@ -550,17 +542,17 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
         </div>
       </div>
       <div>
-        <h4 class="text-white font-extrabold text-sm mb-4 uppercase tracking-wider">Collections</h4>
+        <h4 class="text-white font-extrabold text-sm mb-4 uppercase tracking-wider">কালেকশন</h4>
         <ul class="space-y-2.5 text-xs font-semibold">
-          <li><a href="#shop" onclick="filterCategory('shirts')" class="hover:text-gold-400">Shirts</a></li>
-          <li><a href="#shop" onclick="filterCategory('tshirts')" class="hover:text-gold-400">T-Shirts & Polo</a></li>
-          <li><a href="#shop" onclick="filterCategory('jeans')" class="hover:text-gold-400">Denim Jeans</a></li>
-          <li><a href="#shop" onclick="filterCategory('pants')" class="hover:text-gold-400">Pants</a></li>
-          <li><a href="#shop" onclick="filterCategory('jackets')" class="hover:text-gold-400">Jackets & Hoodies</a></li>
+          <li><a href="#shop" onclick="filterCategory('shirts')" class="hover:text-gold-400">শার্ট</a></li>
+          <li><a href="#shop" onclick="filterCategory('tshirts')" class="hover:text-gold-400">টি-শার্ট ও পোলো</a></li>
+          <li><a href="#shop" onclick="filterCategory('jeans')" class="hover:text-gold-400">ডেনিম জিন্স</a></li>
+          <li><a href="#shop" onclick="filterCategory('pants')" class="hover:text-gold-400">প্যান্ট</a></li>
+          <li><a href="#shop" onclick="filterCategory('jackets')" class="hover:text-gold-400">জ্যাকেট ও হুডি</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="text-white font-extrabold text-sm mb-4 uppercase tracking-wider">Contact</h4>
+        <h4 class="text-white font-extrabold text-sm mb-4 uppercase tracking-wider">যোগাযোগ</h4>
         <ul class="space-y-2.5 text-xs font-semibold">
           <li><a href="tel:+8801353808618" class="hover:text-gold-400">01353-808618</a></li>
           <li><a href="tel:+8801357317938" class="hover:text-gold-400">01357-317938</a></li>
@@ -568,15 +560,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
         </ul>
       </div>
       <div>
-        <h4 class="text-white font-extrabold text-sm mb-4 uppercase tracking-wider">Address</h4>
-        <p class="text-xs leading-relaxed">Shafipur Bazar, Kaliakoir,<br>Gazipur, Bangladesh</p>
-        <h4 class="text-white font-extrabold text-sm mt-5 mb-2 uppercase tracking-wider">Payment</h4>
-        <span class="inline-flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg bg-white/5 border border-white/10"><i class="fa-solid fa-money-bill-wave text-gold-400"></i> Cash on Delivery</span>
+        <h4 class="text-white font-extrabold text-sm mb-4 uppercase tracking-wider">ঠিকানা</h4>
+        <p class="text-xs leading-relaxed">শফিপুর বাজার, কালিয়াকৈর,<br>গাজীপুর, বাংলাদেশ</p>
+        <h4 class="text-white font-extrabold text-sm mt-5 mb-2 uppercase tracking-wider">পেমেন্ট</h4>
+        <span class="inline-flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg bg-white/5 border border-white/10"><i class="fa-solid fa-money-bill-wave text-gold-400"></i> ক্যাশ অন ডেলিভারি</span>
       </div>
     </div>
     <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs gap-2">
-      <p>&copy; 2026 BANA FASHION. All Rights Reserved.</p>
-      <p>Founder & CEO: Mr. Rahad</p>
+      <p>© ২০২৬ BANA FASHION। সর্বস্বত্ব সংরক্ষিত।</p>
+      <p>প্রতিষ্ঠাতা ও সিইও: জনাব রাহাদ</p>
     </div>
   </div>
 </footer>
@@ -584,10 +576,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 <!-- FLOATING BUTTONS -->
 <div id="helpFab" class="fixed bottom-5 right-4 z-30 flex flex-col items-end gap-3">
   <div id="helpMenu" class="help-menu closed w-60 rounded-2xl bg-ink-900 border border-white/10 shadow-2xl p-3 space-y-2">
-    <div class="flex items-center gap-2 px-1 pb-1 text-[11px] font-extrabold tracking-widest uppercase text-gold-400"><i class="fa-solid fa-headset"></i> Helpline</div>
+    <div class="flex items-center gap-2 px-1 pb-1 text-[11px] font-extrabold tracking-widest uppercase text-gold-400"><i class="fa-solid fa-headset"></i> হেল্পলাইন</div>
     <a id="fabWa" href="https://wa.me/8801353808618" target="_blank" rel="noopener" class="flex items-center gap-3 p-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-extrabold transition-colors"><i class="fa-brands fa-whatsapp text-xl wa-rot"></i><span>WhatsApp<small class="block text-[10px] font-semibold opacity-80">01353-808618</small></span></a>
-    <a id="fabTel" href="tel:+8801353808618" class="flex items-center gap-3 p-3 rounded-xl btn-gold text-sm font-extrabold"><i class="fa-solid fa-phone-volume text-lg"></i><span>Call Now<small class="block text-[10px] font-semibold opacity-70">01353-808618</small></span></a>
-    <a href="tel:+8801357317938" class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-extrabold transition-colors"><i class="fa-solid fa-phone text-lg text-gold-400"></i><span>Support<small class="block text-[10px] font-semibold opacity-70">01357-317938</small></span></a>
+    <a id="fabTel" href="tel:+8801353808618" class="flex items-center gap-3 p-3 rounded-xl btn-gold text-sm font-extrabold"><i class="fa-solid fa-phone-volume text-lg"></i><span>এখনই কল করুন<small class="block text-[10px] font-semibold opacity-70">01353-808618</small></span></a>
+    <a href="tel:+8801357317938" class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-extrabold transition-colors"><i class="fa-solid fa-phone text-lg text-gold-400"></i><span>সাপোর্ট<small class="block text-[10px] font-semibold opacity-70">01357-317938</small></span></a>
   </div>
   <button onclick="toggleHelp()" aria-label="Helpline" class="w-14 h-14 rounded-full bg-emerald-500 text-white text-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform pulse-ring"><i id="helpIcon" class="fa-brands fa-whatsapp wa-rot"></i></button>
 </div>
@@ -599,7 +591,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div id="cartOverlay" onclick="toggleCartDrawer()" class="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 modal-bg"></div>
   <div id="cartContent" class="drawer absolute right-0 top-0 bottom-0 w-full max-w-md bg-ink-900 text-white shadow-2xl flex flex-col translate-x-full border-l border-white/10">
     <div class="p-5 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-ink-800 to-ink-900">
-      <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl btn-gold flex items-center justify-center"><i class="fa-solid fa-bag-shopping"></i></div><div><h3 class="font-display font-extrabold text-lg leading-tight">Shopping Bag</h3><p id="cartCount" class="text-[11px] text-silver-400">0 items</p></div></div>
+      <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl btn-gold flex items-center justify-center"><i class="fa-solid fa-bag-shopping"></i></div><div><h3 class="font-display font-extrabold text-lg leading-tight">শপিং ব্যাগ</h3><p id="cartCount" class="text-[11px] text-silver-400">০ টি পণ্য</p></div></div>
       <button onclick="toggleCartDrawer()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-gold-500 hover:text-black transition-colors"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="px-5 py-3 bg-gold-500/10 border-b border-white/10">
@@ -609,13 +601,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
     <div id="cartList" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
     <div id="emptyCart" class="hidden flex-1 flex-col items-center justify-center p-6 text-center">
       <div class="w-20 h-20 rounded-full bg-gold-500/10 text-gold-400 flex items-center justify-center text-3xl mb-4 float"><i class="fa-solid fa-basket-shopping"></i></div>
-      <h4 class="font-display font-bold text-lg">Your bag is empty</h4><p class="text-xs text-silver-400 mt-1">Pick something you love from our collection.</p>
-      <button onclick="toggleCartDrawer();goShop('all')" class="mt-5 px-6 py-3 rounded-xl btn-gold font-extrabold text-xs">START SHOPPING</button>
+      <h4 class="font-display font-bold text-lg">আপনার ব্যাগ খালি</h4><p class="text-xs text-silver-400 mt-1">আমাদের কালেকশন থেকে পছন্দের পণ্য বেছে নিন।</p>
+      <button onclick="toggleCartDrawer();goShop('all')" class="mt-5 px-6 py-3 rounded-xl btn-gold font-extrabold text-xs">কেনাকাটা শুরু করুন</button>
     </div>
     <div class="p-5 border-t border-white/10 bg-ink-800 space-y-3">
-      <div class="flex justify-between items-center"><span class="text-sm text-silver-300 font-semibold">Subtotal</span><span id="cartSubtotal" class="font-display text-xl text-gold-400">৳0</span></div>
-      <p class="text-[11px] text-silver-400"><i class="fa-solid fa-truck-fast mr-1 text-gold-500"></i>Delivery charge is calculated at checkout · Cash on Delivery</p>
-      <button onclick="startCheckout()" class="w-full py-4 rounded-xl btn-gold font-extrabold text-sm tracking-wider shadow-xl shadow-gold-500/20">PROCEED TO CHECKOUT <i class="fa-solid fa-arrow-right text-xs ml-1"></i></button>
+      <div class="flex justify-between items-center"><span class="text-sm text-silver-300 font-semibold">সাবটোটাল</span><span id="cartSubtotal" class="font-display text-xl text-gold-400">৳0</span></div>
+      <p class="text-[11px] text-silver-400"><i class="fa-solid fa-truck-fast mr-1 text-gold-500"></i>ডেলিভারি চার্জ চেকআউটে যোগ হবে · ক্যাশ অন ডেলিভারি</p>
+      <button onclick="startCheckout()" class="w-full py-4 rounded-xl btn-gold font-extrabold text-sm tracking-wider shadow-xl shadow-gold-500/20">চেকআউটে যান <i class="fa-solid fa-arrow-right text-xs ml-1"></i></button>
     </div>
   </div>
 </div>
@@ -623,15 +615,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 <!-- MINI CART (pops under the bag icon when an item is added) -->
 <div id="miniCart" class="mini-out fixed top-[84px] right-3 sm:right-6 z-[45] w-[calc(100%-1.5rem)] max-w-xs rounded-2xl bg-ink-900 text-white border border-gold-500/40 shadow-[0_20px_60px_-10px_rgba(245,158,11,.35)] overflow-hidden">
   <div class="absolute -top-2 right-5 sm:right-6 w-4 h-4 rotate-45 bg-ink-900 border-l border-t border-gold-500/40"></div>
-  <div class="flex items-center gap-2 px-4 pt-4 text-[11px] font-extrabold tracking-widest uppercase text-emerald-400"><i class="fa-solid fa-circle-check"></i> Added to bag</div>
+  <div class="flex items-center gap-2 px-4 pt-4 text-[11px] font-extrabold tracking-widest uppercase text-emerald-400"><i class="fa-solid fa-circle-check"></i> ব্যাগে যোগ হয়েছে</div>
   <div class="flex items-center gap-3 p-4">
     <img id="miniImg" src="" alt="" class="w-16 h-16 rounded-xl object-cover bg-ink-800 border border-white/10" onerror="this.style.opacity=0">
     <div class="min-w-0 flex-1"><h4 id="miniTitle" class="font-extrabold text-sm truncate"></h4><div id="miniMeta" class="text-[11px] text-silver-400 mt-0.5"></div><div id="miniPrice" class="font-display text-gold-400 text-base mt-1"></div></div>
   </div>
   <div class="px-4 pb-3"><div class="flex justify-between text-[11px] text-silver-400"><span id="miniCount"></span><span id="miniSub" class="font-bold text-white"></span></div></div>
   <div class="grid grid-cols-2 gap-2 p-4 pt-0">
-    <button onclick="hideMini();toggleCartDrawer()" class="py-3 rounded-xl border border-white/20 hover:bg-white/10 text-xs font-extrabold transition-colors">View Bag</button>
-    <button onclick="hideMini();startCheckout()" class="py-3 rounded-xl btn-gold text-xs font-extrabold">Checkout</button>
+    <button onclick="hideMini();toggleCartDrawer()" class="py-3 rounded-xl border border-white/20 hover:bg-white/10 text-xs font-extrabold transition-colors">ব্যাগ দেখুন</button>
+    <button onclick="hideMini();startCheckout()" class="py-3 rounded-xl btn-gold text-xs font-extrabold">চেকআউট</button>
   </div>
   <div class="h-1 bg-white/10"><div id="miniBar" class="h-full bg-gold-500" style="width:0"></div></div>
 </div>
@@ -641,7 +633,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div onclick="toggleWishlistModal()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
   <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
     <div class="pointer-events-auto w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-200"><h3 class="font-display font-extrabold text-xl"><i class="fa-solid fa-heart text-gold-600 mr-2"></i>Wishlist</h3><button onclick="toggleWishlistModal()"><i class="fa-solid fa-xmark text-lg text-slate-400"></i></button></div>
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200"><h3 class="font-display font-extrabold text-xl"><i class="fa-solid fa-heart text-gold-600 mr-2"></i>উইশলিস্ট</h3><button onclick="toggleWishlistModal()"><i class="fa-solid fa-xmark text-lg text-slate-400"></i></button></div>
       <div id="wishlistContent" class="py-4 max-h-[60vh] overflow-y-auto space-y-3"></div>
     </div>
   </div>
@@ -653,45 +645,45 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div class="relative min-h-screen">
     <div class="w-full max-w-5xl mx-auto bg-white min-h-screen shadow-xl">
       <div class="bg-ink-900 text-white p-5 flex items-center justify-between sticky top-0 z-10">
-        <div><h3 class="font-display font-extrabold text-xl">Confirm Your Order</h3><p class="text-[11px] text-silver-400">Choose your payment method & confirm</p></div>
+        <div><h3 class="font-display font-extrabold text-xl">অর্ডার কনফার্ম করুন</h3><p class="text-[11px] text-silver-400">পেমেন্ট মেথড বেছে কনফার্ম করুন</p></div>
         <button onclick="closeCheckout()"><i class="fa-solid fa-xmark text-lg text-silver-300"></i></button>
       </div>
       <form id="checkoutForm" onsubmit="placeOrder(event)" class="grid md:grid-cols-5 gap-0">
         <div class="md:col-span-3 p-6 space-y-4">
-          <div><label class="text-xs font-bold">Full Name *</label><input id="coName" required class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Your name"></div>
-          <div><label class="text-xs font-bold">Mobile Number *</label><input id="coPhone" required inputmode="tel" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="01XXXXXXXXX"></div>
+          <div><label class="text-xs font-bold">পূর্ণ নাম *</label><input id="coName" required class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="আপনার নাম"></div>
+          <div><label class="text-xs font-bold">মোবাইল নম্বর *</label><input id="coPhone" required inputmode="tel" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="01XXXXXXXXX"></div>
           <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-4">
-            <div class="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-ink-900"><span class="w-7 h-7 rounded-lg btn-gold flex items-center justify-center text-[11px]"><i class="fa-solid fa-location-dot"></i></span>Delivery Location</div>
+            <div class="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-ink-900"><span class="w-7 h-7 rounded-lg btn-gold flex items-center justify-center text-[11px]"><i class="fa-solid fa-location-dot"></i></span>ডেলিভারির ঠিকানা</div>
             <div class="grid sm:grid-cols-2 gap-4">
-              <div><label class="text-xs font-bold">District (জেলা) *</label><select id="coDist" required onchange="onDist()" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">Select district</option></select></div>
-              <div><label class="text-xs font-bold">Division (বিভাগ)</label><div id="coDivTxt" class="mt-1 w-full px-4 py-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-400 flex items-center gap-2"><i class="fa-solid fa-map text-xs"></i><span>Auto-selected from district</span></div><input type="hidden" id="coDiv"></div>
+              <div><label class="text-xs font-bold">জেলা *</label><select id="coDist" required onchange="onDist()" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">জেলা বাছাই করুন</option></select></div>
+              <div><label class="text-xs font-bold">বিভাগ</label><div id="coDivTxt" class="mt-1 w-full px-4 py-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-400 flex items-center gap-2"><i class="fa-solid fa-map text-xs"></i><span>জেলা বাছলে নিজে থেকে আসবে</span></div><input type="hidden" id="coDiv"></div>
             </div>
-            <div id="coUpBox" class="hidden"><label class="text-xs font-bold">Upazila / Thana (উপজেলা / থানা) *</label><select id="coUp" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">Select upazila / thana</option></select></div>
+            <div id="coUpBox" class="hidden"><label class="text-xs font-bold">উপজেলা / থানা *</label><select id="coUp" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">উপজেলা / থানা বাছাই করুন</option></select></div>
             <div id="coDelTag" class="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-xs flex items-center gap-3"></div>
           </div>
           <input type="hidden" id="coArea" value="dhaka">
-          <div><label class="text-xs font-bold">Full Address *</label><textarea id="coAddress" required rows="3" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="House no, road, village / area"></textarea></div>
+          <div><label class="text-xs font-bold">পূর্ণ ঠিকানা *</label><textarea id="coAddress" required rows="3" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="বাড়ি নং, রোড, গ্রাম / এলাকা"></textarea></div>
           <div class="rounded-2xl p-4 bg-gradient-to-br from-ink-900 to-ink-800 text-white border border-gold-500/30 flex items-center gap-3 shadow-lg">
             <div class="w-12 h-12 rounded-xl btn-gold flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-location-crosshairs"></i></div>
-            <div class="flex-1 min-w-0"><div class="font-extrabold text-sm">Use my current location</div><div id="geoMsg" class="text-[11px] text-silver-400 leading-snug">Auto-fill your district, area &amp; address using GPS</div></div>
-            <button type="button" id="geoBtn" onclick="useMyLocation()" class="px-4 py-2.5 rounded-xl btn-gold text-xs font-extrabold shrink-0"><i class="fa-solid fa-satellite-dish mr-1"></i>Locate</button>
+            <div class="flex-1 min-w-0"><div class="font-extrabold text-sm">আমার বর্তমান লোকেশন ব্যবহার করুন</div><div id="geoMsg" class="text-[11px] text-silver-400 leading-snug">GPS দিয়ে জেলা, এলাকা ও ঠিকানা নিজে থেকে পূরণ হবে</div></div>
+            <button type="button" id="geoBtn" onclick="useMyLocation()" class="px-4 py-2.5 rounded-xl btn-gold text-xs font-extrabold shrink-0"><i class="fa-solid fa-satellite-dish mr-1"></i>লোকেট</button>
           </div><input type="hidden" id="coLat"><input type="hidden" id="coLng">
-          <div><label class="text-xs font-bold">Order Note (optional)</label><input id="coNote" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Any special instruction"></div>
-          <div id="coPayBox" class="space-y-3"><div class="text-xs font-bold">Payment Method *</div><div id="coPayOpts" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
-<div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="Your sender number (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)" oninput="chkTrx()"><div id="coTrxErr" class="text-[11px] font-extrabold text-red-500"></div><div class="text-[11px] text-slate-500">Each TrxID can be used only once.</div></div></div>
-<div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs flex gap-3"><i class="fa-solid fa-truck-fast text-sky-500 text-lg mt-0.5"></i><div class="font-bold text-slate-700">Delivery Charge<div class="font-semibold mt-1">Inside Dhaka: <span id="noteIn" class="text-sky-600"></span> &nbsp;|&nbsp; Outside Dhaka: <span id="noteOut" class="text-sky-600"></span></div><div id="noteFree" class="font-normal text-slate-500 mt-1"></div></div></div>
+          <div><label class="text-xs font-bold">অর্ডার নোট (ঐচ্ছিক)</label><input id="coNote" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="বিশেষ কোনো নির্দেশনা"></div>
+          <div id="coPayBox" class="space-y-3"><div class="text-xs font-bold">পেমেন্ট মেথড *</div><div id="coPayOpts" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+<div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="আপনার সেন্ডার নম্বর (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)" oninput="chkTrx()"><div id="coTrxErr" class="text-[11px] font-extrabold text-red-500"></div><div class="text-[11px] text-slate-500">প্রতিটি TrxID শুধু একবার ব্যবহার করা যাবে।</div></div></div>
+<div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs flex gap-3"><i class="fa-solid fa-truck-fast text-sky-500 text-lg mt-0.5"></i><div class="font-bold text-slate-700">ডেলিভারি চার্জ<div class="font-semibold mt-1">ঢাকার ভিতরে: <span id="noteIn" class="text-sky-600"></span> &nbsp;|&nbsp; ঢাকার বাইরে: <span id="noteOut" class="text-sky-600"></span></div><div id="noteFree" class="font-normal text-slate-500 mt-1"></div></div></div>
         </div>
         <div class="md:col-span-2 p-6 bg-slate-50 border-t md:border-t-0 md:border-l border-slate-200 flex flex-col">
-          <h4 class="font-extrabold text-sm mb-3">Order Summary</h4>
+          <h4 class="font-extrabold text-sm mb-3">অর্ডার সামারি</h4>
           <div id="coItems" class="space-y-2 flex-1 max-h-56 overflow-y-auto text-xs"></div>
-          <div class="mt-3"><div class="flex gap-2"><input id="coPromo" class="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-slate-200 text-xs uppercase font-bold tracking-wider" placeholder="PROMO CODE"><button type="button" onclick="applyPromo()" class="px-4 rounded-xl bg-ink-900 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-ticket mr-1"></i>Apply</button></div><div id="promoMsg" class="text-[11px] mt-1 font-bold"></div></div>
+          <div class="mt-3"><div class="flex gap-2"><input id="coPromo" class="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-slate-200 text-xs uppercase font-bold tracking-wider" placeholder="প্রোমো কোড"><button type="button" onclick="applyPromo()" class="px-4 rounded-xl bg-ink-900 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-ticket mr-1"></i>প্রয়োগ করুন</button></div><div id="promoMsg" class="text-[11px] mt-1 font-bold"></div></div>
           <div class="mt-4 pt-3 border-t border-slate-200 space-y-1.5 text-xs">
-            <div class="flex justify-between"><span class="text-slate-500">Subtotal</span><span id="coSub" class="font-bold"></span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Delivery</span><span id="coShip" class="font-bold"></span></div>
-            <div id="coDiscRow" class="hidden"><div class="flex justify-between"><span class="text-emerald-600 font-bold"><i class="fa-solid fa-tag mr-1"></i><span id="coDiscCode">Promo</span></span><span id="coDisc" class="font-bold text-emerald-600"></span></div></div>
-            <div class="flex justify-between text-base font-extrabold pt-2 border-t border-slate-200"><span>Total</span><span id="coTotal" class="text-gold-600"></span></div>
+            <div class="flex justify-between"><span class="text-slate-500">সাবটোটাল</span><span id="coSub" class="font-bold"></span></div>
+            <div class="flex justify-between"><span class="text-slate-500">ডেলিভারি</span><span id="coShip" class="font-bold"></span></div>
+            <div id="coDiscRow" class="hidden"><div class="flex justify-between"><span class="text-emerald-600 font-bold"><i class="fa-solid fa-tag mr-1"></i><span id="coDiscCode">প্রোমো</span></span><span id="coDisc" class="font-bold text-emerald-600"></span></div></div>
+            <div class="flex justify-between text-base font-extrabold pt-2 border-t border-slate-200"><span>মোট</span><span id="coTotal" class="text-gold-600"></span></div>
           </div>
-          <button id="coSubmit" type="submit" class="mt-4 w-full py-4 rounded-xl btn-gold font-extrabold text-sm shadow-lg shadow-gold-500/25">CONFIRM ORDER</button>
+          <button id="coSubmit" type="submit" class="mt-4 w-full py-4 rounded-xl btn-gold font-extrabold text-sm shadow-lg shadow-gold-500/25">অর্ডার কনফার্ম করুন</button>
         </div>
       </form>
     </div>
@@ -704,14 +696,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div class="relative min-h-screen flex items-center justify-center p-4">
     <div class="pop w-full max-w-md bg-white rounded-3xl p-8 text-center shadow-2xl">
       <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-500 text-4xl flex items-center justify-center mx-auto"><i class="fa-solid fa-circle-check"></i></div>
-      <h3 class="font-display font-extrabold text-2xl mt-4">Order Confirmed!</h3>
-      <p class="text-sm text-slate-500 mt-2">Thank you for shopping with BANA FASHION. We will call you shortly to confirm delivery.</p>
-      <div class="mt-4 p-3 rounded-xl bg-slate-100 text-xs">Order ID<div id="successId" class="font-extrabold text-lg tracking-wider text-ink-900"></div></div>
+      <h3 class="font-display font-extrabold text-2xl mt-4">অর্ডার কনফার্ম হয়েছে!</h3>
+      <p class="text-sm text-slate-500 mt-2">BANA FASHION-এ কেনাকাটার জন্য ধন্যবাদ। ডেলিভারি নিশ্চিত করতে আমরা শীঘ্রই আপনাকে কল করব।</p>
+      <div class="mt-4 p-3 rounded-xl bg-slate-100 text-xs">অর্ডার আইডি<div id="successId" class="font-extrabold text-lg tracking-wider text-ink-900"></div></div>
       <div id="successSummary" class="mt-3 text-left text-xs rounded-xl border border-slate-200 p-3 space-y-1.5 max-h-52 overflow-y-auto"></div>
-      <button onclick="showLastInv()" class="mt-4 w-full py-3 rounded-xl bg-ink-900 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-file-invoice mr-1.5"></i>View / Print Invoice</button>
+      <button onclick="showLastInv()" class="mt-4 w-full py-3 rounded-xl bg-ink-900 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-file-invoice mr-1.5"></i>ইনভয়েস দেখুন / প্রিন্ট করুন</button>
       <div class="mt-3 grid grid-cols-2 gap-3">
-        <a id="successWa" href="#" target="_blank" rel="noopener" class="py-3 rounded-xl bg-emerald-500 text-white text-xs font-extrabold"><i class="fa-brands fa-whatsapp mr-1"></i>Send on WhatsApp</a>
-        <button onclick="document.getElementById('successModal').classList.add('hidden')" class="py-3 rounded-xl btn-gold text-xs font-extrabold">Continue Shopping</button>
+        <a id="successWa" href="#" target="_blank" rel="noopener" class="py-3 rounded-xl bg-emerald-500 text-white text-xs font-extrabold"><i class="fa-brands fa-whatsapp mr-1"></i>WhatsApp-এ পাঠান</a>
+        <button onclick="document.getElementById('successModal').classList.add('hidden')" class="py-3 rounded-xl btn-gold text-xs font-extrabold">কেনাকাটা চালিয়ে যান</button>
       </div>
     </div>
   </div>
@@ -770,6 +762,16 @@ const CATEGORIES = [
   {id:'jeans',label:'Denim'},{id:'pants',label:'Pants'},{id:'shorts',label:'Quarter Shorts'},{id:'jackets',label:'Jackets & Hoodies'},
   {id:'threepiece',label:'Three Piece'},{id:'watches',label:'Watches'}
 ];
+const CATBN={all:'সব পণ্য',shoes:'জুতা',shirts:'শার্ট',tshirts:'টি-শার্ট ও পোলো',jeans:'ডেনিম জিন্স',pants:'প্যান্ট',shorts:'কোয়ার্টার শর্টস',jackets:'জ্যাকেট ও হুডি',threepiece:'থ্রি পিস',watches:'ঘড়ি'};
+CATEGORIES.forEach(c=>{ if(CATBN[c.id]) c.label=CATBN[c.id]; });
+const catLabel=id=>CATBN[id]||id;
+const BADGEBN={new:'নতুন',hot:'হট',trending:'ট্রেন্ডিং',popular:'জনপ্রিয়',premium:'প্রিমিয়াম',limited:'লিমিটেড',bestseller:'বেস্টসেলার',set:'সেট',essential:'এসেনশিয়াল',value:'ভ্যালু',sale:'সেল',eid:'ঈদ'};
+const badgeBn=b=>BADGEBN[String(b||'').toLowerCase()]||b;
+const bnum=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+const DBN={Dhaka:'ঢাকা',Gazipur:'গাজীপুর',Narayanganj:'নারায়ণগঞ্জ',Narsingdi:'নরসিংদী',Manikganj:'মানিকগঞ্জ',Munshiganj:'মুন্সিগঞ্জ',Faridpur:'ফরিদপুর',Gopalganj:'গোপালগঞ্জ',Madaripur:'মাদারীপুর',Rajbari:'রাজবাড়ী',Shariatpur:'শরীয়তপুর',Tangail:'টাঙ্গাইল',Kishoreganj:'কিশোরগঞ্জ',Chattogram:'চট্টগ্রাম',"Cox's Bazar":'কক্সবাজার',Cumilla:'কুমিল্লা',Feni:'ফেনী',Brahmanbaria:'ব্রাহ্মণবাড়িয়া',Noakhali:'নোয়াখালী',Lakshmipur:'লক্ষ্মীপুর',Chandpur:'চাঁদপুর',Khagrachhari:'খাগড়াছড়ি',Rangamati:'রাঙ্গামাটি',Bandarban:'বান্দরবান',Rajshahi:'রাজশাহী',Chapainawabganj:'চাঁপাইনবাবগঞ্জ',Naogaon:'নওগাঁ',Natore:'নাটোর',Pabna:'পাবনা',Sirajganj:'সিরাজগঞ্জ',Bogura:'বগুড়া',Joypurhat:'জয়পুরহাট',Khulna:'খুলনা',Bagerhat:'বাগেরহাট',Satkhira:'সাতক্ষীরা',Jashore:'যশোর',Jhenaidah:'ঝিনাইদহ',Magura:'মাগুরা',Narail:'নড়াইল',Kushtia:'কুষ্টিয়া',Chuadanga:'চুয়াডাঙ্গা',Meherpur:'মেহেরপুর',Barishal:'বরিশাল',Bhola:'ভোলা',Jhalokati:'ঝালকাঠি',Patuakhali:'পটুয়াখালী',Pirojpur:'পিরোজপুর',Barguna:'বরগুনা',Sylhet:'সিলেট',Moulvibazar:'মৌলভীবাজার',Habiganj:'হবিগঞ্জ',Sunamganj:'সুনামগঞ্জ',Rangpur:'রংপুর',Dinajpur:'দিনাজপুর',Kurigram:'কুড়িগ্রাম',Lalmonirhat:'লালমনিরহাট',Nilphamari:'নীলফামারী',Gaibandha:'গাইবান্ধা',Thakurgaon:'ঠাকুরগাঁও',Panchagarh:'পঞ্চগড়',Mymensingh:'ময়মনসিংহ',Jamalpur:'জামালপুর',Netrokona:'নেত্রকোনা',Sherpur:'শেরপুর'};
+const DVBN={Dhaka:'ঢাকা',Chattogram:'চট্টগ্রাম',Rajshahi:'রাজশাহী',Khulna:'খুলনা',Barishal:'বরিশাল',Sylhet:'সিলেট',Rangpur:'রংপুর',Mymensingh:'ময়মনসিংহ'};
+const DEFAULT_CATS=[['shoes','photo-1542291026-7eec264c27ff'],['shirts','photo-1598033129183-c4f50c736f10'],['tshirts','photo-1521572267360-ee0c2909d518'],['jeans','photo-1541099649105-f69ad21f3246'],['pants','photo-1473966968600-fa801b869a1a'],['shorts','photo-1591195853828-11db59a44f6b'],['jackets','photo-1556905055-8f358a7a47b2'],['threepiece','photo-1507679799987-c73779587ccf'],['watches','photo-1523275335684-37898b6baf30']].map(([id,im])=>({id,label:CATBN[id],image:'https://images.unsplash.com/'+im+'?auto=format&fit=crop&w=500&q=80'}));
+
 const LOCAL_PRODUCTS = [
   {"id": "s1", "title": "Jordan 1 Low Red", "category": "shoes", "price": 3113.5, "oldPrice": 4790, "rating": 4.8, "reviews": 0, "badge": "New", "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=700&q=80"], "sizes": ["40", "41", "42", "43", "44"], "colors": ["Red/Black", "Black"], "stock": 14, "description": "Classic low-top sneaker with red overlays, cushioned sole and durable stitching. Everyday street comfort."},
   {"id": "s2", "title": "Jordan 1 Low Pain Green", "category": "shoes", "price": 3113.5, "oldPrice": 4790, "rating": 4.8, "reviews": 0, "badge": "New", "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=700&q=80"], "sizes": ["40", "41", "42", "43", "44"], "colors": ["Green/Black"], "stock": 8, "description": "Green and black low-top with soft padded collar and grippy rubber outsole."},
@@ -843,15 +845,15 @@ function renderProducts(){
     const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0, wl=state.wishlist.includes(p.id);
     return `<div class="pcard reveal in group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
       <div class="relative overflow-hidden bg-ink-800 aspect-[4/5]">
-        ${p.badge?`<span class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/85 text-gold-400 font-extrabold text-[10px] uppercase tracking-wider">${esc(p.badge)}</span>`:''}
+        ${p.badge?`<span class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/85 text-gold-400 font-extrabold text-[10px] uppercase tracking-wider">${esc(badgeBn(p.badge))}</span>`:''}
         ${off>0?`<span class="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-md btn-gold font-extrabold text-[10px]">-${off}%</span>`:''}
         <button onclick="event.stopPropagation();toggleWishlist('${p.id}')" class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-all ${wl?'text-rose-500':'text-slate-700'}"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
         ${(()=>{ const im=(p.images&&p.images.length?p.images:[p.image]); const all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0" style="transition:transform .8s cubic-bezier(.65,0,.35,1)">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>${im.length>1?`<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">${im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}`; })()}
-        <div class="hidden sm:flex absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity justify-center"><span class="w-full py-2.5 rounded-xl bg-white text-ink-900 text-center font-extrabold text-xs">VIEW & ORDER <i class="fa-solid fa-arrow-right ml-1"></i></span></div>
+        <div class="hidden sm:flex absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity justify-center"><span class="w-full py-2.5 rounded-xl bg-white text-ink-900 text-center font-extrabold text-xs">দেখুন ও অর্ডার করুন <i class="fa-solid fa-arrow-right ml-1"></i></span></div>
       </div>
       <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
-          <div class="flex items-center justify-between text-[10px] sm:text-[11px] mb-1"><span class="uppercase tracking-widest font-extrabold text-gold-600">${esc(p.category)}</span><span class="text-gold-500 font-bold"><i class="fa-solid fa-star mr-1"></i>${p.rating||4.5}</span></div>
+          <div class="flex items-center justify-between text-[10px] sm:text-[11px] mb-1"><span class="font-extrabold text-gold-600">${esc(catLabel(p.category))}</span><span class="text-gold-500 font-bold"><i class="fa-solid fa-star mr-1"></i>${p.rating||4.5}</span></div>
           <h3 class="font-extrabold text-xs sm:text-sm text-ink-900 line-clamp-1 group-hover:text-gold-600 transition-colors">${esc(p.title)}</h3>
         </div>
         <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
@@ -878,7 +880,7 @@ async function loadFirestoreProducts(){
   try{
     const snap=await getDocs(collection(db,'products'));
     const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()}));
-    if(items.length){ state.products=items.map(p=>({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); renderProducts(); openFromHash(); } else { try{ const sd=await getDoc(doc(db,'settings','site')); if(sd.exists()&&sd.data().seeded){ state.products=[]; renderProducts(); } }catch(e){} }
+    if(items.length){ state.products=items.map(p=>({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); renderProducts(); buildCatRow(); openFromHash(); } else { try{ const sd=await getDoc(doc(db,'settings','site')); if(sd.exists()&&sd.data().seeded){ state.products=[]; renderProducts(); } }catch(e){} }
   }catch(e){ console.warn('Firestore products not loaded, using local data:',e.message); }
 }
 
@@ -888,7 +890,7 @@ async function loadSite(){
   try{ const s=await getDoc(doc(db,'settings','site')); if(s.exists()) state.site=s.data(); }catch(e){}
   try{ const p=await getDoc(doc(db,'settings','payment')); if(p.exists()) state.payCfg=p.data(); }catch(e){}
   try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
-    if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:x.label}))); buildCatRow(); renderTabs(); } }catch(e){}
+    if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:CATBN[x.id]||x.label}))); buildCatRow(); renderTabs(); } }catch(e){}
   renderMenu(); renderEid();
   const st=state.site||{}; { const w=String(st.whatsapp||'').replace(/\D/g,''); if(w&&$('fabWa')) $('fabWa').href='https://wa.me/'+w; const hp=String(st.helpline||'').replace(/[^\d+]/g,''); if(hp&&$('fabTel')) $('fabTel').href='tel:'+hp; }
   window.SHOPX={...(st.shopAddress?{addr:st.shopAddress}:{}),...(st.helpline?{phone:st.helpline}:{})}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
@@ -903,9 +905,26 @@ async function loadSite(){
   el.textContent=`#productGrid{grid-template-columns:repeat(${m},minmax(0,1fr))!important}@media(min-width:640px){#productGrid{grid-template-columns:repeat(${Math.min(d,3)},minmax(0,1fr))!important}}@media(min-width:1024px){#productGrid{grid-template-columns:repeat(${d},minmax(0,1fr))!important}}`;
   renderProducts();
 }
-function buildCatRow(){ const r=$('catRow'); if(!r||!state.cats) return;
-  r.innerHTML=state.cats.slice(0,8).map((c,i)=>`<div onclick="goShop('${esc(c.id)}')" style="--d:${(i*.12).toFixed(2)}s" class="cat-card lit group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg"><img src="${esc(c.image)}" alt="${esc(c.label)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()"><div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left"><h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">${esc(c.label)}</h3></div></div>`).join(''); }
-const PCOL={bkash:['#E2136E','bKash'],nagad:['#F6921E','Nagad'],rocket:['#8C3494','Rocket'],upay:['#EAB308','Upay']};
+function buildCatRow(){ const r=$('catRow'); if(!r) return;
+  const list=((state.cats&&state.cats.length)?state.cats:DEFAULT_CATS).filter(c=>c.id!=='all').slice(0,12);
+  r.innerHTML=list.map((c,i)=>{ const n=state.products.filter(p=>p.category===c.id).length; const img=c.image||(state.products.find(p=>p.category===c.id)||{}).image||'';
+    return `<div onclick="goShop('${esc(c.id)}')" style="--d:${(i*.1).toFixed(2)}s" class="cat-card lit group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer bg-ink-800 shadow-lg">
+      ${img?`<img src="${esc(img)}" alt="${esc(CATBN[c.id]||c.label)}" loading="lazy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()">`:''}
+      <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent flex flex-col justify-end p-2 sm:p-4">
+        <h3 class="font-display font-bold text-[11px] sm:text-base text-white leading-tight">${esc(CATBN[c.id]||c.label)}</h3>
+        ${n?`<span class="text-[9px] sm:text-[11px] text-gold-400 font-semibold mt-0.5">${bnum(n)} টি পণ্য <i class="fa-solid fa-arrow-right text-[8px] ml-0.5 group-hover:translate-x-1 transition-transform"></i></span>`:''}
+      </div></div>`; }).join(''); }
+/* ===== pencil-writing text + Bengali spacing fix ===== */
+function pencilInit(){
+  document.querySelectorAll('#shop h2,#about h2,#shop .text-gold-600.font-extrabold,#about .text-gold-400.font-extrabold').forEach(e=>e.setAttribute('data-pen',''));
+  const els=[...document.querySelectorAll('[data-pen]:not(.penned)')];
+  els.forEach(el=>{ el.classList.add('penned'); el.innerHTML=`<span class="penw"><span class="pen">${el.innerHTML}</span><i class="fa-solid fa-pencil penc"></i></span>`; });
+  const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ setTimeout(()=>en.target.classList.add('write'),180); io.unobserve(en.target); } }),{threshold:.5});
+  els.forEach(e=>io.observe(e));
+}
+function bnFix(){ const run=()=>{ const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT); let n; while((n=w.nextNode())){ if(/[\u0980-\u09FF]/.test(n.nodeValue)){ const el=n.parentElement; if(el&&!el.dataset.bnf&&!/^(SCRIPT|STYLE)$/.test(el.tagName)){ el.dataset.bnf=1; el.style.letterSpacing='normal'; el.style.textTransform='none'; } } } };
+  run(); let t; new MutationObserver(()=>{ clearTimeout(t); t=setTimeout(run,200); }).observe(document.body,{childList:true,subtree:true,characterData:true}); }
+
 function payIcon(k,m){ if(k==='cod') return '<span class="w-9 h-9 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-money-bill-wave"></i></span>';
   if(m&&m.logo) return `<img src="${esc(m.logo)}" class="w-9 h-9 rounded-lg object-contain bg-white shrink-0">`;
   const c=PCOL[k]; return `<span class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold text-[9px] shrink-0" style="background:${c[0]}">${c[1]}</span>`; }
@@ -914,14 +933,14 @@ function renderPay(){ const cfg=state.payCfg||{}, act=['bkash','nagad','rocket',
   const req=!!(state.site&&state.site.requireAdvance&&act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
   if(state.payM&&state.payM!=='cod'&&!act.includes(state.payM)) state.payM='cod';
   state.payM=state.payM||'cod';
-  $('coPayOpts').innerHTML=(req?[]:['cod']).concat(act).map(k=>{ const on=state.payM===k, dis=free&&k!=='cod'; return `<button type="button" ${dis?'disabled':`onclick="setPayM('${k}')"`} class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'} ${dis?'opacity-40':''}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'Cash on Delivery':PCOL[k][1]}</span></button>`; }).join('');
+  $('coPayOpts').innerHTML=(req?[]:['cod']).concat(act).map(k=>{ const on=state.payM===k, dis=free&&k!=='cod'; return `<button type="button" ${dis?'disabled':`onclick="setPayM('${k}')"`} class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'} ${dis?'opacity-40':''}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'ক্যাশ অন ডেলিভারি':PCOL[k][1]}</span></button>`; }).join('');
   const adv=state.payM!=='cod'; $('coPayInfo').classList.toggle('hidden',!adv);
-  $('coPayMsg').innerHTML=adv?`Please <b>Send Money</b> the delivery charge <b>${money(ship)}</b> to ${PCOL[state.payM][1]}: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b> <button type="button" onclick="copyNum('${esc(cfg[state.payM].number)}')" class="ml-1 px-2.5 py-1 rounded-lg bg-ink-900 text-gold-400 text-[11px] font-extrabold"><i class="fa-regular fa-copy mr-1"></i>Copy</button>, then enter your number and TrxID below. The rest is Cash on Delivery.`:'';
+  $('coPayMsg').innerHTML=adv?`অনুগ্রহ করে ডেলিভারি চার্জ <b>${money(ship)}</b> ${PCOL[state.payM][1]} নম্বরে <b>Send Money</b> করুন: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b> <button type="button" onclick="copyNum('${esc(cfg[state.payM].number)}')" class="ml-1 px-2.5 py-1 rounded-lg bg-ink-900 text-gold-400 text-[11px] font-extrabold"><i class="fa-regular fa-copy mr-1"></i>কপি</button>। তারপর নিচে আপনার নম্বর ও TrxID দিন। বাকি টাকা ক্যাশ অন ডেলিভারিতে দেবেন।`:'';
 }
 function setPayM(k){ state.payM=k; renderPay(); }
-async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY||!state.user) return; box.innerHTML='<div class="text-silver-400">Loading...</div>';
+async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY||!state.user) return; box.innerHTML='<div class="text-silver-400">লোড হচ্ছে...</div>';
   try{ const s=await getDocs(query(collection(db,'orders'),where('uid','==',state.user.uid))); const a=[]; s.forEach(d=>a.push(d.data())); a.sort((x,y)=>(y.createdAt?.seconds||0)-(x.createdAt?.seconds||0)); state.my=a;
-    box.innerHTML=a.map((o,i)=>`<div class="p-3 rounded-xl bg-white/5 border border-white/10"><div class="flex justify-between font-bold"><span>${esc(o.orderId)}</span><span class="text-gold-400 uppercase">${esc(o.status)}</span></div><div class="text-silver-400">${money(o.total)}${o.deliveryPaid?' · Delivery charge paid ✔':''}</div><button onclick="showMyInv(${i})" class="text-gold-400 font-bold mt-1"><i class="fa-solid fa-file-invoice mr-1"></i>Invoice</button>${o.courier&&o.courier.tracking?`<a target="_blank" rel="noopener" class="text-gold-400 underline" href="https://steadfast.com.bd/t/${encodeURIComponent(o.courier.tracking)}">${esc(o.courier.name||'Courier')}: ${esc(o.courier.tracking)} — Track</a>`:''}</div>`).join('')||'<div class="text-silver-400">No orders yet</div>';
+    box.innerHTML=a.map((o,i)=>`<div class="p-3 rounded-xl bg-white/5 border border-white/10"><div class="flex justify-between font-bold"><span>${esc(o.orderId)}</span><span class="text-gold-400 uppercase">${esc(o.status)}</span></div><div class="text-silver-400">${money(o.total)}${o.deliveryPaid?' · ডেলিভারি চার্জ পরিশোধিত ✔':''}</div><button onclick="showMyInv(${i})" class="text-gold-400 font-bold mt-1"><i class="fa-solid fa-file-invoice mr-1"></i>Invoice</button>${o.courier&&o.courier.tracking?`<a target="_blank" rel="noopener" class="text-gold-400 underline" href="https://steadfast.com.bd/t/${encodeURIComponent(o.courier.tracking)}">${esc(o.courier.name||'Courier')}: ${esc(o.courier.tracking)} — Track</a>`:''}</div>`).join('')||'<div class="text-silver-400">এখনো কোনো অর্ডার নেই</div>';
   }catch(e){ box.innerHTML=''; } }
 
 /* ===== INVOICE + QR ===== */
@@ -955,12 +974,12 @@ function showInvoice(o){ const old=document.getElementById('invWrap'); if(old) o
 
 function showLastInv(){ if(state.lastOrder) showInvoice({...state.lastOrder,createdAt:new Date()}); }
 function showMyInv(i){ if(state.my&&state.my[i]) showInvoice(state.my[i]); }
-function copyNum(n){ const done=()=>toast('Number copied: '+n); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(n).then(done,done); else { const t=document.createElement('textarea'); t.value=n; document.body.appendChild(t); t.select(); try{document.execCommand('copy')}catch(e){} t.remove(); done(); } }
+function copyNum(n){ const done=()=>toast('নম্বর কপি হয়েছে: '+n); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(n).then(done,done); else { const t=document.createElement('textarea'); t.value=n; document.body.appendChild(t); t.select(); try{document.execCommand('copy')}catch(e){} t.remove(); done(); } }
 let trxT; function chkTrx(){ clearTimeout(trxT); const el=$('coTrxErr'); el.textContent=''; const t=$('coTrx').value.trim().toUpperCase(); if(!FIREBASE_READY||!/^[A-Z0-9]{6,20}$/.test(t)) return;
   trxT=setTimeout(async()=>{ try{ const sn=await getDoc(doc(db,'trx',t)); if(sn.exists()) el.textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; }catch(e){} },400); }
 async function verifyOrder(){ const id=new URLSearchParams(location.search).get('verify'); if(!id||!FIREBASE_READY) return; let r=null; try{ const sn=await getDoc(doc(db,'receipts',id)); if(sn.exists()) r=sn.data(); }catch(e){}
   const w=document.createElement('div'); w.className='fixed inset-0 z-[130] bg-black/85 flex items-center justify-center p-4';
-  w.innerHTML=`<div class="pop bg-white rounded-3xl p-8 max-w-sm w-full text-center"><div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${r?'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-500'}"><i class="fa-solid ${r?'fa-circle-check':'fa-circle-xmark'}"></i></div><h3 class="font-display font-extrabold text-xl mt-3">${r?'Order Verified':'Invalid Order'}</h3>${r?`<div class="mt-3 p-3 rounded-xl bg-slate-100 text-xs space-y-1"><div>Order ID: <b class="font-mono">${esc(r.orderId)}</b></div><div>Customer: <b>${esc(r.name||'')}</b></div><div>Status: <b class="uppercase text-gold-600">${esc(r.status)}</b></div><div>Total: <b>${money(r.total)}</b></div></div>`:`<p class="text-xs text-slate-500 mt-2">No order found with this ID: ${esc(id)}</p>`}<button onclick="this.closest('.fixed').remove()" class="mt-5 w-full py-3 rounded-xl btn-gold font-extrabold text-xs">Close</button></div>`; document.body.appendChild(w); }
+  w.innerHTML=`<div class="pop bg-white rounded-3xl p-8 max-w-sm w-full text-center"><div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${r?'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-500'}"><i class="fa-solid ${r?'fa-circle-check':'fa-circle-xmark'}"></i></div><h3 class="font-display font-extrabold text-xl mt-3">${r?'Order Verified':'Invalid Order'}</h3>${r?`<div class="mt-3 p-3 rounded-xl bg-slate-100 text-xs space-y-1"><div>অর্ডার আইডি: <b class="font-mono">${esc(r.orderId)}</b></div><div>কাস্টমার: <b>${esc(r.name||'')}</b></div><div>স্ট্যাটাস: <b class="uppercase text-gold-600">${esc(r.status)}</b></div><div>মোট: <b>${money(r.total)}</b></div></div>`:`<p class="text-xs text-slate-500 mt-2">No order found with this ID: ${esc(id)}</p>`}<button onclick="this.closest('.fixed').remove()" class="mt-5 w-full py-3 rounded-xl btn-gold font-extrabold text-xs">Close</button></div>`; document.body.appendChild(w); }
 
 /* ===== GPS LOCATION AUTO-FILL ===== */
 const DALIAS={chittagong:'Chattogram',comilla:'Cumilla',bogra:'Bogura',jessore:'Jashore',barisal:'Barishal',jhalakathi:'Jhalokati',jhalokathi:'Jhalokati','chapai nawabganj':'Chapainawabganj',netrakona:'Netrokona',maulvibazar:'Moulvibazar',"cox's bazar":"Cox's Bazar",coxsbazar:"Cox's Bazar",narsinghdi:'Narsingdi',laxmipur:'Lakshmipur',sirajgonj:'Sirajganj',khagrachari:'Khagrachhari',kishorganj:'Kishoreganj',gazipur:'Gazipur'};
@@ -972,8 +991,8 @@ function geoDist(a){ const keys=Object.keys(BD); const c=[a.state_district,a.cou
 function geoUp(d,a){ const list=BD[d].split(','); const c=[a.city_district,a.suburb,a.quarter,a.neighbourhood,a.county,a.municipality,a.town,a.village,a.city,a.state_district];
   for(const n0 of c){ const n=geoNorm(n0); if(!n) continue; const k=list.find(u=>geoNorm(u)===n)||list.find(u=>geoNorm(u).length>3&&(n.includes(geoNorm(u))||geoNorm(u).includes(n))); if(k) return k; } return ''; }
 function useMyLocation(){ const m=$('geoMsg'), b=$('geoBtn');
-  if(!navigator.geolocation){ m.textContent='Location is not supported on this device/browser.'; return; }
-  m.textContent='Locating via GPS... please allow location access'; b.disabled=true; b.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Locating';
+  if(!navigator.geolocation){ m.textContent='এই ডিভাইস/ব্রাউজারে লোকেশন সাপোর্ট নেই।'; return; }
+  m.textContent='GPS দিয়ে লোকেশন খোঁজা হচ্ছে... অনুমতি দিন'; b.disabled=true; b.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Locating';
   const done=()=>{ b.disabled=false; b.innerHTML='<i class="fa-solid fa-satellite-dish mr-1"></i>Locate'; };
   navigator.geolocation.getCurrentPosition(async pos=>{
     const {latitude:la,longitude:lo,accuracy:ac}=pos.coords; $('coLat').value=la.toFixed(6); $('coLng').value=lo.toFixed(6);
@@ -983,7 +1002,7 @@ function useMyLocation(){ const m=$('geoMsg'), b=$('geoBtn');
       const street=[a.house_number,a.road,a.neighbourhood||a.quarter,a.suburb||a.village].filter(Boolean).join(', ')||(j.display_name||'').split(',').slice(0,3).join(',');
       if(street&&!$('coAddress').value.trim()) $('coAddress').value=street;
       m.innerHTML=d?`<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check mr-1"></i>${up?up+', ':''}${d}</span> · accuracy ~${Math.round(ac)}m${up?'':'<br>Please choose your upazila / thana.'}`:'Location saved, but area not recognised. Please select your district manually.';
-    }catch(e){ m.textContent='GPS point saved (map link will be sent). Could not read the address - please fill it manually.'; }
+    }catch(e){ m.textContent='GPS লোকেশন সেভ হয়েছে (ম্যাপ লিংক যাবে)। ঠিকানা পড়া যায়নি — নিজে লিখে দিন।'; }
     done(); },
     err=>{ m.textContent=err.code===1?'Permission denied. Allow location access in your browser settings and try again.':'Could not get your location. Please try again outdoors or enter address manually.'; done(); },
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }
@@ -992,30 +1011,30 @@ function useMyLocation(){ const m=$('geoMsg'), b=$('geoBtn');
 const pio=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in2'); pio.unobserve(en.target); } }),{threshold:.08,rootMargin:'0px 0px -4% 0px'});
 function discAmt(){ const p=state.promo; if(!p) return 0; const sub=subtotal(); if(sub<(p.minOrder||0)) return 0; let d=p.type==='percent'?Math.round(sub*p.value/100):p.value; if(p.type==='percent'&&p.maxDiscount) d=Math.min(d,p.maxDiscount); return Math.max(0,Math.min(d,sub)); }
 async function applyPromo(){ const code=$('coPromo').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), m=$('promoMsg'); const bad=t=>{ state.promo=null; m.className='text-[11px] mt-1 font-bold text-red-500'; m.textContent=t; updateCheckoutTotals(); };
-  if(!code){ state.promo=null; m.textContent=''; updateCheckoutTotals(); return; } if(!FIREBASE_READY||!state.user) return bad('Please sign in to use a promo code');
-  m.className='text-[11px] mt-1 font-bold text-slate-500'; m.textContent='Checking...';
-  try{ const sn=await getDoc(doc(db,'promos',code)); if(!sn.exists()) return bad('Invalid promo code'); const p=sn.data();
-    if(p.active===false) return bad('This promo code is not active');
-    if(p.expiry&&new Date(p.expiry+'T23:59:59')<new Date()) return bad('This promo code has expired');
-    if(p.limit&&(p.used||0)>=p.limit) return bad('This promo code has reached its usage limit');
+  if(!code){ state.promo=null; m.textContent=''; updateCheckoutTotals(); return; } if(!FIREBASE_READY||!state.user) return bad('প্রোমো কোড ব্যবহার করা যাচ্ছে না, একটু পরে চেষ্টা করুন');
+  m.className='text-[11px] mt-1 font-bold text-slate-500'; m.textContent='যাচাই হচ্ছে...';
+  try{ const sn=await getDoc(doc(db,'promos',code)); if(!sn.exists()) return bad('প্রোমো কোডটি সঠিক নয়'); const p=sn.data();
+    if(p.active===false) return bad('এই প্রোমো কোডটি চালু নেই');
+    if(p.expiry&&new Date(p.expiry+'T23:59:59')<new Date()) return bad('এই প্রোমো কোডের মেয়াদ শেষ');
+    if(p.limit&&(p.used||0)>=p.limit) return bad('এই প্রোমো কোডের ব্যবহারের সীমা শেষ');
     if(subtotal()<(p.minOrder||0)) return bad('Minimum order '+money(p.minOrder)+' required for this code');
-    const u=await getDoc(doc(db,'promoUses',code+'_'+state.user.uid)); if(u.exists()) return bad('You have already used this promo code');
+    const u=await getDoc(doc(db,'promoUses',code+'_'+state.user.uid)); if(u.exists()) return bad('আপনি এই প্রোমো কোডটি আগেই ব্যবহার করেছেন');
     state.promo={code,type:p.type,value:p.value,minOrder:p.minOrder||0,maxDiscount:p.maxDiscount||0}; updateCheckoutTotals();
     m.className='text-[11px] mt-1 font-bold text-emerald-600'; m.innerHTML='<i class="fa-solid fa-circle-check mr-1"></i>'+code+' applied! You save '+money(discAmt());
-  }catch(e){ bad('Could not verify the promo code. Try again.'); } }
+  }catch(e){ bad('প্রোমো কোড যাচাই করা যায়নি। আবার চেষ্টা করুন।'); } }
 function renderEid(){ const st=state.site||{}, list=state.products.filter(p=>p.eid), sec=$('eid'); if(!sec) return;
   const on=st.eidOn&&list.length; sec.classList.toggle('hidden',!on); if(!on) return;
-  $('eidTitle').textContent=st.eidTitle||'Eid Collection'; $('eidSub').textContent=st.eidSub||'Celebrate Eid in style - handpicked festive collection';
+  $('eidTitle').textContent=st.eidTitle||'ঈদ কালেকশন'; $('eidSub').textContent=st.eidSub||'Celebrate Eid in style - handpicked festive collection';
   $('eidGrid').innerHTML=list.map((p,i)=>`<div class="eid-card rounded-2xl overflow-hidden cursor-pointer reveal in" style="animation:fadeUp .6s ${(i%4)*.08}s backwards" onclick="openProduct('${p.id}')"><div class="aspect-[4/5] overflow-hidden relative bg-ink-800"><img src="${esc(p.image)}" alt="" loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"><span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-gold-500 text-black font-extrabold text-[10px]"><i class="fa-solid fa-moon mr-1"></i>EID</span></div><div class="p-3"><div class="text-white font-bold text-sm truncate">${esc(p.title)}</div><div class="mt-1 flex items-center gap-2"><span class="text-gold-400 font-extrabold">${money(p.price)}</span>${p.oldPrice?`<span class="text-[11px] text-white/40 line-through">${money(p.oldPrice)}</span>`:''}</div></div></div>`).join(''); }
 function renderMenu(){ const nav=$('mobileNav'); if(!nav) return; const st=state.site||{};
-  const it=[['#hero','Home','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'Eid Collection','fa-moon','']]:[]),['#shop','All Products','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory('${c.id}');`]),['#about','About','fa-circle-info',''],['#helpline','Helpline','fa-headset','']];
-  nav.innerHTML=it.map((x,i)=>`<a href="${x[0]}" onclick="${x[3]}toggleMobileMenu()" style="--i:${i}" class="mnav flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-gold-400 ${x[1]==='Helpline'?'text-gold-400':''}"><i class="fa-solid ${x[2]} w-5 text-center text-gold-400/80"></i>${esc(x[1])}</a>`).join(''); }
+  const it=[['#hero','হোম','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'ঈদ কালেকশন','fa-moon','']]:[]),['#shop','সব পণ্য','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory('${c.id}');`]),['#about','আমাদের কথা','fa-circle-info',''],['#helpline','হেল্পলাইন','fa-headset','']];
+  nav.innerHTML=it.map((x,i)=>`<a href="${x[0]}" onclick="${x[3]}toggleMobileMenu()" style="--i:${i}" class="mnav flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-gold-400 ${x[0]==='#helpline'?'text-gold-400':''}"><i class="fa-solid ${x[2]} w-5 text-center text-gold-400/80"></i>${esc(x[1])}</a>`).join(''); }
 function flyToCart(src){ const f=state.flyFrom||{left:innerWidth/2-30,top:innerHeight/2,width:60,height:60}, cb=$('cartBadge').parentElement, t=cb.getBoundingClientRect();
   const el=document.createElement('img'); el.src=src; const sx=f.left+f.width/2, sy=f.top+f.height/2;
   el.style.cssText=`position:fixed;z-index:200;left:${sx-32}px;top:${sy-32}px;width:64px;height:64px;border-radius:16px;object-fit:cover;border:2px solid #F59E0B;box-shadow:0 12px 30px rgba(0,0,0,.45);pointer-events:none`; document.body.appendChild(el);
   const dx=t.left+t.width/2-sx, dy=t.top+t.height/2-sy;
   const a=el.animate([{transform:'translate(0,0) scale(1) rotate(0)',opacity:1},{transform:`translate(${dx*.45}px,${dy*.45-90}px) scale(.75) rotate(14deg)`,opacity:1,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.14) rotate(28deg)`,opacity:.35}],{duration:900,easing:'cubic-bezier(.55,0,.25,1)'});
-  a.onfinish=()=>{ el.remove(); cb.classList.remove('cart-pop'); void cb.offsetWidth; cb.classList.add('cart-pop'); toast('Added to your bag',true); }; }
+  a.onfinish=()=>{ el.remove(); cb.classList.remove('cart-pop'); void cb.offsetWidth; cb.classList.add('cart-pop'); toast('ব্যাগে যোগ হয়েছে',true); }; }
 document.addEventListener('click',e=>{ const t=e.target.closest('[onclick*="addToCart("]'); if(t) state.flyFrom=t.getBoundingClientRect(); },true);
 /* ================= PRODUCT MODAL ================= */
 /* ================= PRODUCT PAGE (full view, Shopify-style) ================= */
@@ -1040,8 +1059,8 @@ document.addEventListener('click',e=>{ const a=e.target.closest('a[href^="#"]');
 function ppStars(r,cls='text-gold-500'){ r=Math.round(r||0); return `<span class="${cls} text-xs">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'fa-solid':'fa-regular'} fa-star"></i>`).join('')}</span>`; }
 function ppVarsHTML(p){
   const S=state.pp, sizes=(p.sizes&&p.sizes.length)?p.sizes:SIZES, cols=p.colors||[];
-  return (cols.length?`<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">Color: <span class="font-semibold text-slate-500 normal-case">${esc(S.color)}</span></div><div class="flex flex-wrap gap-2">${cols.map(c=>`<button onclick="ppColor('${esc(c).replace(/'/g,"\\'")}')" class="ppbtn flex items-center gap-2 px-3.5 py-2 rounded-full border-2 text-xs font-bold ${S.color===c?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}"><span class="w-3.5 h-3.5 rounded-full border border-slate-300" style="background:${CSSCOL[c]||'#e5e7eb'}"></span>${esc(c)}</button>`).join('')}</div></div>`:'')+
-  `<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">Size: <span class="font-semibold text-slate-500 normal-case">${esc(S.size)}</span></div><div class="flex flex-wrap gap-2">${sizes.map(z=>`<button onclick="ppSize('${esc(z).replace(/'/g,"\\'")}')" class="ppbtn min-w-[3rem] px-4 py-2.5 rounded-lg border-2 text-xs font-extrabold ${S.size===z?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}">${esc(z)}</button>`).join('')}</div></div>`;
+  return (cols.length?`<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">কালার: <span class="font-semibold text-slate-500 normal-case">${esc(S.color)}</span></div><div class="flex flex-wrap gap-2">${cols.map(c=>`<button onclick="ppColor('${esc(c).replace(/'/g,"\\'")}')" class="ppbtn flex items-center gap-2 px-3.5 py-2 rounded-full border-2 text-xs font-bold ${S.color===c?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}"><span class="w-3.5 h-3.5 rounded-full border border-slate-300" style="background:${CSSCOL[c]||'#e5e7eb'}"></span>${esc(c)}</button>`).join('')}</div></div>`:'')+
+  `<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">সাইজ: <span class="font-semibold text-slate-500 normal-case">${esc(S.size)}</span></div><div class="flex flex-wrap gap-2">${sizes.map(z=>`<button onclick="ppSize('${esc(z).replace(/'/g,"\\'")}')" class="ppbtn min-w-[3rem] px-4 py-2.5 rounded-lg border-2 text-xs font-extrabold ${S.size===z?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}">${esc(z)}</button>`).join('')}</div></div>`;
 }
 function ppCurrent(){ return state.products.find(x=>x.id===state.pp.id); }
 function ppSize(z){ state.pp.size=z; $('ppVars').innerHTML=ppVarsHTML(ppCurrent()); }
@@ -1049,7 +1068,7 @@ function ppColor(c){ state.pp.color=c; $('ppVars').innerHTML=ppVarsHTML(ppCurren
 function ppQty(d){ const p=ppCurrent(), st=stockOf(p), mx=(st&&st>0)?st:99; state.pp.qty=Math.max(1,Math.min(mx,state.pp.qty+d)); $('ppQ').textContent=state.pp.qty; }
 function ppGo(i,rel){ const p=ppCurrent(), n=ppImgs(p).length; if(rel) i=state.pp.img+i; state.pp.img=(i+n)%n; $('ppTrack').style.transform=`translateX(-${state.pp.img*100}%)`; document.querySelectorAll('.ppthumb').forEach((t,k)=>{ t.classList.toggle('border-ink-900',k===state.pp.img); t.classList.toggle('border-transparent',k!==state.pp.img); }); const dots=document.querySelectorAll('.ppdot'); dots.forEach((d,k)=>d.classList.toggle('bg-white',k===state.pp.img)); }
 function ppAdd(buy){
-  const p=ppCurrent(), S=state.pp, st=stockOf(p); if(st!==null&&st<=0){ toast('Sorry, this item is out of stock',false); return; }
+  const p=ppCurrent(), S=state.pp, st=stockOf(p); if(st!==null&&st<=0){ toast('দুঃখিত, এই পণ্যটির স্টক শেষ',false); return; }
   const variant=S.size+(S.color?' / '+S.color:'');
   state.flyFrom=$(buy?'ppBuy':'ppAddBtn').getBoundingClientRect();
   addToCart(p.id,S.qty,variant,!!buy);
@@ -1061,7 +1080,7 @@ function ppRelCard(p,i){
   const wl=state.wishlist.includes(p.id);
   return `<div class="pcard group cursor-pointer" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
     <div class="relative overflow-hidden rounded-xl bg-silver-100 aspect-[3/4]">
-      <span class="absolute top-2.5 left-2.5 z-10 px-2.5 py-1 bg-white text-ink-900 text-[11px] font-semibold rounded-sm">${esc(p.badge||'New')}</span>
+      <span class="absolute top-2.5 left-2.5 z-10 px-2.5 py-1 bg-white text-ink-900 text-[11px] font-semibold rounded-sm">${esc(badgeBn(p.badge||'New'))}</span>
       <button onclick="event.stopPropagation();ppHeart(this,'${p.id}')" class="absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/95 flex items-center justify-center ${wl?'text-rose-500':'text-slate-700'}"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
       ${ppSlide(p)}
     </div>
@@ -1072,19 +1091,19 @@ function ppRelCard(p,i){
 function renderPP(){
   const p=ppCurrent(), S=state.pp, im=ppImgs(p), st=stockOf(p);
   const off=(p.oldPrice&&p.oldPrice>p.price)?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0;
-  const stockHTML=st===null?`<div class="flex items-center gap-2 text-emerald-600 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>In stock</div>`
-    :st<=0?`<div class="flex items-center gap-2 text-red-600 text-xs font-extrabold"><i class="fa-solid fa-circle-xmark"></i>Out of stock</div>`
-    :st<=10?`<div class="flex items-center gap-2 text-orange-600 text-xs font-extrabold animate-pulse"><i class="fa-solid fa-fire"></i>Hurry! Only ${st} left in stock</div>`
-    :`<div class="flex items-center gap-2 text-emerald-600 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>In stock</div>`;
+  const stockHTML=st===null?`<div class="flex items-center gap-2 text-emerald-600 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>স্টকে আছে</div>`
+    :st<=0?`<div class="flex items-center gap-2 text-red-600 text-xs font-extrabold"><i class="fa-solid fa-circle-xmark"></i>স্টক শেষ</div>`
+    :st<=10?`<div class="flex items-center gap-2 text-orange-600 text-xs font-extrabold animate-pulse"><i class="fa-solid fa-fire"></i>তাড়াতাড়ি করুন! মাত্র ${st} টি বাকি</div>`
+    :`<div class="flex items-center gap-2 text-emerald-600 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>স্টকে আছে</div>`;
   const dis=(st!==null&&st<=0)?'disabled':'';
   const pay=['bkash','nagad','rocket','upay'].map(k=>{ const c=(typeof PCOL!=='undefined'&&PCOL[k])||['#555',k]; return `<span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold text-white" style="background:${c[0]}">${c[1]}</span>`; }).join('');
   $('productPage').innerHTML=`<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
-    <button onclick="closeProduct()" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-ink-900"><i class="fa-solid fa-arrow-left"></i>Continue shopping</button>
+    <button onclick="closeProduct()" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-ink-900"><i class="fa-solid fa-arrow-left"></i>কেনাকাটা চালিয়ে যান</button>
     <div class="grid md:grid-cols-2 gap-6 lg:gap-12 mt-4">
       <div class="md:sticky md:top-24 self-start">
         <div id="ppStage" class="relative overflow-hidden rounded-2xl bg-silver-100 aspect-[4/5]">
           <div id="ppTrack" class="flex h-full" style="transition:transform .5s cubic-bezier(.65,0,.35,1)">${im.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>
-          ${p.badge?`<span class="absolute top-3 left-3 px-2.5 py-1 bg-white text-ink-900 text-[11px] font-semibold rounded-sm">${esc(p.badge)}</span>`:''}
+          ${p.badge?`<span class="absolute top-3 left-3 px-2.5 py-1 bg-white text-ink-900 text-[11px] font-semibold rounded-sm">${esc(badgeBn(p.badge))}</span>`:''}
           ${off?`<span class="absolute top-3 right-3 px-2.5 py-1 rounded-md btn-gold text-[11px] font-extrabold">-${off}%</span>`:''}
           ${im.length>1?`<button onclick="ppGo(-1,true)" aria-label="Previous" class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button><button onclick="ppGo(1,true)" aria-label="Next" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
           <div class="absolute bottom-3 inset-x-0 flex justify-center gap-1.5">${im.map((_,k)=>`<span class="ppdot w-2 h-2 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}
@@ -1092,34 +1111,34 @@ function renderPP(){
         ${im.length>1?`<div class="flex gap-2.5 mt-3 overflow-x-auto pb-1">${im.map((u,k)=>`<button onclick="ppGo(${k})" aria-label="Photo ${k+1}" class="ppthumb shrink-0 w-16 sm:w-20 aspect-[4/5] rounded-lg overflow-hidden border-2 ${k?'border-transparent':'border-ink-900'} bg-silver-100"><img src="${esc(u)}" class="w-full h-full object-cover" onerror="this.style.opacity=0"></button>`).join('')}</div>`:''}
       </div>
       <div>
-        <div class="text-[11px] font-extrabold uppercase tracking-widest text-gold-600">${esc((CATEGORIES.find(c=>c.id===p.category)||{}).label||p.category)}</div>
+        <div class="text-[12px] font-extrabold text-gold-600">${esc((CATEGORIES.find(c=>c.id===p.category)||{}).label||p.category)}</div>
         <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-ink-900 mt-1 leading-tight">${esc(p.title)}</h1>
-        <div class="flex items-center gap-2 mt-2">${ppStars(p.rating)}<a href="#ppReviews" onclick="event.preventDefault();document.getElementById('ppReviews').scrollIntoView({behavior:'smooth'})" class="text-xs text-slate-500 underline" id="ppRateTxt">Reviews</a></div>
+        <div class="flex items-center gap-2 mt-2">${ppStars(p.rating)}<a href="#ppReviews" onclick="event.preventDefault();document.getElementById('ppReviews').scrollIntoView({behavior:'smooth'})" class="text-xs text-slate-500 underline" id="ppRateTxt">রিভিউ</a></div>
         <div class="flex items-center flex-wrap gap-x-3 gap-y-1 mt-4">
           ${p.oldPrice?`<span class="text-base text-slate-400 line-through">${money(p.oldPrice)}</span>`:''}
           <span class="font-extrabold text-2xl sm:text-3xl text-red-600">${money(p.price)}</span>
-          ${off?`<span class="px-2 py-0.5 rounded-md bg-red-50 text-red-600 text-[11px] font-extrabold">Save ${off}%</span>`:''}
+          ${off?`<span class="px-2 py-0.5 rounded-md bg-red-50 text-red-600 text-[11px] font-extrabold">সাশ্রয় ${off}%</span>`:''}
         </div>
         <div class="mt-3">${stockHTML}</div>
         <div id="ppVars">${ppVarsHTML(p)}</div>
-        <div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">Quantity</div>
+        <div class="mt-5"><div class="text-xs font-extrabold mb-2">পরিমাণ</div>
           <div class="inline-flex items-center border-2 border-slate-200 rounded-lg"><button onclick="ppQty(-1)" aria-label="Decrease" class="w-11 h-11 text-lg font-bold text-slate-500 hover:text-black">−</button><span id="ppQ" class="w-12 text-center font-extrabold">1</span><button onclick="ppQty(1)" aria-label="Increase" class="w-11 h-11 text-lg font-bold text-slate-500 hover:text-black">+</button></div></div>
         <div class="grid gap-3 mt-6">
-          <button id="ppAddBtn" onclick="ppAdd(false)" ${dis} class="ppbtn w-full py-4 rounded-xl border-2 border-ink-900 text-ink-900 font-extrabold text-sm tracking-wider hover:bg-ink-900 hover:text-white disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bag-shopping mr-2"></i>ADD TO CART</button>
-          <button id="ppBuy" onclick="ppAdd(true)" ${dis} class="ppbtn w-full py-4 rounded-xl btn-gold font-extrabold text-sm tracking-wider shadow-lg shadow-gold-500/25 disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bolt mr-2"></i>BUY IT NOW</button>
+          <button id="ppAddBtn" onclick="ppAdd(false)" ${dis} class="ppbtn w-full py-4 rounded-xl border-2 border-ink-900 text-ink-900 font-extrabold text-sm tracking-wider hover:bg-ink-900 hover:text-white disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bag-shopping mr-2"></i>কার্টে যোগ করুন</button>
+          <button id="ppBuy" onclick="ppAdd(true)" ${dis} class="ppbtn w-full py-4 rounded-xl btn-gold font-extrabold text-sm tracking-wider shadow-lg shadow-gold-500/25 disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bolt mr-2"></i>এখনই কিনুন</button>
         </div>
         <div class="grid grid-cols-3 gap-2 mt-5 text-center">
-          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-hand-holding-dollar text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">Cash on Delivery</div></div>
-          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">Fast Delivery</div></div>
-          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-phone-volume text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">Confirmation Call</div></div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-hand-holding-dollar text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">ক্যাশ অন ডেলিভারি</div></div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">দ্রুত ডেলিভারি</div></div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-phone-volume text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">কনফার্মেশন কল</div></div>
         </div>
-        <div class="flex flex-wrap items-center gap-2 mt-4"><span class="text-[11px] font-bold text-slate-500 mr-1">We accept</span><span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-ink-900 text-white">COD</span>${pay}</div>
-        <div class="text-[11px] text-slate-500 mt-3"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>Delivery: Inside Dhaka ${money(SHIP.dhaka)} · Outside Dhaka ${money(SHIP.outside)}${FREE_SHIP<99999999?` · Free over ${money(FREE_SHIP)}`:''}</div>
-        <div class="mt-6 pt-5 border-t border-slate-200"><div class="text-xs font-extrabold uppercase tracking-wider mb-2">Product Details</div><p class="text-[13px] text-slate-600 leading-relaxed whitespace-pre-line">${esc(p.description||'Premium quality product from BANA FASHION.')}</p></div>
+        <div class="flex flex-wrap items-center gap-2 mt-4"><span class="text-[11px] font-bold text-slate-500 mr-1">যে পেমেন্ট নিই</span><span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-ink-900 text-white">COD</span>${pay}</div>
+        <div class="text-[11px] text-slate-500 mt-3"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>ডেলিভারি: ঢাকার ভিতরে ${money(SHIP.dhaka)} · ঢাকার বাইরে ${money(SHIP.outside)}${FREE_SHIP<99999999?` · ${money(FREE_SHIP)} এর বেশি অর্ডারে ফ্রি`:''}</div>
+        <div class="mt-6 pt-5 border-t border-slate-200"><div class="text-xs font-extrabold mb-2">পণ্যের বিবরণ</div><p class="text-[13px] text-slate-600 leading-relaxed whitespace-pre-line">${esc(p.description||'Premium quality product from BANA FASHION.')}</p></div>
       </div>
     </div>
     <section id="ppReviews" class="mt-14 pt-10 border-t border-slate-200 max-w-3xl mx-auto"></section>
-    <div class="flex items-center gap-4 mt-16 mb-8"><div class="flex-1 h-px bg-slate-200"></div><h2 class="text-xs sm:text-sm font-semibold tracking-[.35em] uppercase text-ink-900">You May Also Like</h2><div class="flex-1 h-px bg-slate-200"></div></div>
+    <div class="flex items-center gap-4 mt-16 mb-8"><div class="flex-1 h-px bg-slate-200"></div><h2 class="text-xs sm:text-sm font-semibold tracking-[.2em] text-ink-900">আপনার পছন্দ হতে পারে</h2><div class="flex-1 h-px bg-slate-200"></div></div>
     <div id="ppRelated" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"></div>
   </div>`;
   // swipe on gallery
@@ -1138,24 +1157,24 @@ async function loadReviews(pid){
 function drawReviews(list){
   const box=$('ppReviews'); if(!box) return; state.pp.rv=0;
   const n=list.length, avg=n?list.reduce((a,r)=>a+(+r.rating||0),0)/n:0;
-  $('ppRateTxt').textContent=n?`${avg.toFixed(1)} (${n} review${n>1?'s':''})`:'No reviews yet';
-  box.innerHTML=`<div class="flex items-center justify-between gap-3 flex-wrap"><div><h2 class="font-display font-extrabold text-xl">Customer Reviews</h2>${n?`<div class="flex items-center gap-2 mt-1">${ppStars(avg)}<span class="text-xs text-slate-500">${avg.toFixed(1)} out of 5 · ${n} review${n>1?'s':''}</span></div>`:`<p class="text-sm text-slate-500 mt-1">Be the first to write a review</p>`}</div>
-    <button onclick="ppToggleForm()" class="px-5 py-2.5 rounded-xl bg-ink-900 text-white text-xs font-extrabold">Write a review</button></div>
+  $('ppRateTxt').textContent=n?`${avg.toFixed(1)} (${n} টি রিভিউ)`:'এখনো কোনো রিভিউ নেই';
+  box.innerHTML=`<div class="flex items-center justify-between gap-3 flex-wrap"><div><h2 class="font-display font-extrabold text-xl">কাস্টমার রিভিউ</h2>${n?`<div class="flex items-center gap-2 mt-1">${ppStars(avg)}<span class="text-xs text-slate-500">৫ এর মধ্যে ${avg.toFixed(1)} · ${n} টি রিভিউ</span></div>`:`<p class="text-sm text-slate-500 mt-1">প্রথম রিভিউটি আপনিই লিখুন</p>`}</div>
+    <button onclick="ppToggleForm()" class="px-5 py-2.5 rounded-xl bg-ink-900 text-white text-xs font-extrabold">রিভিউ লিখুন</button></div>
     <form id="ppForm" onsubmit="ppSubmitReview(event)" class="hidden mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-      <div><div class="text-xs font-bold mb-1">Your rating</div><div id="ppRateBtns" class="text-2xl text-gold-500">${[1,2,3,4,5].map(i=>`<button type="button" onclick="ppRate(${i})" class="px-0.5" aria-label="${i} star"><i class="fa-regular fa-star"></i></button>`).join('')}</div></div>
-      <input id="rvName" required maxlength="40" placeholder="Your name" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white">
-      <textarea id="rvText" required rows="3" maxlength="600" placeholder="Share your experience with this product" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"></textarea>
-      <button class="px-6 py-3 rounded-xl btn-gold text-xs font-extrabold">Submit review</button></form>
+      <div><div class="text-xs font-bold mb-1">আপনার রেটিং</div><div id="ppRateBtns" class="text-2xl text-gold-500">${[1,2,3,4,5].map(i=>`<button type="button" onclick="ppRate(${i})" class="px-0.5" aria-label="${i} star"><i class="fa-regular fa-star"></i></button>`).join('')}</div></div>
+      <input id="rvName" required maxlength="40" placeholder="আপনার নাম" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white">
+      <textarea id="rvText" required rows="3" maxlength="600" placeholder="এই পণ্য সম্পর্কে আপনার অভিজ্ঞতা লিখুন" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"></textarea>
+      <button class="px-6 py-3 rounded-xl btn-gold text-xs font-extrabold">রিভিউ জমা দিন</button></form>
     <div class="mt-6 space-y-4">${list.map(r=>`<div class="pb-4 border-b border-slate-100"><div class="flex items-center justify-between"><b class="text-sm">${esc(r.name)}</b>${ppStars(r.rating)}</div><p class="text-[13px] text-slate-600 mt-1.5 whitespace-pre-line">${esc(r.text)}</p><div class="text-[10px] text-slate-400 mt-1">${r.at?new Date(r.at).toLocaleDateString('en-GB'):''}</div></div>`).join('')}</div>`;
 }
 function ppToggleForm(){ $('ppForm').classList.toggle('hidden'); }
 function ppRate(i){ state.pp.rv=i; $('ppRateBtns').querySelectorAll('i').forEach((el,k)=>el.className=(k<i?'fa-solid':'fa-regular')+' fa-star'); }
 async function ppSubmitReview(e){
-  e.preventDefault(); if(!state.pp.rv){ toast('Please select a star rating',false); return; }
+  e.preventDefault(); if(!state.pp.rv){ toast('অনুগ্রহ করে স্টার রেটিং দিন',false); return; }
   const pid=state.pp.id, rev={id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),pid,name:$('rvName').value.trim(),rating:state.pp.rv,text:$('rvText').value.trim(),at:Date.now()};
   const mine=load('bana_rev_'+pid,[]); mine.push(rev); save('bana_rev_'+pid,mine);
   if(FIREBASE_READY){ try{ await setDoc(doc(db,'reviews',rev.id),{...rev,createdAt:serverTimestamp()}); }catch(err){} }
-  toast('Thank you for your review!'); loadReviews(pid);
+  toast('আপনার রিভিউয়ের জন্য ধন্যবাদ!'); loadReviews(pid);
 }
 
 /* ================= CART ================= */
@@ -1173,17 +1192,17 @@ function updateCart(){
   { const n=state.cart.reduce((a,i)=>a+i.qty,0), b=$('cartBadge'); b.textContent=n>99?'99+':n; b.classList.toggle('empty',n===0); if(n>0){ b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); } }
   $('cartList').innerHTML=state.cart.map((it,i)=>`<div class="bag-item flex gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 items-center">
     <img src="${esc(it.image)}" class="w-16 h-20 rounded-xl object-cover shrink-0 bg-ink-800" onerror="this.style.opacity=0">
-    <div class="flex-1 min-w-0"><h4 class="font-extrabold text-xs truncate text-white">${esc(it.title)}</h4><span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-silver-300">Size ${esc(it.size)}</span><div class="font-display text-sm text-gold-400 mt-1">${money(it.price*it.qty)}</div></div>
+    <div class="flex-1 min-w-0"><h4 class="font-extrabold text-xs truncate text-white">${esc(it.title)}</h4><span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-silver-300">সাইজ ${esc(it.size)}</span><div class="font-display text-sm text-gold-400 mt-1">${money(it.price*it.qty)}</div></div>
     <div class="flex flex-col items-end gap-2">
       <button onclick="removeItem(${i})" class="text-silver-400 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
       <div class="flex items-center border border-white/15 rounded-lg bg-ink-800"><button onclick="cartQty(${i},-1)" class="px-2.5 py-1 text-xs font-bold hover:text-gold-400">-</button><span class="px-2 text-xs font-bold">${it.qty}</span><button onclick="cartQty(${i},1)" class="px-2.5 py-1 text-xs font-bold hover:text-gold-400">+</button></div>
     </div></div>`).join('');
-  const nItems=state.cart.reduce((a,i)=>a+i.qty,0); $('cartCount').textContent=nItems+(nItems===1?' item':' items');
+  const nItems=state.cart.reduce((a,i)=>a+i.qty,0); $('cartCount').textContent=nItems+' টি পণ্য';
   const empty=state.cart.length===0;
   $('emptyCart').classList.toggle('hidden',!empty); $('emptyCart').classList.toggle('flex',empty); $('cartList').classList.toggle('hidden',empty);
   const sub=subtotal(); $('cartSubtotal').textContent=money(sub);
   const pct=Math.min(100,sub/FREE_SHIP*100); $('shipBar').style.width=pct+'%'; $('shipPct').textContent=Math.round(pct)+'%';
-  $('shipText').textContent = sub>=FREE_SHIP ? '🎉 You unlocked FREE delivery!' : `Add ${money(FREE_SHIP-sub)} more for FREE delivery`;
+  $('shipText').textContent = sub>=FREE_SHIP ? '🎉 আপনি ফ্রি ডেলিভারি পেয়েছেন!' : `ফ্রি ডেলিভারির জন্য আরও ${money(FREE_SHIP-sub)} যোগ করুন`;
 }
 function toggleCartDrawer(){
   const d=$('cartDrawer'),o=$('cartOverlay'),c=$('cartContent');
@@ -1194,16 +1213,16 @@ function toggleCartDrawer(){
 /* ================= WISHLIST ================= */
 function toggleWishlist(id){
   const i=state.wishlist.indexOf(id);
-  if(i>-1){ state.wishlist.splice(i,1); toast('Removed from wishlist'); } else { state.wishlist.push(id); toast('Saved to wishlist ❤️'); }
+  if(i>-1){ state.wishlist.splice(i,1); toast('উইশলিস্ট থেকে সরানো হয়েছে'); } else { state.wishlist.push(id); toast('উইশলিস্টে যোগ হয়েছে ❤️'); }
   save('bana_wish',state.wishlist); updateWishlist(); renderProducts();
 }
 function updateWishlist(){
   const b=$('wishlistBadge'); b.textContent=state.wishlist.length; b.classList.toggle('opacity-0',!state.wishlist.length); b.classList.toggle('scale-0',!state.wishlist.length);
   const c=$('wishlistContent');
-  if(!state.wishlist.length){ c.innerHTML='<p class="text-center text-xs text-slate-400 py-6">No saved items yet.</p>'; return; }
+  if(!state.wishlist.length){ c.innerHTML='<p class="text-center text-xs text-slate-400 py-6">এখনো কোনো পছন্দের পণ্য নেই।</p>'; return; }
   c.innerHTML=state.wishlist.map(id=>state.products.find(p=>p.id===id)).filter(Boolean).map(p=>`<div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/70">
     <div class="flex items-center gap-3 min-w-0"><img src="${esc(p.image)}" class="w-12 h-12 rounded-xl object-cover bg-ink-800"><div class="min-w-0"><h4 class="font-extrabold text-xs truncate">${esc(p.title)}</h4><span class="text-xs font-bold text-gold-600">${money(p.price)}</span></div></div>
-    <div class="flex gap-2 shrink-0"><button onclick="toggleWishlistModal();openProduct('${p.id}')" class="px-3 py-1.5 rounded-lg btn-gold font-extrabold text-xs">View</button><button onclick="toggleWishlist('${p.id}')" class="p-1.5 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div></div>`).join('');
+    <div class="flex gap-2 shrink-0"><button onclick="toggleWishlistModal();openProduct('${p.id}')" class="px-3 py-1.5 rounded-lg btn-gold font-extrabold text-xs">দেখুন</button><button onclick="toggleWishlist('${p.id}')" class="p-1.5 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div></div>`).join('');
 }
 function toggleWishlistModal(){ $('wishlistModal').classList.toggle('hidden'); }
 
@@ -1216,7 +1235,7 @@ function openAccount(){} function closeAuth(){} function setAuthTab(){} function
 
 /* ================= CHECKOUT ================= */
 function startCheckout(){
-  if(!state.cart.length){ toast('Your bag is empty',false); return; }
+  if(!state.cart.length){ toast('আপনার ব্যাগ খালি',false); return; }
   if($('cartDrawer').classList.contains('hidden')===false) toggleCartDrawer();
   openCheckout();
 }
@@ -1226,30 +1245,30 @@ function openCheckout(){
 }
 function closeCheckout(){ $('checkoutModal').classList.add('hidden'); document.body.style.overflow=''; }
 function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value]; }
-function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; if(state.promo&&s<(state.promo.minOrder||0)){ state.promo=null; $('promoMsg').textContent=''; } const dc=discAmt(); $('coDiscRow').classList.toggle('hidden',!dc); $('coDisc').textContent='-'+money(dc); if(state.promo) $('coDiscCode').textContent=state.promo.code; $('coTotal').textContent=money(s-dc+sh);
-  $('noteIn').textContent=money(SHIP.dhaka); $('noteOut').textContent=money(SHIP.outside); $('noteFree').textContent=sh===0?'Your delivery is FREE - no advance payment needed.':(FREE_SHIP<99999999?'Free delivery on orders over '+money(FREE_SHIP)+'.':''); }
+function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'ফ্রি'; if(state.promo&&s<(state.promo.minOrder||0)){ state.promo=null; $('promoMsg').textContent=''; } const dc=discAmt(); $('coDiscRow').classList.toggle('hidden',!dc); $('coDisc').textContent='-'+money(dc); if(state.promo) $('coDiscCode').textContent=state.promo.code; $('coTotal').textContent=money(s-dc+sh);
+  $('noteIn').textContent=money(SHIP.dhaka); $('noteOut').textContent=money(SHIP.outside); $('noteFree').textContent=sh===0?'আপনার ডেলিভারি ফ্রি — অগ্রিম পেমেন্ট লাগবে না।':(FREE_SHIP<99999999?money(FREE_SHIP)+' এর বেশি অর্ডারে ডেলিভারি ফ্রি।':''); }
 const BD={"Dhaka":"Adabor,Badda,Banani,Bangshal,Bimanbandar,Cantonment,Chawkbazar,Dakshinkhan,Darus Salam,Demra,Dhamrai,Dhanmondi,Dohar,Gendaria,Gulshan,Hazaribagh,Jatrabari,Kadamtali,Kafrul,Kalabagan,Kamrangirchar,Keraniganj,Khilgaon,Khilkhet,Kotwali,Lalbagh,Mirpur,Mohammadpur,Motijheel,Nawabganj,New Market,Pallabi,Paltan,Ramna,Rampura,Sabujbagh,Savar,Shahbagh,Shyampur,Sutrapur,Tejgaon,Turag,Uttara,Uttar Khan,Wari","Gazipur":"Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur,Tongi","Narayanganj":"Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon","Narsingdi":"Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur","Manikganj":"Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair","Munshiganj":"Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari","Faridpur":"Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha","Gopalganj":"Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara","Madaripur":"Kalkini,Madaripur Sadar,Rajoir,Shibchar","Rajbari":"Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar","Shariatpur":"Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira","Tangail":"Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar","Kishoreganj":"Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail","Chattogram":"Anwara,Banshkhali,Boalkhali,Chandanaish,Chattogram City,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda","Cox's Bazar":"Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia","Cumilla":"Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Cumilla Sadar,Cumilla Sadar Dakshin,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohorgonj,Muradnagar,Nangalkot,Titas","Feni":"Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi","Brahmanbaria":"Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail","Noakhali":"Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar","Lakshmipur":"Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati","Chandpur":"Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti","Khagrachhari":"Dighinala,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh","Rangamati":"Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar","Bandarban":"Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi","Rajshahi":"Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Rajshahi City,Tanore","Chapainawabganj":"Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj","Naogaon":"Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar","Natore":"Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra","Pabna":"Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar","Sirajganj":"Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara","Bogura":"Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatola","Joypurhat":"Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi","Khulna":"Batiaghata,Dacope,Dighalia,Dumuria,Khulna City,Koyra,Paikgachha,Phultala,Rupsha,Terokhada","Bagerhat":"Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola","Satkhira":"Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala","Jashore":"Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha","Jhenaidah":"Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa","Magura":"Magura Sadar,Mohammadpur,Shalikha,Sreepur","Narail":"Kalia,Lohagara,Narail Sadar","Kushtia":"Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur","Chuadanga":"Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar","Meherpur":"Gangni,Meherpur Sadar,Mujibnagar","Barishal":"Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gournadi,Hizla,Mehendiganj,Muladi,Wazirpur","Bhola":"Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin","Jhalokati":"Jhalokati Sadar,Kathalia,Nalchity,Rajapur","Patuakhali":"Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali","Pirojpur":"Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar","Barguna":"Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali","Sylhet":"Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj","Moulvibazar":"Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal","Habiganj":"Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj","Sunamganj":"Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur","Rangpur":"Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj","Dinajpur":"Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Fulbari,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur","Kurigram":"Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur","Lalmonirhat":"Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram","Nilphamari":"Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur","Gaibandha":"Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj","Thakurgaon":"Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar","Panchagarh":"Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia","Mymensingh":"Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal","Jamalpur":"Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari","Netrokona":"Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala","Sherpur":"Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi"};
 const DIV_COUNTS=[['Dhaka',13],['Chattogram',11],['Rajshahi',8],['Khulna',10],['Barishal',6],['Sylhet',4],['Rangpur',8],['Mymensingh',4]];
 const DIV_OF=(()=>{ const m={}, ks=Object.keys(BD); let n=0; DIV_COUNTS.forEach(([dv,c])=>{ ks.slice(n,n+c).forEach(d=>m[d]=dv); n+=c; }); return m; })();
-function initDist(){ const el=$('coDist'); if(el.options.length<=1) el.innerHTML='<option value="">Select district</option>'+Object.keys(BD).sort().map(d=>`<option>${d}</option>`).join(''); onDist(); }
+function initDist(){ const el=$('coDist'); if(el.options.length<=1) el.innerHTML='<option value="">জেলা বাছাই করুন</option>'+Object.keys(BD).sort((a,b)=>(DBN[a]||a).localeCompare(DBN[b]||b,'bn')).map(d=>`<option value="${d}">${DBN[d]||d} (${d})</option>`).join(''); onDist(); }
 function onDist(){
   const d=$('coDist').value, box=$('coUpBox'), up=$('coUp'), dv=DIV_OF[d]||'';
   $('coArea').value=(d===''||d==='Dhaka')?'dhaka':'outside'; $('coDiv').value=dv;
   $('coDivTxt').className='mt-1 w-full px-4 py-3 rounded-xl border text-sm flex items-center gap-2 '+(dv?'border-emerald-300 bg-emerald-50 text-ink-900 font-extrabold':'border-dashed border-slate-300 bg-slate-50 text-slate-400');
-  $('coDivTxt').innerHTML=dv?`<i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i><span>${dv} Division</span>`:'<i class="fa-solid fa-map text-xs"></i><span>Auto-selected from district</span>';
-  if(!d){ box.classList.add('hidden'); up.required=false; up.innerHTML='<option value="">Select upazila / thana</option>'; }
-  else { up.innerHTML='<option value="">Select upazila / thana</option>'+BD[d].split(',').map(x=>`<option>${x}</option>`).join(''); box.classList.remove('hidden'); up.required=true; }
+  $('coDivTxt').innerHTML=dv?`<i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i><span>${DVBN[dv]||dv} বিভাগ</span>`:'<i class="fa-solid fa-map text-xs"></i><span>জেলা বাছলে নিজে থেকে আসবে</span>';
+  if(!d){ box.classList.add('hidden'); up.required=false; up.innerHTML='<option value="">উপজেলা / থানা বাছাই করুন</option>'; }
+  else { up.innerHTML='<option value="">উপজেলা / থানা বাছাই করুন</option>'+BD[d].split(',').map(x=>`<option>${x}</option>`).join(''); box.classList.remove('hidden'); up.required=true; }
   const inside=(d==='Dhaka');
-  $('coDelTag').innerHTML=!d?`<i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="leading-relaxed"><b class="text-ink-900">Delivery charge</b><br>Inside Dhaka <b>${money(SHIP.dhaka)}</b> &nbsp;·&nbsp; Outside Dhaka <b>${money(SHIP.outside)}</b></div>`
-    :`<i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="leading-relaxed flex-1"><b class="text-ink-900">${inside?'Inside Dhaka':'Outside Dhaka'}</b> · ${d}${dv?', '+dv+' Division':''}<br><span class="text-slate-500">Delivery charge</span> <b class="text-ink-900">${money(inside?SHIP.dhaka:SHIP.outside)}</b></div>`;
+  $('coDelTag').innerHTML=!d?`<i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="leading-relaxed"><b class="text-ink-900">ডেলিভারি চার্জ</b><br>ঢাকার ভিতরে <b>${money(SHIP.dhaka)}</b> &nbsp;·&nbsp; ঢাকার বাইরে <b>${money(SHIP.outside)}</b></div>`
+    :`<i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="leading-relaxed flex-1"><b class="text-ink-900">${inside?'ঢাকার ভিতরে':'ঢাকার বাইরে'}</b> · ${DBN[d]||d}${dv?', '+(DVBN[dv]||dv)+' বিভাগ':''}<br><span class="text-slate-500">ডেলিভারি চার্জ</span> <b class="text-ink-900">${money(inside?SHIP.dhaka:SHIP.outside)}</b></div>`;
   updateCheckoutTotals(); }
 async function placeOrder(e){
   e.preventDefault();
   const phone=$('coPhone').value.replace(/[\s-]/g,'').replace(/^\+?88/,'');
-  if(!/^01[3-9]\d{8}$/.test(phone)){ toast('Enter a valid Bangladeshi mobile number (01XXXXXXXXX)',false); return; }
+  if(!/^01[3-9]\d{8}$/.test(phone)){ toast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)',false); return; }
   let pay=null; if(state.payM&&state.payM!=='cod'&&shipCost()>0){ const sender=$('coSender').value.replace(/[\s-]/g,''), trx=$('coTrx').value.trim().toUpperCase();
-    if(!/^01[3-9]\d{8}$/.test(sender)||!/^[A-Z0-9]{6,20}$/.test(trx)){ toast('Enter your sender number and TrxID',false); return; } if($('coTrxErr').textContent){ toast($('coTrxErr').textContent,false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
-  const btn=$('coSubmit'); btn.disabled=true; btn.textContent='PLACING ORDER...';
+    if(!/^01[3-9]\d{8}$/.test(sender)||!/^[A-Z0-9]{6,20}$/.test(trx)){ toast('আপনার সেন্ডার নম্বর ও TrxID দিন',false); return; } if($('coTrxErr').textContent){ toast($('coTrxErr').textContent,false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
+  const btn=$('coSubmit'); btn.disabled=true; btn.textContent='অর্ডার হচ্ছে...';
   const sub=subtotal(), ship=shipCost(), disc=discAmt(), orderId='BF-'+Date.now().toString(36).toUpperCase();
   const order={orderId,uid:state.user.uid,email:state.user.email||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,district:$('coDist').value,division:$('coDiv').value,upazila:$('coUp').value,address:$('coAddress').value.trim(),geo:$('coLat').value?{lat:+$('coLat').value,lng:+$('coLng').value}:null,note:$('coNote').value.trim(),
     items:state.cart.map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,discount:disc,promo:(disc&&state.promo)?{code:state.promo.code,type:state.promo.type,value:state.promo.value}:null,delivery:ship,total:sub-disc+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
@@ -1257,14 +1276,14 @@ async function placeOrder(e){
     if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); if(pay) bt.set(doc(db,'trx',pay.trxId),{uid:state.user.uid,orderId,at:serverTimestamp()}); bt.set(doc(db,'receipts',orderId),{orderId,uid:state.user.uid,status:'pending',total:order.total,name:(order.customerName||'').split(' ')[0],createdAt:serverTimestamp()}); if(disc&&state.promo){ bt.update(doc(db,'promos',state.promo.code),{used:increment(1)}); bt.set(doc(db,'promoUses',state.promo.code+'_'+state.user.uid),{uid:state.user.uid,orderId,at:serverTimestamp()}); } await bt.commit(); }
     else { const all=load('bana_orders',[]); all.push({...order,createdAt:new Date().toISOString()}); save('bana_orders',all); }
     const waNum=String((state.site&&state.site.whatsapp)||'8801353808618').replace(/\D/g,'');
-    const msg=['*NEW ORDER - BANA FASHION*','Order ID: '+orderId,'Name: '+order.customerName,'Phone: '+phone,'Address: '+order.address+', '+order.upazila+', '+order.district+(order.division?', '+order.division+' Division':''),order.geo?'Location: https://www.google.com/maps?q='+order.geo.lat+','+order.geo.lng:'','',...order.items.map(i=>'• '+i.title+' ('+i.size+') x'+i.qty+' = '+money(i.price*i.qty)),'','Delivery: '+(ship?money(ship):'FREE'),...(disc?['Promo '+state.promo.code+': -'+money(disc)]:[]),'*Total: '+money(order.total)+'*','Payment: '+order.payment+(pay?' | TrxID: '+pay.trxId:'')].filter(x=>x!==undefined).join('\n');
+    const msg=['*NEW ORDER - BANA FASHION*','অর্ডার আইডি: '+orderId,'Name: '+order.customerName,'Phone: '+phone,'Address: '+order.address+', '+order.upazila+', '+order.district+(order.division?', '+order.division+' Division':''),order.geo?'Location: https://www.google.com/maps?q='+order.geo.lat+','+order.geo.lng:'','',...order.items.map(i=>'• '+i.title+' ('+i.size+') x'+i.qty+' = '+money(i.price*i.qty)),'','Delivery: '+(ship?money(ship):'ফ্রি'),...(disc?['Promo '+state.promo.code+': -'+money(disc)]:[]),'*মোট: '+money(order.total)+'*','Payment: '+order.payment+(pay?' | TrxID: '+pay.trxId:'')].filter(x=>x!==undefined).join('\n');
     const waUrl='https://wa.me/'+waNum+'?text='+encodeURIComponent(msg); $('successWa').href=waUrl;
     if(!(state.site&&state.site.waAuto===false)) setTimeout(()=>{ try{ window.open(waUrl,'_blank'); }catch(e){} },700);
     $('successId').textContent=orderId; state.lastOrder=order;
-    $('successSummary').innerHTML=order.items.map(i=>`<div class="flex justify-between gap-2"><span class="truncate">${esc(i.title)} <span class="text-slate-400">(${esc(i.size)}) ×${i.qty}</span></span><b>${money(i.price*i.qty)}</b></div>`).join('')+`<div class="border-t border-slate-200 pt-1.5 flex justify-between"><span class="text-slate-500">Delivery</span><b>${ship?money(ship):'FREE'}</b></div>`+(disc?`<div class="flex justify-between"><span class="text-emerald-600">Discount</span><b>-${money(disc)}</b></div>`:'')+`<div class="flex justify-between text-sm font-extrabold"><span>Total</span><span>${money(order.total)}</span></div><div class="border-t border-slate-200 pt-1.5 text-slate-500 leading-relaxed"><b class="text-ink-900">${esc(order.customerName)}</b> · ${esc(order.phone)}<br>${esc(order.address)}, ${esc(order.upazila)}, ${esc(order.district)}${order.division?', '+esc(order.division)+' Division':''} <span class="text-gold-600 font-bold">(${order.area==='dhaka'?'Inside Dhaka':'Outside Dhaka'})</span><br>Payment: ${esc(order.payment)}</div>`;
-    state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); onDist(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='Auto-fill your district, area & address using GPS'; $('successModal').classList.remove('hidden');
-  }catch(err){ console.error(err); if(pay&&err.code==='permission-denied') $('coTrxErr').textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; toast(err.code==='permission-denied'&&state.promo&&!pay?'This promo code is no longer valid. Please remove it and try again.':pay&&err.code==='permission-denied'?'এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!':'Could not place order: '+(err.message||'try again'),false); }
-  btn.disabled=false; btn.textContent='CONFIRM ORDER';
+    $('successSummary').innerHTML=order.items.map(i=>`<div class="flex justify-between gap-2"><span class="truncate">${esc(i.title)} <span class="text-slate-400">(${esc(i.size)}) ×${i.qty}</span></span><b>${money(i.price*i.qty)}</b></div>`).join('')+`<div class="border-t border-slate-200 pt-1.5 flex justify-between"><span class="text-slate-500">ডেলিভারি</span><b>${ship?money(ship):'ফ্রি'}</b></div>`+(disc?`<div class="flex justify-between"><span class="text-emerald-600">ডিসকাউন্ট</span><b>-${money(disc)}</b></div>`:'')+`<div class="flex justify-between text-sm font-extrabold"><span>মোট</span><span>${money(order.total)}</span></div><div class="border-t border-slate-200 pt-1.5 text-slate-500 leading-relaxed"><b class="text-ink-900">${esc(order.customerName)}</b> · ${esc(order.phone)}<br>${esc(order.address)}, ${esc(order.upazila)}, ${esc(DBN[order.district]||order.district)}${order.division?', '+esc(DVBN[order.division]||order.division)+' বিভাগ':''} <span class="text-gold-600 font-bold">(${order.area==='dhaka'?'ঢাকার ভিতরে':'ঢাকার বাইরে'})</span><br>পেমেন্ট: ${esc(order.payment)}</div>`;
+    state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); onDist(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='GPS দিয়ে জেলা, এলাকা ও ঠিকানা নিজে থেকে পূরণ হবে'; $('successModal').classList.remove('hidden');
+  }catch(err){ console.error(err); if(pay&&err.code==='permission-denied') $('coTrxErr').textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; toast(err.code==='permission-denied'&&state.promo&&!pay?'এই প্রোমো কোডটি আর বৈধ নয়। কোডটি সরিয়ে আবার চেষ্টা করুন।':pay&&err.code==='permission-denied'?'এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!':'অর্ডার করা যায়নি: '+(err.message||'try again'),false); }
+  btn.disabled=false; btn.textContent='অর্ডার কনফার্ম করুন';
 }
 
 /* ================= MISC ================= */
@@ -1273,7 +1292,7 @@ function setupReveal(){
   const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); if(en.target.querySelector('.counter')) en.target.querySelectorAll('.counter').forEach(runCounter); io.unobserve(en.target); } }),{threshold:.15});
   document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
 }
-function runCounter(el){ if(el.dataset.done) return; el.dataset.done=1; const to=+el.dataset.to; let n=0; const step=Math.max(1,Math.ceil(to/60)); const t=setInterval(()=>{ n=Math.min(to,n+step); el.textContent=n.toLocaleString('en-US'); if(n>=to) clearInterval(t); },25); }
+function runCounter(el){ if(el.dataset.done) return; el.dataset.done=1; const to=+el.dataset.to; let n=0; const step=Math.max(1,Math.ceil(to/60)); const t=setInterval(()=>{ n=Math.min(to,n+step); el.textContent=n.toLocaleString('bn-BD'); if(n>=to) clearInterval(t); },25); }
 window.addEventListener('scroll',()=>{ const t=$('toTop'); const show=window.scrollY>600; t.classList.toggle('opacity-0',!show); t.classList.toggle('pointer-events-none',!show); },{passive:true});
 
 
@@ -1320,12 +1339,12 @@ window.addEventListener('scroll',()=>{ const h=document.documentElement; const p
 
 /* ===== v3 JS: promo banners, hero dots, splash ===== */
 const PROMOS=[
- {bg:'linear-gradient(120deg,#000 0%,#2b1503 45%,#8a4b06 100%)',icon:'fa-fire',tag:'Mega Sale',big:'50% OFF',title:'FLAT HALF-PRICE DEALS',text:'Selected shirts & tees at half price. Limited time only!',cta:'SHOP SALE',cat:'all'},
- {bg:'linear-gradient(120deg,#020617 0%,#0c1e3a 50%,#1e4976 100%)',icon:'fa-snowflake',tag:'Winter Collection',big:'UP TO 30% OFF',title:'JACKETS & HOODIES',text:'Stay warm, look sharp — premium winter wear.',cta:'SHOP WINTER',cat:'jackets'},
- {bg:'linear-gradient(120deg,#021a12 0%,#064e3b 55%,#0f766e 100%)',icon:'fa-tags',tag:'Combo Offer',big:'BUY 2 · SAVE 10%',title:'MIX & MATCH ANY STYLE',text:'Pick any two items and save more on your order.',cta:'GRAB OFFER',cat:'all'},
- {bg:'linear-gradient(120deg,#12061f 0%,#3b1275 55%,#6d28d9 100%)',icon:'fa-truck-fast',tag:'Free Delivery',big:'ORDERS OVER ৳3000',title:'FREE DELIVERY ALL OVER BD',text:'Cash on Delivery · Check the product, then pay.',cta:'ORDER NOW',cat:'all'},
- {bg:'linear-gradient(120deg,#1c0509 0%,#5f1212 55%,#b91c1c 100%)',icon:'fa-shirt',tag:'Tee Deal',big:'TEES FROM ৳590',title:'HEAVY COTTON T-SHIRTS & POLO',text:'Everyday comfort at the best price.',cta:'SHOP TEES',cat:'tshirts'},
- {bg:'linear-gradient(120deg,#050505 0%,#1a1204 50%,#7c5a0a 100%)',icon:'fa-bolt',tag:'New Arrivals',big:'FRESH DROPS',title:'NEW STYLES EVERY WEEK',text:'Be the first to wear the latest BANA FASHION looks.',cta:'EXPLORE NEW',cat:'all'}
+ {bg:'linear-gradient(120deg,#000 0%,#2b1503 45%,#8a4b06 100%)',icon:'fa-fire',tag:'মেগা সেল',big:'৫০% ছাড়',title:'অর্ধেক দামের অফার',text:'নির্বাচিত শার্ট ও টি-শার্ট অর্ধেক দামে। অফার সীমিত সময়ের জন্য!',cta:'সেল দেখুন',cat:'all'},
+ {bg:'linear-gradient(120deg,#020617 0%,#0c1e3a 50%,#1e4976 100%)',icon:'fa-snowflake',tag:'শীতের কালেকশন',big:'৩০% পর্যন্ত ছাড়',title:'জ্যাকেট ও হুডি',text:'উষ্ণ থাকুন, স্মার্ট দেখান — প্রিমিয়াম শীতের পোশাক।',cta:'শীতের পোশাক দেখুন',cat:'jackets'},
+ {bg:'linear-gradient(120deg,#021a12 0%,#064e3b 55%,#0f766e 100%)',icon:'fa-tags',tag:'কম্বো অফার',big:'২টি কিনলে ১০% সাশ্রয়',title:'পছন্দমতো মিলিয়ে নিন',text:'যেকোনো দুইটি পণ্য নিন, অর্ডারে আরও সাশ্রয় করুন।',cta:'অফারটি নিন',cat:'all'},
+ {bg:'linear-gradient(120deg,#12061f 0%,#3b1275 55%,#6d28d9 100%)',icon:'fa-truck-fast',tag:'ফ্রি ডেলিভারি',big:'৩,০০০ টাকার বেশি অর্ডারে',title:'সারা বাংলাদেশে ফ্রি ডেলিভারি',text:'ক্যাশ অন ডেলিভারি · পণ্য দেখে টাকা দিন।',cta:'এখনই অর্ডার করুন',cat:'all'},
+ {bg:'linear-gradient(120deg,#1c0509 0%,#5f1212 55%,#b91c1c 100%)',icon:'fa-shirt',tag:'টি-শার্ট ডিল',big:'মাত্র ৫৯০ টাকা থেকে',title:'হেভি কটন টি-শার্ট ও পোলো',text:'সেরা দামে প্রতিদিনের আরাম।',cta:'টি-শার্ট দেখুন',cat:'tshirts'},
+ {bg:'linear-gradient(120deg,#050505 0%,#1a1204 50%,#7c5a0a 100%)',icon:'fa-bolt',tag:'নতুন কালেকশন',big:'একদম নতুন',title:'প্রতি সপ্তাহে নতুন স্টাইল',text:'সর্বশেষ BANA FASHION লুক সবার আগে পরুন।',cta:'নতুন দেখুন',cat:'all'}
 ];
 function buildPromos(){
   const hero=$('hero'); const anchor=hero.querySelector(':scope > button'); if(!anchor) return;
@@ -1362,7 +1381,7 @@ Object.assign(window,{ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleFor
 
 /* init */
 state.cart=load('bana_cart',[]); state.wishlist=load('bana_wish',[]);
-buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); setupReveal(); loadFirestoreProducts(); loadSite(); verifyOrder(); openFromHash();
+buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); setupReveal(); loadFirestoreProducts(); loadSite(); verifyOrder(); openFromHash(); buildCatRow(); pencilInit(); bnFix();
 { const t0=performance.now(); const done=()=>{ const w=Math.max(0,2700-(performance.now()-t0)); setTimeout(()=>{ const p=$('preloader'); if(!p) return; p.classList.add('out'); setTimeout(()=>p.remove(),550); },w); }; if(document.readyState==='complete') done(); else window.addEventListener('load',done); }
 </script>
 </body>
