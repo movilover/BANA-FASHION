@@ -117,6 +117,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 .pl-line{width:0;animation:plLine .7s 1.9s ease forwards}
 @keyframes plLine{to{width:10rem}}
 #preloader.out{opacity:0}
+/* splash exit: starts 4.3s after first paint (logo finishes ~2.9s -> ~1.4s hold), then a soft zoom-blur-fade into the site */
+@keyframes plExit{0%{opacity:1;transform:scale(1);filter:blur(0)}100%{opacity:0;transform:scale(1.08);filter:blur(8px);visibility:hidden}}
+#preloader{animation:plExit .7s cubic-bezier(.4,0,.2,1) 4.3s forwards;will-change:opacity,transform}
 /* cart badge */
 @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.7)}100%{transform:scale(1)}}
 .cart-badge.bump{animation:bump .5s ease}
@@ -363,6 +366,25 @@ select.co-in{appearance:none;-webkit-appearance:none;padding-right:38px;backgrou
   <div class="pl-line mt-3 h-0.5 bg-gradient-to-r from-transparent via-gold-500 to-transparent rounded"></div>
   <div class="pl-tag mt-3 text-[9px] sm:text-[10px] text-silver-400 font-bold uppercase">প্রিমিয়াম মেনস ফ্যাশন</div>
 </div>
+<script>
+/* SPLASH (classic script: runs while the page is parsed, so the logo animation starts on the first paint, in sync with the CSS timeline) */
+(function(){
+  window.__splash=0;                                   /* 0 = showing, 1 = leaving, 2 = gone */
+  var box=document.getElementById('plLogo'), p=document.getElementById('preloader');
+  if(!box||!p){ window.__splash=2; return; }
+  var src=box.getAttribute('data-src'), N=5, S=128, T=S/N, R=Math.random, h='';
+  for(var r=0;r<N;r++)for(var c=0;c<N;c++){
+    var a=R()*Math.PI*2, d=90+R()*130, x=Math.cos(a)*d, y=Math.sin(a)*d, rot=(R()<.5?-1:1)*(360+R()*540);
+    h+='<div class="pl-tile" style="width:'+(T+.6)+'px;height:'+(T+.6)+'px;left:'+(c*T)+'px;top:'+(r*T)+'px;background-image:url('+src+');background-size:'+S+'px '+S+'px;background-position:-'+(c*T)+'px -'+(r*T)+'px;--x:'+x.toFixed(0)+'px;--y:'+y.toFixed(0)+'px;--r:'+rot.toFixed(0)+'deg;animation-delay:'+(R()*.12).toFixed(2)+'s"></div>';
+  }
+  box.innerHTML=h+'<div class="pl-ring"></div>';
+  function fire(n,name){ if(window.__splash>=n) return; window.__splash=n; document.dispatchEvent(new Event(name)); }
+  p.addEventListener('animationstart',function(e){ if(e.animationName==='plExit') fire(1,'splash:exit'); });
+  p.addEventListener('animationend',function(e){ if(e.animationName==='plExit'){ fire(1,'splash:exit'); if(p.parentNode) p.parentNode.removeChild(p); fire(2,'splash:done'); } });
+  setTimeout(function(){ fire(1,'splash:exit'); if(p.parentNode) p.parentNode.removeChild(p); fire(2,'splash:done'); },7000);   /* safety net */
+})();
+</script>
+
 
 <!-- TOP TICKER -->
 <div class="bg-gradient-to-r from-gold-600 via-gold-500 to-gold-600 text-black text-xs font-bold overflow-hidden">
@@ -892,7 +914,9 @@ const CATEGORIES = [
 ];
 const CATBN={all:'সব পণ্য',shoes:'জুতা',shirts:'শার্ট',tshirts:'টি-শার্ট ও পোলো',jeans:'ডেনিম জিন্স',pants:'প্যান্ট',shorts:'কোয়ার্টার শর্টস',jackets:'জ্যাকেট ও হুডি',threepiece:'থ্রি পিস',watches:'ঘড়ি'};
 CATEGORIES.forEach(c=>{ if(CATBN[c.id]) c.label=CATBN[c.id]; });
-const catLabel=id=>CATBN[id]||id;
+/* label of a category: accepts an id string OR a Firestore category object (this used to return the object itself -> "[object Object]") */
+const _s=v=>typeof v==='string'?v.trim():(typeof v==='number'?String(v):(v&&typeof v==='object'?_s(v.bn||v.bangla||v.en||v.name||v.label||''):''));
+const catLabel=c=>{ if(c&&typeof c==='object'){ const id=_s(c.id); return _s(c.nameBn||c.name_bn||c.bn||c.labelBn)||CATBN[id]||_s(c.name)||_s(c.label)||_s(c.title)||id; } return CATBN[c]||_s(c); };
 const BADGEBN={new:'নতুন',hot:'হট',trending:'ট্রেন্ডিং',popular:'জনপ্রিয়',premium:'প্রিমিয়াম',limited:'লিমিটেড',bestseller:'বেস্টসেলার',set:'সেট',essential:'এসেনশিয়াল',value:'ভ্যালু',sale:'সেল',eid:'ঈদ'};
 const badgeBn=b=>BADGEBN[String(b||'').toLowerCase()]||b;
 const bnum=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
@@ -909,7 +933,7 @@ const PCOL={bkash:['#E2136E','bKash'],nagad:['#F6921E','Nagad'],rocket:['#8C3494
 const state = { products:[],loaded:false,rvUnsub:null, cart:[], wishlist:[], cat:'all', q:'', sort:'default', hero:0, user:null, pm:{id:null,size:'M',qty:1}, pendingCheckout:false, authTab:'login', buyNow:null, hold:false };
 const $ = id => document.getElementById(id);
 const money = n => 'Tk ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:(Number(n)%1?2:0),maximumFractionDigits:2});
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc = s => String((s&&typeof s==='object'&&!Array.isArray(s))?(s.bn||s.label||s.name||s.title||''):(s ?? '')).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const save = (k,v) => { try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} };
 const load = (k,d) => { try{const v=JSON.parse(localStorage.getItem(k)); return v ?? d}catch(e){return d} };
 
@@ -1025,12 +1049,12 @@ async function loadSite(){
 const SVG_TIE='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M9 2h6l-1.2 3 1.7 12.2L12 22l-3.5-4.8L10.2 5z"/></svg>';
 const SVG_PANT='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M7 2h10l1 20h-4.6L12 9.5 10.6 22H6z"/></svg>';
 const CAT_ICONS=[[/t-?shirt|টি-?শার্ট|polo|পোলো/i,'<i class="fa-solid fa-vest"></i>'],[/panjabi|punjabi|পাঞ্জাবি|kurta/i,SVG_TIE],[/shirt|শার্ট/i,'<i class="fa-solid fa-shirt"></i>'],[/pant|প্যান্ট|jeans|জিন্স|trouser|shorts|শর্টস/i,SVG_PANT],[/watch|ঘড়ি/i,'<i class="fa-solid fa-stopwatch"></i>'],[/suit|সুট|jacket|hoodie|জ্যাকেট|হুডি|coat|three|থ্রি/i,'<i class="fa-solid fa-user-tie"></i>'],[/shoe|জুতা|sneaker|sandal/i,'<i class="fa-solid fa-shoe-prints"></i>'],[/belt|wallet|bag|ব্যাগ|বেল্ট/i,'<i class="fa-solid fa-bag-shopping"></i>']];
-function catIcon(c){ const t=(c.id||'')+' '+(c.label||'')+' '+(CATBN[c.id]||''); for(const [re,ic] of CAT_ICONS) if(re.test(t)) return ic; return '<i class="fa-solid fa-tags"></i>'; }
+function catIcon(c){ const t=(c.id||'')+' '+catLabel(c)+' '+(CATBN[c.id]||''); for(const [re,ic] of CAT_ICONS) if(re.test(t)) return ic; return '<i class="fa-solid fa-tags"></i>'; }
 function buildCatRow(){ const r=$('catRow'); if(!r) return;
   let list=(state.cats&&state.cats.length)?state.cats:CATEGORIES.filter(c=>state.products.some(p=>p.category===c.id));
   list=list.filter(c=>c.id!=='all').slice(0,24);
   const sec=$('categories'); if(sec) sec.classList.toggle('hidden',!list.length);
-  r.innerHTML=list.map((c,i)=>{ const name=state.cats&&state.cats.length?catLabel(c):(CATBN[c.id]||c.label); const n=state.products.filter(p=>p.category===c.id).length;
+  r.innerHTML=list.map((c,i)=>{ const name=catLabel(c)||String(c.id||''); const n=state.products.filter(p=>p.category===c.id).length;
     return `<div onclick="goShop('${esc(c.id)}')" style="--d:${(i*.09).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}</span><h3 class="cat-name">${esc(name)}</h3>${n?`<span class="cat-cnt">${bnum(n)}+ পণ্য</span>`:''}</div>`; }).join(''); if(catsInView) playCats(); }
 /* ===== pencil-writing text + Bengali spacing fix ===== */
 function pencilInit(){
@@ -1624,17 +1648,7 @@ function buildPromos(){
   const n=hero.querySelectorAll('.hero-slide').length;
   $('heroDots').innerHTML=Array.from({length:n},(_,i)=>`<button aria-label="Slide ${i+1}" onclick="goToHeroSlide(${i})" class="hero-dot h-1.5 w-5 sm:w-9 rounded-full bg-white/25 overflow-hidden"><span class="hero-bar block h-full bg-gold-500"></span></button>`).join('');
 }
-/* splash: 5x5 tiles of the logo */
-function runSplash(){
-  const box=$('plLogo'); if(!box) return; const src=box.dataset.src, N=5, S=128, T=S/N, R=Math.random;
-  let h='';
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
-    const a=R()*Math.PI*2, d=90+R()*130, x=Math.cos(a)*d, y=Math.sin(a)*d, rot=(R()<.5?-1:1)*(360+R()*540);
-    h+=`<div class="pl-tile" style="width:${T+.6}px;height:${T+.6}px;left:${c*T}px;top:${r*T}px;background-image:url(${src});background-size:${S}px ${S}px;background-position:-${c*T}px -${r*T}px;--x:${x.toFixed(0)}px;--y:${y.toFixed(0)}px;--r:${rot.toFixed(0)}deg;animation-delay:${(R()*.12).toFixed(2)}s"></div>`;
-  }
-  box.innerHTML=h+'<div class="pl-ring"></div>';
-}
-runSplash(); buildPromos();
+buildPromos();
 
 /* expose handlers to inline onclick */
 Object.assign(window,{ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleForm,ppSubmitReview,showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,showLastInv,showMyInv,showInvoice,copyNum,chkTrx,updateCheckoutTotals,placeOrder,setArea,coQty,coRemove,closeConfirm});
@@ -1642,7 +1656,9 @@ Object.assign(window,{ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleFor
 /* init */
 state.cart=load('bana_cart',[]); state.wishlist=load('bana_wish',[]);
 buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); clearTimeout(heroTimer); setupReveal(); setupCounters(); loadFirestoreProducts(); loadSite(); verifyOrder(); openFromHash(); buildCatRow(); pencilInit(); bnFix();
-{ const t0=performance.now(); const done=()=>{ const w=Math.max(0,4300-(performance.now()-t0)); setTimeout(()=>{ const p=$('preloader'); if(!p) return; p.classList.add('out'); setTimeout(()=>{ p.remove(); restartHero(); },550); },w); }; if(document.readyState==='complete') done(); else window.addEventListener('load',done); }
+/* hero starts together with the splash exit (banner 1 = 2s, banner 2 = 4s are counted from here) */
+{ let started=false; const startSite=()=>{ if(started) return; started=true; setTimeout(()=>restartHero(),350); };
+  if((window.__splash||0)>=1||!$('preloader')) startSite(); else document.addEventListener('splash:exit',startSite,{once:true}); }
 </script>
 </body>
 </html>
