@@ -835,8 +835,10 @@ const DVBN={Dhaka:'ঢাকা',Chattogram:'চট্টগ্রাম',Rajsha
 const SIZES = ['M','L','XL','XXL'];
 let FREE_SHIP = 3000;
 const SHIP = {dhaka:80,outside:150};
+/* payment brand colours + labels (was missing -> ReferenceError inside renderPay() -> checkout never opened) */
+const PCOL={bkash:['#E2136E','bKash'],nagad:['#F6921E','Nagad'],rocket:['#8C3494','Rocket'],upay:['#EAB308','Upay']};
 
-const state = { products:[],loaded:false,rvUnsub:null, cart:[], wishlist:[], cat:'all', q:'', sort:'default', hero:0, user:null, pm:{id:null,size:'M',qty:1}, pendingCheckout:false, authTab:'login' };
+const state = { products:[],loaded:false,rvUnsub:null, cart:[], wishlist:[], cat:'all', q:'', sort:'default', hero:0, user:null, pm:{id:null,size:'M',qty:1}, pendingCheckout:false, authTab:'login', buyNow:null, hold:false };
 const $ = id => document.getElementById(id);
 const money = n => 'Tk ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:(Number(n)%1?2:0),maximumFractionDigits:2});
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -924,7 +926,7 @@ async function loadFirestoreProducts(){
   }
   state.loaded=true;
   /* drop cart / wishlist entries of deleted products and refresh price, title, image */
-  state.cart=state.cart.filter(i=>state.products.some(p=>p.id===i.id)).map(i=>{ const p=state.products.find(x=>x.id===i.id); return {...i,title:p.title,price:p.price,image:p.image}; });
+  state.cart=state.cart.filter(i=>state.products.some(p=>p.id===i.id)).map(i=>{ const p=state.products.find(x=>x.id===i.id); return {...i,title:p.title,price:p.price,image:p.image||(p.images&&p.images[0])||i.image||''}; });
   state.wishlist=state.wishlist.filter(id=>state.products.some(p=>p.id===id)); save('bana_wish',state.wishlist);
   renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash();
 }
@@ -939,7 +941,7 @@ async function loadSite(){
   renderMenu(); renderEid();
   const st=state.site||{}; { const w=String(st.whatsapp||'').replace(/\D/g,''); if(w&&$('fabWa')) $('fabWa').href='https://wa.me/'+w; const hp=String(st.helpline||'').replace(/[^\d+]/g,''); if(hp&&$('fabTel')) $('fabTel').href='tel:'+hp; }
   window.SHOPX={...(st.shopAddress?{addr:st.shopAddress}:{}),...(st.helpline?{phone:st.helpline}:{})}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
-  updateCheckoutTotals();
+  try{ updateCheckoutTotals(); }catch(e){ console.warn('checkout totals:',e); }
   try{ const bs=await getDocs(collection(db,'banners')); const a=[]; bs.forEach(d=>a.push(d.data())); a.sort((x,y)=>(x.order||0)-(y.order||0));
     if(a.length){ const hero=$('hero'), anchor=hero.querySelector(':scope > button'), first=hero.querySelector('.hero-slide');
       a.forEach(b=>first.insertAdjacentHTML('beforebegin',`<div class="hero-slide absolute inset-0 flex items-center"><img class="hero-img absolute inset-0 w-full h-full object-cover" src="${esc(b.image)}" alt=""><div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent"></div><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full"><div class="max-w-xl space-y-3"><h1 class="a a2 font-display font-extrabold text-2xl sm:text-4xl text-white leading-[1.05]">${esc(b.title)}</h1>${b.sub?`<p class="a a3 text-silver-300 text-sm sm:text-base">${esc(b.sub)}</p>`:''}<div class="a a4"><a href="#shop" onclick="filterCategory('${esc(b.cat||'all')}')" class="btn-gold inline-block px-6 py-3 rounded-xl font-extrabold text-sm shadow-xl">${esc(b.cta||'SHOP NOW')} <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a></div></div></div></div>`));
@@ -973,15 +975,15 @@ function bnFix(){ const run=()=>{ const w=document.createTreeWalker(document.bod
 
 function payIcon(k,m){ if(k==='cod') return '<span class="w-9 h-9 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-money-bill-wave"></i></span>';
   if(m&&m.logo) return `<img src="${esc(m.logo)}" class="w-9 h-9 rounded-lg object-contain bg-white shrink-0">`;
-  const c=PCOL[k]; return `<span class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold text-[9px] shrink-0" style="background:${c[0]}">${c[1]}</span>`; }
+  const c=PCOL[k]||['#555',String(k).toUpperCase()]; return `<span class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold text-[9px] shrink-0" style="background:${c[0]}">${c[1]}</span>`; }
 function renderPay(){ const cfg=state.payCfg||{}, act=['bkash','nagad','rocket','upay'].filter(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false), ship=shipCost(), free=ship===0;
   if(free&&state.payM&&state.payM!=='cod') state.payM='cod';
   const req=!!(state.site&&state.site.requireAdvance&&act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
   if(state.payM&&state.payM!=='cod'&&!act.includes(state.payM)) state.payM='cod';
   state.payM=state.payM||'cod';
-  $('coPayOpts').innerHTML=(req?[]:['cod']).concat(act).map(k=>{ const on=state.payM===k, dis=free&&k!=='cod'; return `<button type="button" ${dis?'disabled':`onclick="setPayM('${k}')"`} class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'} ${dis?'opacity-40':''}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'ক্যাশ অন ডেলিভারি':PCOL[k][1]}</span></button>`; }).join('');
+  $('coPayOpts').innerHTML=(req?[]:['cod']).concat(act).map(k=>{ const on=state.payM===k, dis=free&&k!=='cod'; return `<button type="button" ${dis?'disabled':`onclick="setPayM('${k}')"`} class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'} ${dis?'opacity-40':''}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'ক্যাশ অন ডেলিভারি':(PCOL[k]||[0,k])[1]}</span></button>`; }).join('');
   const adv=state.payM!=='cod'; $('coPayInfo').classList.toggle('hidden',!adv);
-  $('coPayMsg').innerHTML=adv?`অনুগ্রহ করে ডেলিভারি চার্জ <b>${money(ship)}</b> ${PCOL[state.payM][1]} নম্বরে <b>Send Money</b> করুন: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b> <button type="button" onclick="copyNum('${esc(cfg[state.payM].number)}')" class="ml-1 px-2.5 py-1 rounded-lg bg-ink-900 text-gold-400 text-[11px] font-extrabold"><i class="fa-regular fa-copy mr-1"></i>কপি</button>। তারপর নিচে আপনার নম্বর ও TrxID দিন। বাকি টাকা ক্যাশ অন ডেলিভারিতে দেবেন।`:'';
+  $('coPayMsg').innerHTML=adv?`অনুগ্রহ করে ডেলিভারি চার্জ <b>${money(ship)}</b> ${(PCOL[state.payM]||[0,state.payM])[1]} নম্বরে <b>Send Money</b> করুন: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b> <button type="button" onclick="copyNum('${esc(cfg[state.payM].number)}')" class="ml-1 px-2.5 py-1 rounded-lg bg-ink-900 text-gold-400 text-[11px] font-extrabold"><i class="fa-regular fa-copy mr-1"></i>কপি</button>। তারপর নিচে আপনার নম্বর ও TrxID দিন। বাকি টাকা ক্যাশ অন ডেলিভারিতে দেবেন।`:'';
 }
 function setPayM(k){ state.payM=k; renderPay(); }
 async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY||!state.user) return; box.innerHTML='<div class="text-silver-400">লোড হচ্ছে...</div>';
@@ -1075,12 +1077,23 @@ function renderEid(){ const st=state.site||{}, list=state.products.filter(p=>p.e
 function renderMenu(){ const nav=$('mobileNav'); if(!nav) return; const st=state.site||{};
   const it=[['#hero','হোম','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'ঈদ কালেকশন','fa-moon','']]:[]),['#shop','সব পণ্য','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory('${c.id}');`]),['#about','আমাদের কথা','fa-circle-info',''],['#helpline','হেল্পলাইন','fa-headset','']];
   nav.innerHTML=it.map((x,i)=>`<a href="${x[0]}" onclick="${x[3]}toggleMobileMenu()" style="--i:${i}" class="mnav flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-gold-400 ${x[0]==='#helpline'?'text-gold-400':''}"><i class="fa-solid ${x[2]} w-5 text-center text-gold-400/80"></i>${esc(x[1])}</a>`).join(''); }
-function flyToCart(src){ const f=state.flyFrom||{left:innerWidth/2-30,top:innerHeight/2,width:60,height:60}, cb=$('cartBadge').parentElement, t=cb.getBoundingClientRect();
-  const el=document.createElement('img'); el.src=src; const sx=f.left+f.width/2, sy=f.top+f.height/2;
-  el.style.cssText=`position:fixed;z-index:200;left:${sx-32}px;top:${sy-32}px;width:64px;height:64px;border-radius:16px;object-fit:cover;border:2px solid #F59E0B;box-shadow:0 12px 30px rgba(0,0,0,.45);pointer-events:none`; document.body.appendChild(el);
-  const dx=t.left+t.width/2-sx, dy=t.top+t.height/2-sy;
-  const a=el.animate([{transform:'translate(0,0) scale(1) rotate(0)',opacity:1},{transform:`translate(${dx*.45}px,${dy*.45-90}px) scale(.75) rotate(14deg)`,opacity:1,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.14) rotate(28deg)`,opacity:.35}],{duration:900,easing:'cubic-bezier(.55,0,.25,1)'});
-  a.onfinish=()=>{ el.remove(); cb.classList.remove('cart-pop'); void cb.offsetWidth; cb.classList.add('cart-pop'); toast('ব্যাগে যোগ হয়েছে',true); }; }
+function flyToCart(src){
+  const bag=$('cartBadge').parentElement, t=bag.getBoundingClientRect();
+  const f=state.flyFrom||{left:innerWidth/2-30,top:innerHeight/2,width:60,height:60}, S=60;
+  const sx=f.left+f.width/2, sy=f.top+f.height/2, dx=t.left+t.width/2-sx, dy=t.top+t.height/2-sy;
+  const el=document.createElement('div'); let landed=false;
+  el.style.cssText=`position:fixed;z-index:200;left:${sx-S/2}px;top:${sy-S/2}px;width:${S}px;height:${S}px;border-radius:14px;background:#161616 center/cover no-repeat;border:2px solid #F59E0B;box-shadow:0 12px 30px rgba(0,0,0,.45);pointer-events:none;display:flex;align-items:center;justify-content:center;color:#FBBF24;will-change:transform,opacity`;
+  if(src) el.style.backgroundImage='url("'+String(src).replace(/"/g,'%22')+'")'; else el.innerHTML='<i class="fa-solid fa-bag-shopping"></i>';
+  document.body.appendChild(el);
+  const land=()=>{ if(landed) return; landed=true; el.remove(); state.hold=false; refreshBadge(true); bag.classList.remove('cart-pop'); void bag.offsetWidth; bag.classList.add('cart-pop'); toast('ব্যাগে যোগ হয়েছে',true); };
+  try{
+    const a=el.animate([{transform:'translate(0,0) scale(1) rotate(0deg)',opacity:1},
+      {transform:`translate(${dx*.5}px,${dy*.5-70}px) scale(.72) rotate(12deg)`,opacity:1,offset:.5},
+      {transform:`translate(${dx}px,${dy}px) scale(.12) rotate(24deg)`,opacity:.4}],{duration:850,easing:'cubic-bezier(.5,0,.3,1)',fill:'forwards'});
+    a.onfinish=land; a.oncancel=land;
+  }catch(e){ land(); }
+  setTimeout(land,1300);
+}
 document.addEventListener('click',e=>{ const t=e.target.closest('[onclick*="addToCart("]'); if(t) state.flyFrom=t.getBoundingClientRect(); },true);
 /* ================= PRODUCT MODAL ================= */
 /* ================= PRODUCT PAGE (full view, Shopify-style) ================= */
@@ -1100,13 +1113,13 @@ function hidePP(){ if(!document.body.classList.contains('pp-open')) return; if(s
 function closeProduct(){ if(history.state&&history.state.pid){ history.back(); } else { hidePP(); if(location.hash.startsWith('#product-')){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} } setTimeout(()=>{ const sh=$('shop'); if(sh) sh.scrollIntoView(); },30); } }
 function openFromHash(){ const m=location.hash.match(/^#product-(.+)$/); if(!m) return; const id=decodeURIComponent(m[1]); if(state.pp&&state.pp.id===id&&document.body.classList.contains('pp-open')) return; openProduct(id,false); }
 window.addEventListener('popstate',e=>{ const pid=e.state&&e.state.pid; if(pid) openProduct(pid,false); else hidePP(); });
-document.addEventListener('click',e=>{ const a=e.target.closest('a[href^="#"]'); if(!a||!document.body.classList.contains('pp-open')) return; const h=a.getAttribute('href'); if(!h||h.length<2||h.startsWith('#product-')) return; e.preventDefault(); hidePP(); try{ history.replaceState(null,'',location.pathname+location.search); }catch(_){} setTimeout(()=>{ const t=document.querySelector(h); if(t) t.scrollIntoView({behavior:'smooth'}); },30); });
+document.addEventListener('click',e=>{ const a=e.target.closest('a[href^="#"]'); if(!a||!document.body.classList.contains('pp-open')) return; const h=a.getAttribute('href'); if(!h||h.length<2||h.startsWith('#product-')||h==='#ppReviews') return; e.preventDefault(); hidePP(); try{ history.replaceState(null,'',location.pathname+location.search); }catch(_){} setTimeout(()=>{ const t=document.querySelector(h); if(t) t.scrollIntoView({behavior:'smooth'}); },30); });
 
 function ppStars(r,cls='text-gold-500'){ r=Math.round(r||0); return `<span class="${cls} text-xs">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'fa-solid':'fa-regular'} fa-star"></i>`).join('')}</span>`; }
 function ppVarsHTML(p){
   const S=state.pp, sizes=(p.sizes&&p.sizes.length)?p.sizes:SIZES, cols=p.colors||[];
-  return (cols.length?`<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">কালার: <span class="font-semibold text-slate-500 normal-case">${esc(S.color)}</span></div><div class="flex flex-wrap gap-2">${cols.map(c=>`<button onclick="ppColor('${esc(c).replace(/'/g,"\\'")}')" class="ppbtn flex items-center gap-2 px-3.5 py-2 rounded-full border-2 text-xs font-bold ${S.color===c?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}"><span class="w-3.5 h-3.5 rounded-full border border-slate-300" style="background:${CSSCOL[c]||'#e5e7eb'}"></span>${esc(c)}</button>`).join('')}</div></div>`:'')+
-  `<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">সাইজ: <span class="font-semibold text-slate-500 normal-case">${esc(S.size)}</span></div><div class="flex flex-wrap gap-2">${sizes.map(z=>`<button onclick="ppSize('${esc(z).replace(/'/g,"\\'")}')" class="ppbtn min-w-[3rem] px-4 py-2.5 rounded-lg border-2 text-xs font-extrabold ${S.size===z?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}">${esc(z)}</button>`).join('')}</div></div>`;
+  return (cols.length?`<div class="mt-4"><div class="text-[11px] font-extrabold mb-1.5 uppercase tracking-wider">কালার: <span class="font-semibold text-slate-500 normal-case">${esc(S.color)}</span></div><div class="flex flex-wrap gap-1.5">${cols.map(c=>`<button onclick="ppColor('${esc(c).replace(/'/g,"\\'")}')" class="ppbtn flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold ${S.color===c?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}"><span class="w-3 h-3 rounded-full border border-slate-300" style="background:${CSSCOL[c]||'#e5e7eb'}"></span>${esc(c)}</button>`).join('')}</div></div>`:'')+
+  `<div class="mt-4"><div class="text-[11px] font-extrabold mb-1.5 uppercase tracking-wider">সাইজ: <span class="font-semibold text-slate-500 normal-case">${esc(S.size)}</span></div><div class="flex flex-wrap gap-1.5">${sizes.map(z=>`<button onclick="ppSize('${esc(z).replace(/'/g,"\\'")}')" class="ppbtn min-w-[2.6rem] px-3 py-1.5 rounded-md border text-[11px] font-extrabold ${S.size===z?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}">${esc(z)}</button>`).join('')}</div></div>`;
 }
 function ppCurrent(){ return state.products.find(x=>x.id===state.pp.id); }
 function ppSize(z){ state.pp.size=z; $('ppVars').innerHTML=ppVarsHTML(ppCurrent()); }
@@ -1114,11 +1127,18 @@ function ppColor(c){ state.pp.color=c; $('ppVars').innerHTML=ppVarsHTML(ppCurren
 function ppQty(d){ const p=ppCurrent(), st=stockOf(p), mx=(st&&st>0)?st:99; state.pp.qty=Math.max(1,Math.min(mx,state.pp.qty+d)); $('ppQ').textContent=state.pp.qty; }
 function ppGo(i,rel){ const p=ppCurrent(), n=ppImgs(p).length; if(rel) i=state.pp.img+i; state.pp.img=(i+n)%n; $('ppTrack').style.transform=`translateX(-${state.pp.img*100}%)`; document.querySelectorAll('.ppthumb').forEach((t,k)=>{ t.classList.toggle('border-ink-900',k===state.pp.img); t.classList.toggle('border-transparent',k!==state.pp.img); }); const dots=document.querySelectorAll('.ppdot'); dots.forEach((d,k)=>d.classList.toggle('bg-white',k===state.pp.img)); }
 function ppAdd(buy){
-  const p=ppCurrent(), S=state.pp, st=stockOf(p); if(st!==null&&st<=0){ toast('দুঃখিত, এই পণ্যটির স্টক শেষ',false); return; }
-  const variant=S.size+(S.color?' / '+S.color:'');
-  state.flyFrom=$(buy?'ppBuy':'ppAddBtn').getBoundingClientRect();
-  addToCart(p.id,S.qty,variant,!!buy);
-  if(buy) startCheckout();
+  const p=ppCurrent(), S=state.pp; if(!p) return; const st=stockOf(p);
+  if(st!==null&&st<=0){ toast('দুঃখিত, এই পণ্যটির স্টক শেষ',false); return; }
+  const variant=S.size+(S.color?' / '+S.color:''), img=ppImgs(p)[0]||p.image||'';
+  if(buy){
+    /* BUY NOW: open the order form straight away with only this product (cart is not touched) */
+    state.buyNow={id:p.id,title:p.title,price:p.price,image:img,size:variant,qty:S.qty};
+    openCheckout(); return;
+  }
+  /* ADD TO CART: fly the product image from the gallery (if visible) or the button to the bag icon */
+  const stg=$('ppStage'), sr=stg?stg.getBoundingClientRect():null, br=$('ppAddBtn').getBoundingClientRect();
+  state.flyFrom=(sr&&sr.bottom>120&&sr.top<innerHeight-120)?{left:sr.left+sr.width/2-30,top:Math.max(sr.top,80)+Math.min(sr.height,innerHeight-120)/2-30,width:60,height:60}:br;
+  addToCart(p.id,S.qty,variant,false);
 }
 function ppHeart(btn,id){ toggleWishlist(id); const on=state.wishlist.includes(id); btn.className=btn.className.replace(/text-rose-500|text-slate-700/,on?'text-rose-500':'text-slate-700'); btn.querySelector('i').className=(on?'fa-solid':'fa-regular')+' fa-heart'; }
 function ppSlide(p){ const im=ppImgs(p), all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>`; }
@@ -1142,7 +1162,7 @@ function renderPP(){
     :st<=10?`<div class="flex items-center gap-2 text-orange-600 text-xs font-extrabold animate-pulse"><i class="fa-solid fa-fire"></i>তাড়াতাড়ি করুন! মাত্র ${st} টি বাকি</div>`
     :`<div class="flex items-center gap-2 text-emerald-600 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>স্টকে আছে</div>`;
   const dis=(st!==null&&st<=0)?'disabled':'';
-  const pay=['bkash','nagad','rocket','upay'].map(k=>{ const c=(typeof PCOL!=='undefined'&&PCOL[k])||['#555',k]; return `<span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold text-white" style="background:${c[0]}">${c[1]}</span>`; }).join('');
+  const pay=['bkash','nagad','rocket','upay'].map(k=>{ const c=(typeof PCOL!=='undefined'&&PCOL[k])||['#555',k]; return `<span class="px-2 py-0.5 rounded text-[9px] font-extrabold text-white" style="background:${c[0]}">${c[1]}</span>`; }).join('');
   $('productPage').innerHTML=`<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
     <button onclick="closeProduct()" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-ink-900"><i class="fa-solid fa-arrow-left"></i>কেনাকাটা চালিয়ে যান</button>
     <div class="grid md:grid-cols-2 gap-6 lg:gap-12 mt-4">
@@ -1167,20 +1187,20 @@ function renderPP(){
         </div>
         <div class="mt-3">${stockHTML}</div>
         <div id="ppVars">${ppVarsHTML(p)}</div>
-        <div class="mt-5"><div class="text-xs font-extrabold mb-2">পরিমাণ</div>
-          <div class="inline-flex items-center border-2 border-slate-200 rounded-lg"><button onclick="ppQty(-1)" aria-label="Decrease" class="w-11 h-11 text-lg font-bold text-slate-500 hover:text-black">−</button><span id="ppQ" class="w-12 text-center font-extrabold">1</span><button onclick="ppQty(1)" aria-label="Increase" class="w-11 h-11 text-lg font-bold text-slate-500 hover:text-black">+</button></div></div>
-        <div class="grid gap-3 mt-6">
-          <button id="ppAddBtn" onclick="ppAdd(false)" ${dis} class="ppbtn w-full py-4 rounded-xl border-2 border-ink-900 text-ink-900 font-extrabold text-sm tracking-wider hover:bg-ink-900 hover:text-white disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bag-shopping mr-2"></i>কার্টে যোগ করুন</button>
-          <button id="ppBuy" onclick="ppAdd(true)" ${dis} class="ppbtn w-full py-4 rounded-xl btn-gold font-extrabold text-sm tracking-wider shadow-lg shadow-gold-500/25 disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bolt mr-2"></i>এখনই কিনুন</button>
+        <div class="mt-4"><div class="text-[11px] font-extrabold mb-1.5 uppercase tracking-wider">পরিমাণ</div>
+          <div class="inline-flex items-center border border-slate-200 rounded-md"><button onclick="ppQty(-1)" aria-label="Decrease" class="w-8 h-8 text-base font-bold text-slate-500 hover:text-black">−</button><span id="ppQ" class="w-9 text-center text-sm font-extrabold">1</span><button onclick="ppQty(1)" aria-label="Increase" class="w-8 h-8 text-base font-bold text-slate-500 hover:text-black">+</button></div></div>
+        <div class="grid grid-cols-2 gap-2.5 mt-5">
+          <button id="ppAddBtn" onclick="ppAdd(false)" ${dis} class="ppbtn w-full py-2.5 px-2 rounded-lg border border-ink-900 text-ink-900 font-bold text-[12.5px] tracking-wide hover:bg-ink-900 hover:text-white disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bag-shopping mr-1.5 text-[11px]"></i>কার্টে যোগ করুন</button>
+          <button id="ppBuy" onclick="ppAdd(true)" ${dis} class="ppbtn w-full py-2.5 px-2 rounded-lg btn-gold font-bold text-[12.5px] tracking-wide shadow-md shadow-gold-500/20 disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bolt mr-1.5 text-[11px]"></i>এখনই কিনুন</button>
         </div>
-        <div class="grid grid-cols-3 gap-2 mt-5 text-center">
-          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-hand-holding-dollar text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">ক্যাশ অন ডেলিভারি</div></div>
-          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">দ্রুত ডেলিভারি</div></div>
-          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-phone-volume text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">কনফার্মেশন কল</div></div>
+        <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+          <div class="rounded-lg bg-slate-50 border border-slate-200 p-2"><i class="fa-solid fa-hand-holding-dollar text-gold-600 text-sm"></i><div class="text-[10px] font-bold mt-1 leading-tight">ক্যাশ অন ডেলিভারি</div></div>
+          <div class="rounded-lg bg-slate-50 border border-slate-200 p-2"><i class="fa-solid fa-truck-fast text-gold-600 text-sm"></i><div class="text-[10px] font-bold mt-1 leading-tight">দ্রুত ডেলিভারি</div></div>
+          <div class="rounded-lg bg-slate-50 border border-slate-200 p-2"><i class="fa-solid fa-phone-volume text-gold-600 text-sm"></i><div class="text-[10px] font-bold mt-1 leading-tight">কনফার্মেশন কল</div></div>
         </div>
-        <div class="flex flex-wrap items-center gap-2 mt-4"><span class="text-[11px] font-bold text-slate-500 mr-1">যে পেমেন্ট নিই</span><span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-ink-900 text-white">COD</span>${pay}</div>
-        <div class="text-[11px] text-slate-500 mt-3"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>ডেলিভারি: ঢাকার ভিতরে ${money(SHIP.dhaka)} · ঢাকার বাইরে ${money(SHIP.outside)}${FREE_SHIP<99999999?` · ${money(FREE_SHIP)} এর বেশি অর্ডারে ফ্রি`:''}</div>
-        <div class="mt-6 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200"><div class="flex items-center gap-2 text-xs font-extrabold mb-2 uppercase tracking-wider"><span class="w-1 h-4 rounded bg-gold-500"></span>পণ্যের বিবরণ</div><p class="text-[13px] text-slate-600 leading-[1.85] whitespace-pre-line">${esc(p.description||'Premium quality product from BANA FASHION.')}</p></div>
+        <div class="flex flex-wrap items-center gap-1.5 mt-3"><span class="text-[10px] font-bold text-slate-500 mr-1">যে পেমেন্ট নিই</span><span class="px-2 py-0.5 rounded text-[9px] font-extrabold bg-ink-900 text-white">COD</span>${pay}</div>
+        <div class="text-[10.5px] text-slate-500 mt-2.5"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>ডেলিভারি: ঢাকার ভিতরে ${money(SHIP.dhaka)} · ঢাকার বাইরে ${money(SHIP.outside)}${FREE_SHIP<99999999?` · ${money(FREE_SHIP)} এর বেশি অর্ডারে ফ্রি`:''}</div>
+        <div class="mt-5 p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200"><div class="flex items-center gap-2 text-[11px] font-extrabold mb-1.5 uppercase tracking-wider"><span class="w-1 h-4 rounded bg-gold-500"></span>পণ্যের বিবরণ</div><p class="text-[13px] text-slate-600 leading-[1.85] whitespace-pre-line">${esc(p.description||'Premium quality product from BANA FASHION.')}</p></div>
       </div>
     </div>
     <section id="ppReviews" class="mt-14 pt-10 border-t border-slate-200 max-w-3xl mx-auto"></section>
@@ -1210,16 +1230,16 @@ function loadReviews(pid){
 function drawReviews(list,err){
   const box=$('ppReviews'); if(!box) return;
   if(!$('rvList')){ state.pp.rv=0;
-    box.innerHTML=`<div class="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      <div class="px-5 sm:px-7 py-5 bg-gradient-to-r from-ink-900 to-ink-800 flex items-center justify-between gap-3 flex-wrap"><h2 class="font-display font-bold text-lg text-white"><i class="fa-solid fa-comments text-gold-400 mr-2"></i>কাস্টমার রিভিউ</h2><button onclick="ppToggleForm()" class="px-5 py-2.5 rounded-xl btn-gold text-xs font-extrabold"><i class="fa-solid fa-pen mr-1.5"></i>রিভিউ লিখুন</button></div>
-      <div class="p-5 sm:p-7">
+    box.innerHTML=`<div class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+      <div class="px-4 py-2.5 bg-ink-900 flex items-center justify-between gap-3"><h2 class="font-display font-bold text-[13px] text-white flex items-center gap-2"><i class="fa-solid fa-comments text-gold-400 text-xs"></i>কাস্টমার রিভিউ</h2><button id="rvToggle" type="button" onclick="ppToggleForm()" class="px-3 py-1.5 rounded-lg btn-gold text-[11px] font-bold leading-none whitespace-nowrap"><i class="fa-solid fa-pen mr-1 text-[10px]"></i>রিভিউ লিখুন</button></div>
+      <div class="p-4">
         <div id="rvSummary"></div>
-        <form id="ppForm" onsubmit="ppSubmitReview(event)" class="hidden mt-5 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-          <div><div class="text-xs font-bold mb-1">আপনার রেটিং *</div><div id="ppRateBtns" class="text-2xl text-gold-500">${[1,2,3,4,5].map(i=>`<button type="button" onclick="ppRate(${i})" class="px-0.5 hover:scale-110 transition-transform" aria-label="${i} star"><i class="fa-regular fa-star"></i></button>`).join('')}</div></div>
-          <input id="rvName" required maxlength="40" value="${esc(load('bana_rvname',''))}" placeholder="আপনার নাম *" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white">
-          <textarea id="rvText" required rows="3" maxlength="600" placeholder="এই পণ্য সম্পর্কে আপনার অভিজ্ঞতা লিখুন *" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"></textarea>
-          <button id="rvSubmit" class="px-6 py-3 rounded-xl btn-gold text-xs font-extrabold">রিভিউ জমা দিন</button></form>
-        <div id="rvList" class="mt-5 divide-y divide-slate-100"></div>
+        <form id="ppForm" onsubmit="ppSubmitReview(event)" class="hidden mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+          <div><div class="text-[11px] font-bold mb-1">আপনার রেটিং *</div><div id="ppRateBtns" class="text-xl text-gold-500">${[1,2,3,4,5].map(i=>`<button type="button" onclick="ppRate(${i})" class="px-0.5 hover:scale-110 transition-transform" aria-label="${i} star"><i class="fa-regular fa-star"></i></button>`).join('')}</div></div>
+          <input id="rvName" required maxlength="40" value="${esc(load('bana_rvname',''))}" placeholder="আপনার নাম *" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-[13px] bg-white">
+          <textarea id="rvText" required rows="3" maxlength="600" placeholder="এই পণ্য সম্পর্কে আপনার অভিজ্ঞতা লিখুন *" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-[13px] bg-white"></textarea>
+          <button id="rvSubmit" type="submit" class="px-5 py-2 rounded-lg btn-gold text-[11px] font-bold">রিভিউ জমা দিন</button></form>
+        <div id="rvList" class="mt-3 divide-y divide-slate-100"></div>
       </div></div>`;
   }
   const rt=$('ppRateTxt');
@@ -1227,12 +1247,18 @@ function drawReviews(list,err){
   const n=list.length, avg=n?list.reduce((a,r)=>a+(+r.rating||0),0)/n:0;
   if(rt) rt.textContent=n?`${avg.toFixed(1)} (${bnum(n)} টি রিভিউ)`:'এখনো কোনো রিভিউ নেই';
   const cnt=[5,4,3,2,1].map(k=>list.filter(r=>Math.round(+r.rating||0)===k).length);
-  $('rvSummary').innerHTML=n?`<div class="flex items-center gap-5 sm:gap-8 flex-wrap"><div class="text-center"><div class="font-display font-extrabold text-4xl text-ink-900">${avg.toFixed(1)}</div>${ppStars(avg)}<div class="text-[11px] text-slate-500 mt-1">${bnum(n)} টি রিভিউ</div></div>
+  $('rvSummary').innerHTML=n?`<div class="flex items-center gap-5 sm:gap-8 flex-wrap"><div class="text-center"><div class="font-display font-extrabold text-3xl text-ink-900">${avg.toFixed(1)}</div>${ppStars(avg)}<div class="text-[11px] text-slate-500 mt-1">${bnum(n)} টি রিভিউ</div></div>
     <div class="flex-1 min-w-[180px] space-y-1.5">${cnt.map((c,i)=>`<div class="flex items-center gap-2 text-[11px]"><span class="w-3 font-bold">${5-i}</span><i class="fa-solid fa-star text-gold-500 text-[10px]"></i><div class="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden"><div class="h-full btn-gold" style="width:${n?c/n*100:0}%"></div></div><span class="w-5 text-right text-slate-400">${c}</span></div>`).join('')}</div></div>`
-    :`<p class="text-sm text-slate-500">${err?'রিভিউ লোড করা যায়নি। একটু পরে আবার চেষ্টা করুন।':'এখনো কোনো রিভিউ নেই — প্রথম রিভিউটি আপনিই লিখুন।'}</p>`;
-  $('rvList').innerHTML=list.map(r=>`<div class="py-4 flex gap-3"><div class="w-10 h-10 rounded-full bg-ink-900 text-gold-400 flex items-center justify-center font-extrabold text-sm shrink-0">${esc((r.name||'?').trim().charAt(0).toUpperCase())}</div><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2 flex-wrap"><b class="text-sm">${esc(r.name)}</b>${ppStars(r.rating)}</div><p class="text-[13px] text-slate-600 mt-1 leading-relaxed whitespace-pre-line">${esc(r.text)}</p><div class="text-[10px] text-slate-400 mt-1">${r.at?new Date(r.at).toLocaleDateString('en-GB'):''}</div></div></div>`).join('');
+    :`<p class="text-xs text-slate-500">${err?'রিভিউ লোড করা যায়নি। একটু পরে আবার চেষ্টা করুন।':'এখনো কোনো রিভিউ নেই — প্রথম রিভিউটি আপনিই লিখুন।'}</p>`;
+  $('rvList').innerHTML=list.map(r=>`<div class="py-3 flex gap-2.5"><div class="w-8 h-8 rounded-full bg-ink-900 text-gold-400 flex items-center justify-center font-extrabold text-xs shrink-0">${esc((r.name||'?').trim().charAt(0).toUpperCase())}</div><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2 flex-wrap"><b class="text-[13px]">${esc(r.name)}</b>${ppStars(r.rating)}</div><p class="text-[12.5px] text-slate-600 mt-0.5 leading-relaxed whitespace-pre-line">${esc(r.text)}</p><div class="text-[10px] text-slate-400 mt-1">${r.at?new Date(r.at).toLocaleDateString('en-GB'):''}</div></div></div>`).join('');
 }
-function ppToggleForm(){ $('ppForm').classList.toggle('hidden'); }
+function ppToggleForm(){
+  const f=$('ppForm'); if(!f) return;
+  const show=f.classList.contains('hidden'); f.classList.toggle('hidden',!show);
+  const b=$('rvToggle'); if(b) b.innerHTML=show?'<i class="fa-solid fa-xmark mr-1 text-[10px]"></i>বন্ধ করুন':'<i class="fa-solid fa-pen mr-1 text-[10px]"></i>রিভিউ লিখুন';
+  /* the form opens below the header: bring it into view so the click visibly "does something" */
+  if(show) setTimeout(()=>{ try{ f.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} },60);
+}
 function ppRate(i){ state.pp.rv=i; $('ppRateBtns').querySelectorAll('i').forEach((el,k)=>el.className=(k<i?'fa-solid':'fa-regular')+' fa-star'); }
 async function ppSubmitReview(e){
   e.preventDefault(); if(!state.pp.rv){ toast('অনুগ্রহ করে স্টার রেটিং দিন',false); return; }
@@ -1241,24 +1267,30 @@ async function ppSubmitReview(e){
   try{
     if(FIREBASE_READY){ await addDoc(collection(db,'reviews'),{...rev,createdAt:serverTimestamp()}); }
     else { const mine=load('bana_rev_'+pid,[]); mine.push({...rev,id:'r'+rev.at}); save('bana_rev_'+pid,mine); drawReviews(mine); }
-    save('bana_rvname',name); $('rvText').value=''; state.pp.rv=0; ppRate(0); $('ppForm').classList.add('hidden'); toast('আপনার রিভিউয়ের জন্য ধন্যবাদ!');
-  }catch(err){ console.warn(err); toast('রিভিউ জমা হয়নি: '+(err.code==='permission-denied'?'Firestore rules-এ reviews অনুমতি দিন':(err.message||'আবার চেষ্টা করুন')),false); }
+    save('bana_rvname',name); $('rvText').value=''; state.pp.rv=0; ppRate(0); ppToggleForm(); toast('আপনার রিভিউয়ের জন্য ধন্যবাদ!');
+  }catch(err){ console.warn(err); toast('রিভিউ জমা হয়নি, একটু পরে আবার চেষ্টা করুন',false); console.warn('review submit failed ['+(err.code||'')+']: Firestore rules must allow create on /reviews'); }
   btn.disabled=false; btn.textContent='রিভিউ জমা দিন';
 }
 
 /* ================= CART ================= */
 function addToCart(id,qty=1,size='M',silent=false){
   const p=state.products.find(x=>x.id===id); if(!p) return;
+  const img=p.image||(p.images&&p.images[0])||'';
   const ex=state.cart.find(i=>i.id===id&&i.size===size);
-  if(ex) ex.qty+=qty; else state.cart.push({id,title:p.title,price:p.price,image:p.image,size,qty});
-  updateCart(); if(!silent) showMini(ex||state.cart[state.cart.length-1]);
+  if(ex){ ex.qty+=qty; if(!ex.image) ex.image=img; } else state.cart.push({id,title:p.title,price:p.price,image:img,size,qty});
+  if(!silent) state.hold=true;           /* badge number is released when the flying image lands */
+  updateCart();
+  if(!silent){ showMini(ex||state.cart[state.cart.length-1]); setTimeout(()=>{ if(state.hold){ state.hold=false; refreshBadge(true); } },1600); }
 }
 function cartQty(i,d){ state.cart[i].qty+=d; if(state.cart[i].qty<=0) state.cart.splice(i,1); updateCart(); }
 function removeItem(i){ state.cart.splice(i,1); updateCart(); }
-const subtotal=()=>state.cart.reduce((a,i)=>a+i.price*i.qty,0);
+const cartSub=()=>state.cart.reduce((a,i)=>a+i.price*i.qty,0);
+const checkoutItems=()=>state.buyNow?[state.buyNow]:state.cart;      /* "Buy now" orders only that product */
+const subtotal=()=>checkoutItems().reduce((a,i)=>a+i.price*i.qty,0);
+function refreshBadge(bump){ const n=state.cart.reduce((a,i)=>a+i.qty,0), b=$('cartBadge'); if(!b) return; b.textContent=n>99?'99+':n; b.classList.toggle('empty',n===0); if(bump&&n>0){ b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); } }
 function updateCart(){
   save('bana_cart',state.cart);
-  { const n=state.cart.reduce((a,i)=>a+i.qty,0), b=$('cartBadge'); b.textContent=n>99?'99+':n; b.classList.toggle('empty',n===0); if(n>0){ b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); } }
+  if(!state.hold) refreshBadge(true);
   $('cartList').innerHTML=state.cart.map((it,i)=>`<div class="bag-item flex gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 items-center">
     <img src="${esc(it.image)}" class="w-16 h-20 rounded-xl object-cover shrink-0 bg-ink-800" onerror="this.style.opacity=0">
     <div class="flex-1 min-w-0"><h4 class="font-extrabold text-xs truncate text-white">${esc(it.title)}</h4><span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-silver-300">সাইজ ${esc(it.size)}</span><div class="font-display text-sm text-gold-400 mt-1">${money(it.price*it.qty)}</div></div>
@@ -1269,7 +1301,7 @@ function updateCart(){
   const nItems=state.cart.reduce((a,i)=>a+i.qty,0); $('cartCount').textContent=nItems+' টি পণ্য';
   const empty=state.cart.length===0;
   $('emptyCart').classList.toggle('hidden',!empty); $('emptyCart').classList.toggle('flex',empty); $('cartList').classList.toggle('hidden',empty);
-  const sub=subtotal(); $('cartSubtotal').textContent=money(sub);
+  const sub=cartSub(); $('cartSubtotal').textContent=money(sub);
   const pct=Math.min(100,sub/FREE_SHIP*100); $('shipBar').style.width=pct+'%'; $('shipPct').textContent=Math.round(pct)+'%';
   $('shipText').textContent = sub>=FREE_SHIP ? '🎉 আপনি ফ্রি ডেলিভারি পেয়েছেন!' : `ফ্রি ডেলিভারির জন্য আরও ${money(FREE_SHIP-sub)} যোগ করুন`;
 }
@@ -1304,15 +1336,19 @@ function openAccount(){} function closeAuth(){} function setAuthTab(){} function
 
 /* ================= CHECKOUT ================= */
 function startCheckout(){
+  state.buyNow=null;
   if(!state.cart.length){ toast('আপনার ব্যাগ খালি',false); return; }
   if($('cartDrawer').classList.contains('hidden')===false) toggleCartDrawer();
   openCheckout();
 }
 function openCheckout(){
-  $('coItems').innerHTML=state.cart.map(i=>`<div class="flex items-center gap-2"><img src="${esc(i.image)}" class="w-10 h-10 rounded-lg object-cover bg-ink-800"><div class="flex-1 min-w-0"><div class="font-bold truncate">${esc(i.title)}</div><div class="text-slate-400">Size ${esc(i.size)} × ${i.qty}</div></div><div class="font-bold">${money(i.price*i.qty)}</div></div>`).join('');
-  initDist(); updateCheckoutTotals(); $('checkoutModal').classList.remove('hidden'); $('checkoutModal').scrollTop=0; document.body.style.overflow='hidden';
+  const items=checkoutItems(); if(!items.length){ toast('আপনার ব্যাগ খালি',false); return; }
+  $('coItems').innerHTML=items.map(i=>`<div class="flex items-center gap-2"><img src="${esc(i.image)}" class="w-10 h-10 rounded-lg object-cover bg-ink-800" onerror="this.style.opacity=0"><div class="flex-1 min-w-0"><div class="font-bold truncate">${esc(i.title)}</div><div class="text-slate-400">Size ${esc(i.size)} × ${i.qty}</div></div><div class="font-bold">${money(i.price*i.qty)}</div></div>`).join('');
+  /* show the form first, so a problem in the totals/payment widgets can never block it */
+  $('checkoutModal').classList.remove('hidden'); $('checkoutModal').scrollTop=0; document.body.style.overflow='hidden';
+  try{ initDist(); updateCheckoutTotals(); }catch(err){ console.error('checkout init:',err); }
 }
-function closeCheckout(){ $('checkoutModal').classList.add('hidden'); document.body.style.overflow=''; }
+function closeCheckout(){ $('checkoutModal').classList.add('hidden'); document.body.style.overflow=''; state.buyNow=null; }
 function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value]; }
 function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'ফ্রি'; if(state.promo&&s<(state.promo.minOrder||0)){ state.promo=null; $('promoMsg').textContent=''; } const dc=discAmt(); $('coDiscRow').classList.toggle('hidden',!dc); $('coDisc').textContent='-'+money(dc); if(state.promo) $('coDiscCode').textContent=state.promo.code; $('coTotal').textContent=money(s-dc+sh);
   $('noteIn').textContent=money(SHIP.dhaka); $('noteOut').textContent=money(SHIP.outside); $('noteFree').textContent=sh===0?'আপনার ডেলিভারি ফ্রি — অগ্রিম পেমেন্ট লাগবে না।':(FREE_SHIP<99999999?money(FREE_SHIP)+' এর বেশি অর্ডারে ডেলিভারি ফ্রি।':''); }
@@ -1332,7 +1368,7 @@ function onDist(){
     :`<i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="leading-relaxed flex-1"><b class="text-ink-900">${inside?'ঢাকার ভিতরে':'ঢাকার বাইরে'}</b> · ${DBN[d]||d}${dv?', '+(DVBN[dv]||dv)+' বিভাগ':''}<br><span class="text-slate-500">ডেলিভারি চার্জ</span> <b class="text-ink-900">${money(inside?SHIP.dhaka:SHIP.outside)}</b></div>`;
   updateCheckoutTotals(); }
 async function placeOrder(e){
-  e.preventDefault();
+  e.preventDefault(); if(!checkoutItems().length){ toast('আপনার ব্যাগ খালি',false); return; }
   const phone=$('coPhone').value.replace(/[\s-]/g,'').replace(/^\+?88/,'');
   if(!/^01[3-9]\d{8}$/.test(phone)){ toast('সঠিক মোবাইল নম্বর দিন (01XXXXXXXXX)',false); return; }
   let pay=null; if(state.payM&&state.payM!=='cod'&&shipCost()>0){ const sender=$('coSender').value.replace(/[\s-]/g,''), trx=$('coTrx').value.trim().toUpperCase();
@@ -1340,7 +1376,7 @@ async function placeOrder(e){
   const btn=$('coSubmit'); btn.disabled=true; btn.textContent='অর্ডার হচ্ছে...';
   const sub=subtotal(), ship=shipCost(), disc=discAmt(), orderId='BF-'+Date.now().toString(36).toUpperCase();
   const order={orderId,uid:state.user.uid,email:state.user.email||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,district:$('coDist').value,division:$('coDiv').value,upazila:$('coUp').value,address:$('coAddress').value.trim(),geo:$('coLat').value?{lat:+$('coLat').value,lng:+$('coLng').value}:null,note:$('coNote').value.trim(),
-    items:state.cart.map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,discount:disc,promo:(disc&&state.promo)?{code:state.promo.code,type:state.promo.type,value:state.promo.value}:null,delivery:ship,total:sub-disc+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
+    items:checkoutItems().map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,discount:disc,promo:(disc&&state.promo)?{code:state.promo.code,type:state.promo.type,value:state.promo.value}:null,delivery:ship,total:sub-disc+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
   try{
     if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); if(pay) bt.set(doc(db,'trx',pay.trxId),{uid:state.user.uid,orderId,at:serverTimestamp()}); bt.set(doc(db,'receipts',orderId),{orderId,uid:state.user.uid,status:'pending',total:order.total,name:(order.customerName||'').split(' ')[0],createdAt:serverTimestamp()}); if(disc&&state.promo){ bt.update(doc(db,'promos',state.promo.code),{used:increment(1)}); bt.set(doc(db,'promoUses',state.promo.code+'_'+state.user.uid),{uid:state.user.uid,orderId,at:serverTimestamp()}); } await bt.commit(); }
     else { const all=load('bana_orders',[]); all.push({...order,createdAt:new Date().toISOString()}); save('bana_orders',all); }
@@ -1350,7 +1386,7 @@ async function placeOrder(e){
     if(!(state.site&&state.site.waAuto===false)) setTimeout(()=>{ try{ window.open(waUrl,'_blank'); }catch(e){} },700);
     $('successId').textContent=orderId; state.lastOrder=order;
     $('successSummary').innerHTML=order.items.map(i=>`<div class="flex justify-between gap-2"><span class="truncate">${esc(i.title)} <span class="text-slate-400">(${esc(i.size)}) ×${i.qty}</span></span><b>${money(i.price*i.qty)}</b></div>`).join('')+`<div class="border-t border-slate-200 pt-1.5 flex justify-between"><span class="text-slate-500">ডেলিভারি</span><b>${ship?money(ship):'ফ্রি'}</b></div>`+(disc?`<div class="flex justify-between"><span class="text-emerald-600">ডিসকাউন্ট</span><b>-${money(disc)}</b></div>`:'')+`<div class="flex justify-between text-sm font-extrabold"><span>মোট</span><span>${money(order.total)}</span></div><div class="border-t border-slate-200 pt-1.5 text-slate-500 leading-relaxed"><b class="text-ink-900">${esc(order.customerName)}</b> · ${esc(order.phone)}<br>${esc(order.address)}, ${esc(order.upazila)}, ${esc(DBN[order.district]||order.district)}${order.division?', '+esc(DVBN[order.division]||order.division)+' বিভাগ':''} <span class="text-gold-600 font-bold">(${order.area==='dhaka'?'ঢাকার ভিতরে':'ঢাকার বাইরে'})</span><br>পেমেন্ট: ${esc(order.payment)}</div>`;
-    state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); onDist(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='GPS দিয়ে জেলা, এলাকা ও ঠিকানা নিজে থেকে পূরণ হবে'; $('successModal').classList.remove('hidden');
+    if(!state.buyNow) state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); onDist(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='GPS দিয়ে জেলা, এলাকা ও ঠিকানা নিজে থেকে পূরণ হবে'; $('successModal').classList.remove('hidden');
   }catch(err){ console.error(err); if(pay&&err.code==='permission-denied') $('coTrxErr').textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; toast(err.code==='permission-denied'&&state.promo&&!pay?'এই প্রোমো কোডটি আর বৈধ নয়। কোডটি সরিয়ে আবার চেষ্টা করুন।':pay&&err.code==='permission-denied'?'এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!':'অর্ডার করা যায়নি: '+(err.message||'try again'),false); }
   btn.disabled=false; btn.textContent='অর্ডার কনফার্ম করুন';
 }
