@@ -40,6 +40,9 @@ body{background:#F3F4F6;font-family:'Plus Jakarta Sans','Hind Siliguri',sans-ser
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .marquee{display:flex;width:max-content;animation:marquee 30s linear infinite}
 .marquee:hover{animation-play-state:paused}
+body.pp-open>section{display:none!important}
+.areaopt:has(input:checked){border-color:#111;background:#faf7ee}
+.ppbtn{transition:all .2s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}
 @keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.12)}}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -269,10 +272,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
         <input id="searchInput" oninput="handleSearch(this.value)" placeholder="Search products..." class="w-full bg-white/10 text-white placeholder-silver-400 text-xs rounded-full pl-9 pr-8 py-2.5 border border-transparent transition-all">
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-silver-400 text-xs"></i>
       </div>
-      <button onclick="openAccount()" id="accountBtn" class="relative p-2.5 text-white hover:text-gold-400 rounded-full hover:bg-white/10 transition-colors" title="Account">
-        <i id="accountIcon" class="fa-regular fa-user text-lg"></i>
-        <span id="accountDot" class="hidden absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-ink-900"></span>
-      </button>
+      
       <button onclick="toggleWishlistModal()" class="relative p-2.5 text-white hover:text-gold-400 rounded-full hover:bg-white/10 transition-colors">
         <i class="fa-regular fa-heart text-lg"></i>
         <span id="wishlistBadge" class="absolute top-1 right-1 bg-gold-500 text-black font-extrabold text-[10px] w-4 h-4 rounded-full flex items-center justify-center opacity-0 scale-0 transition-all">0</span>
@@ -289,6 +289,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 </header>
 
 <!-- HERO BANNERS (4 rotating) -->
+<main id="productPage" class="hidden bg-white min-h-screen pb-32"></main>
 <section id="hero" class="relative bg-black overflow-hidden ">
   <!-- Banner 1 : Brand + owner photo -->
   <div class="hero-slide active absolute inset-0 flex items-center">
@@ -582,54 +583,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 
 <!-- FLOATING BUTTONS -->
 <div id="helpFab" class="fixed bottom-5 right-4 z-30 flex flex-col items-end gap-3">
-  <div id="helpMenu" class="help-menu closed w-60 rounded-2xl bg-ink-900 border border-white/10 shadow-2xl p-3 space-y-2">
-    <div class="flex items-center gap-2 px-1 pb-1 text-[11px] font-extrabold tracking-widest uppercase text-gold-400"><i class="fa-solid fa-headset"></i> Helpline</div>
-    <a href="https://wa.me/8801353808618" target="_blank" rel="noopener" class="flex items-center gap-3 p-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-extrabold transition-colors"><i class="fa-brands fa-whatsapp text-xl wa-rot"></i><span>WhatsApp<small class="block text-[10px] font-semibold opacity-80">01353-808618</small></span></a>
-    <a href="tel:+8801353808618" class="flex items-center gap-3 p-3 rounded-xl btn-gold text-sm font-extrabold"><i class="fa-solid fa-phone-volume text-lg"></i><span>Call Now<small class="block text-[10px] font-semibold opacity-70">01353-808618</small></span></a>
-    <a href="tel:+8801357317938" class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm font-extrabold transition-colors"><i class="fa-solid fa-phone text-lg text-gold-400"></i><span>Support<small class="block text-[10px] font-semibold opacity-70">01357-317938</small></span></a>
-  </div>
-  <button onclick="toggleHelp()" aria-label="Helpline" class="w-14 h-14 rounded-full bg-emerald-500 text-white text-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform pulse-ring"><i id="helpIcon" class="fa-brands fa-whatsapp wa-rot"></i></button>
+  <a id="fabTel" href="tel:+8801353808618" aria-label="Call us" class="flex items-center gap-2.5 px-6 h-14 rounded-full bg-ink-900 text-white text-xs font-extrabold tracking-[.18em] shadow-2xl border border-white/10 hover:scale-105 transition-transform"><i class="fa-solid fa-phone"></i>PHONE</a>
+  <a id="fabWa" href="https://wa.me/8801353808618" target="_blank" rel="noopener" aria-label="WhatsApp" class="flex items-center gap-2.5 px-6 h-14 rounded-full bg-emerald-500 text-white text-xs font-extrabold tracking-[.18em] shadow-2xl hover:scale-105 transition-transform pulse-ring"><i class="fa-brands fa-whatsapp text-lg"></i>CONTACT</a>
 </div>
-<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-24 right-[22px] z-30 w-10 h-10 rounded-full btn-gold shadow-xl opacity-0 pointer-events-none transition-opacity"><i class="fa-solid fa-arrow-up"></i></button>
+<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-[168px] right-[22px] z-30 w-10 h-10 rounded-full btn-gold shadow-xl opacity-0 pointer-events-none transition-opacity"><i class="fa-solid fa-arrow-up"></i></button>
 <div id="scrollBar"></div>
 
 <!-- PRODUCT DETAIL MODAL -->
-<div id="productModal" class="fixed inset-0 z-50 hidden opacity-0 modal-bg">
-  <div onclick="closeProduct()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-  <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-    <div class="pointer-events-auto relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 max-h-[92vh] overflow-y-auto">
-      <button onclick="closeProduct()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <div class="h-72 md:h-auto bg-ink-800 relative"><img id="pmImage" src="" alt="" class="w-full h-full object-cover" onerror="this.style.opacity=0"><div id="pmThumbs" class="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto justify-center"></div></div>
-      <div class="p-6 sm:p-8 flex flex-col gap-4">
-        <div>
-          <span id="pmCategory" class="text-gold-600 font-extrabold text-[10px] uppercase tracking-widest"></span>
-          <h3 id="pmTitle" class="font-display font-extrabold text-2xl text-ink-900 mt-1"></h3>
-          <div class="flex items-center gap-2 mt-2"><span class="text-gold-500 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span><span id="pmRating" class="text-xs font-bold text-slate-500"></span></div>
-          <div class="flex items-center gap-2.5 mt-3"><span id="pmPrice" class="font-extrabold text-2xl text-ink-900"></span><span id="pmOld" class="text-xs text-slate-400 line-through"></span><span id="pmOff" class="px-2 py-0.5 rounded-md bg-gold-500/15 text-gold-600 text-[10px] font-extrabold"></span></div>
-          <div class="mt-4 pt-3 border-t border-slate-100"><div class="text-xs font-extrabold text-ink-900 mb-1.5"><i class="fa-solid fa-circle-info text-gold-500 mr-1.5"></i>Product Details</div><p id="pmDesc" class="text-[13px] text-slate-600 leading-relaxed whitespace-pre-line"></p></div>
-          <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-bold text-slate-600 mt-3"><div class="p-2 rounded-xl bg-slate-50"><i class="fa-solid fa-medal text-gold-500 block text-base mb-1"></i>Original Quality</div><div class="p-2 rounded-xl bg-slate-50"><i class="fa-solid fa-money-bill-wave text-gold-500 block text-base mb-1"></i>Cash on Delivery</div><div class="p-2 rounded-xl bg-slate-50"><i class="fa-solid fa-rotate text-gold-500 block text-base mb-1"></i>Easy Exchange</div></div>
-          <div id="pmShip" class="text-[11px] text-slate-500 mt-2"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i></div>
-        </div>
-        <div>
-          <label class="text-xs font-bold block mb-1.5">Select Size</label>
-          <div id="pmSizes" class="flex gap-2 flex-wrap"></div>
-        </div>
-        <div>
-          <label class="text-xs font-bold block mb-1.5">Quantity</label>
-          <div class="inline-flex items-center border border-slate-200 rounded-xl bg-slate-50">
-            <button onclick="pmQty(-1)" class="px-3.5 py-1.5 font-bold text-slate-500 hover:text-black">-</button><span id="pmQty" class="px-3 text-sm font-bold">1</span><button onclick="pmQty(1)" class="px-3.5 py-1.5 font-bold text-slate-500 hover:text-black">+</button>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3 mt-auto">
-          <button onclick="pmAdd(false)" class="py-3.5 rounded-xl border-2 border-ink-900 text-ink-900 hover:bg-ink-900 hover:text-white font-extrabold text-xs transition-all"><i class="fa-solid fa-bag-shopping mr-1.5"></i>Add to Bag</button>
-          <button onclick="pmAdd(true)" class="py-3.5 rounded-xl btn-gold font-extrabold text-xs shadow-lg shadow-gold-500/25"><i class="fa-solid fa-bolt mr-1.5"></i>Order Now</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CART DRAWER -->
 <div id="cartDrawer" class="fixed inset-0 z-50 hidden">
   <div id="cartOverlay" onclick="toggleCartDrawer()" class="absolute inset-0 bg-black/70 backdrop-blur-sm opacity-0 modal-bg"></div>
   <div id="cartContent" class="drawer absolute right-0 top-0 bottom-0 w-full max-w-md bg-ink-900 text-white shadow-2xl flex flex-col translate-x-full border-l border-white/10">
@@ -683,45 +643,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 </div>
 
 <!-- AUTH MODAL -->
-<div id="authModal" class="fixed inset-0 z-[60] hidden">
-  <div onclick="closeAuth()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-  <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-    <div class="pointer-events-auto w-full max-w-md bg-ink-900 text-white rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
-      <div class="p-7 text-center border-b border-white/10 relative">
-        <button onclick="closeAuth()" class="absolute top-4 right-4 text-silver-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-        <div class="w-16 h-16 mx-auto rounded-full bg-black border border-white/25 flex items-center justify-center overflow-hidden"><img src="data:image/jpeg;base64,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" class="w-full h-full object-cover" alt=""><svg style="display:none" class="w-10 h-10"><use href="#bfMark"/></svg></div>
-        <h3 id="authTitle" class="font-display font-extrabold text-xl mt-3">Sign in to confirm your order</h3>
-        <p id="authSub" class="text-xs text-silver-400 mt-1">Sign in or create an account to complete your purchase.</p>
-      </div>
-
-      <!-- Signed-in view -->
-      <div id="profileView" class="hidden p-7 text-center space-y-4">
-        <div id="profileAvatar" class="w-20 h-20 mx-auto rounded-full btn-gold flex items-center justify-center text-3xl font-extrabold"></div>
-        <div><div id="profileName" class="font-bold text-lg"></div><div id="profileEmail" class="text-xs text-silver-400"></div></div><div class="text-[11px] font-bold text-silver-300 uppercase tracking-wider text-left">My Orders</div><div id="myOrders" class="text-left text-xs space-y-2 max-h-60 overflow-auto"></div>
-        <button onclick="doSignOut()" class="w-full py-3 rounded-xl border border-white/20 hover:bg-white/10 text-sm font-bold"><i class="fa-solid fa-right-from-bracket mr-2"></i>Sign Out</button>
-      </div>
-
-      <!-- Sign-in view -->
-      <div id="signinView" class="p-7 space-y-4">
-        <button onclick="googleSignIn()" class="w-full py-3 rounded-xl bg-white text-black font-bold text-sm flex items-center justify-center gap-3 hover:bg-silver-100 transition-colors"><i class="fa-brands fa-google text-rose-500"></i> Continue with Google</button>
-        <div class="flex items-center gap-3 text-[11px] text-silver-400"><span class="flex-1 h-px bg-white/10"></span>OR<span class="flex-1 h-px bg-white/10"></span></div>
-        <div class="grid grid-cols-2 bg-white/5 rounded-xl p-1 text-xs font-bold">
-          <button id="tabLogin" onclick="setAuthTab('login')" class="py-2 rounded-lg btn-gold">Sign In</button>
-          <button id="tabRegister" onclick="setAuthTab('register')" class="py-2 rounded-lg text-silver-300">Create Account</button>
-        </div>
-        <form id="authForm" onsubmit="submitAuth(event)" class="space-y-3">
-          <input id="authName" type="text" placeholder="Full name" class="hidden w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-silver-400">
-          <input id="authEmail" type="email" required placeholder="Email address" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-silver-400">
-          <input id="authPass" type="password" required minlength="6" placeholder="Password (min 6 characters)" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-silver-400">
-          <button id="authSubmit" type="submit" class="w-full py-3.5 rounded-xl btn-gold font-extrabold text-sm">SIGN IN</button>
-        </form>
-        <p id="demoNote" class="hidden text-[11px] text-amber-400/90 text-center leading-relaxed"><i class="fa-solid fa-circle-info mr-1"></i>Demo mode: Firebase keys not added yet. Accounts are saved on this device only.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CHECKOUT MODAL -->
 <div id="checkoutModal" class="fixed inset-0 z-[95] hidden bg-slate-50 overflow-y-auto">
   <div onclick="closeCheckout()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
   <div class="relative min-h-screen">
@@ -734,15 +655,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
         <div class="md:col-span-3 p-6 space-y-4">
           <div><label class="text-xs font-bold">Full Name *</label><input id="coName" required class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Your name"></div>
           <div><label class="text-xs font-bold">Mobile Number *</label><input id="coPhone" required inputmode="tel" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="01XXXXXXXXX"></div>
-          <div class="grid sm:grid-cols-2 gap-4"><div><label class="text-xs font-bold">District (জেলা) *</label><select id="coDist" required onchange="onDist()" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">Select district</option></select></div>
-            <div id="coUpBox" class="hidden"><label class="text-xs font-bold">Upazila / Thana *</label><select id="coUp" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">Select upazila / thana</option></select></div></div>
+          <div><label class="text-xs font-bold">Delivery Area *</label><div class="grid grid-cols-2 gap-3 mt-1">
+            <label class="areaopt cursor-pointer rounded-xl border-2 border-slate-200 p-3 bg-white flex items-center gap-2.5"><input type="radio" name="coAreaR" value="dhaka" checked onchange="setArea('dhaka')" class="accent-black"><span class="text-xs font-extrabold leading-tight">Inside Dhaka<small id="areaPIn" class="block font-semibold text-slate-500"></small></span></label>
+            <label class="areaopt cursor-pointer rounded-xl border-2 border-slate-200 p-3 bg-white flex items-center gap-2.5"><input type="radio" name="coAreaR" value="outside" onchange="setArea('outside')" class="accent-black"><span class="text-xs font-extrabold leading-tight">Outside Dhaka<small id="areaPOut" class="block font-semibold text-slate-500"></small></span></label></div></div>
+          <input type="hidden" id="coDist" value="Dhaka"><input type="hidden" id="coUp" value="">
           <input type="hidden" id="coArea" value="dhaka">
           <div><label class="text-xs font-bold">Full Address *</label><textarea id="coAddress" required rows="3" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="House no, road, village / area"></textarea></div>
-          <div class="rounded-2xl p-4 bg-gradient-to-br from-ink-900 to-ink-800 text-white border border-gold-500/30 flex items-center gap-3 shadow-lg">
-            <div class="w-12 h-12 rounded-xl btn-gold flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-location-crosshairs"></i></div>
-            <div class="flex-1 min-w-0"><div class="font-extrabold text-sm">Use my current location</div><div id="geoMsg" class="text-[11px] text-silver-400 leading-snug">Auto-fill your district, area &amp; address using GPS</div></div>
-            <button type="button" id="geoBtn" onclick="useMyLocation()" class="px-4 py-2.5 rounded-xl btn-gold text-xs font-extrabold shrink-0"><i class="fa-solid fa-satellite-dish mr-1"></i>Locate</button>
-          </div><input type="hidden" id="coLat"><input type="hidden" id="coLng">
+          <input type="hidden" id="coLat"><input type="hidden" id="coLng">
           <div><label class="text-xs font-bold">Order Note (optional)</label><input id="coNote" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Any special instruction"></div>
           <div id="coPayBox" class="space-y-3"><div class="text-xs font-bold">Payment Method *</div><div id="coPayOpts" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
 <div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="Your sender number (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)" oninput="chkTrx()"><div id="coTrxErr" class="text-[11px] font-extrabold text-red-500"></div><div class="text-[11px] text-slate-500">Each TrxID can be used only once.</div></div></div>
@@ -759,7 +678,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
             <div class="flex justify-between text-base font-extrabold pt-2 border-t border-slate-200"><span>Total</span><span id="coTotal" class="text-gold-600"></span></div>
           </div>
           <button id="coSubmit" type="submit" class="mt-4 w-full py-4 rounded-xl btn-gold font-extrabold text-sm shadow-lg shadow-gold-500/25">CONFIRM ORDER</button>
-          <p class="text-[10px] text-slate-400 text-center mt-2">Signed in as <span id="coUser" class="font-bold"></span></p>
         </div>
       </form>
     </div>
@@ -775,6 +693,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
       <h3 class="font-display font-extrabold text-2xl mt-4">Order Confirmed!</h3>
       <p class="text-sm text-slate-500 mt-2">Thank you for shopping with BANA FASHION. We will call you shortly to confirm delivery.</p>
       <div class="mt-4 p-3 rounded-xl bg-slate-100 text-xs">Order ID<div id="successId" class="font-extrabold text-lg tracking-wider text-ink-900"></div></div>
+      <div id="successSummary" class="mt-3 text-left text-xs rounded-xl border border-slate-200 p-3 space-y-1.5 max-h-52 overflow-y-auto"></div>
       <button onclick="showLastInv()" class="mt-4 w-full py-3 rounded-xl bg-ink-900 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-file-invoice mr-1.5"></i>View / Print Invoice</button>
       <div class="mt-3 grid grid-cols-2 gap-3">
         <a id="successWa" href="#" target="_blank" rel="noopener" class="py-3 rounded-xl bg-emerald-500 text-white text-xs font-extrabold"><i class="fa-brands fa-whatsapp mr-1"></i>Send on WhatsApp</a>
@@ -802,7 +721,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 /* ================= FIREBASE (v10 Web SDK) ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, serverTimestamp, doc, getDoc, setDoc, increment, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 /* >>> Replace the YOUR_... values with the keys from Firebase Console > Project Settings > Your apps (Web) <<< */
 const firebaseConfig = {
@@ -833,21 +752,33 @@ async function bump(f){ if(!FIREBASE_READY) return; try{ await setDoc(doc(db,'st
 async function ensureUser(u){ try{ const r=doc(db,'users',u.uid); if(!(await getDoc(r)).exists()){ await setDoc(r,{name:u.displayName||'',email:u.email||'',createdAt:serverTimestamp()}); bump('signups'); } }catch(e){} }
 /* ================= DATA ================= */
 const CATEGORIES = [
-  {id:'all',label:'All Products'},{id:'shirts',label:'Shirts'},{id:'tshirts',label:'T-Shirts & Polo'},
-  {id:'jeans',label:'Denim'},{id:'pants',label:'Pants'},{id:'jackets',label:'Jackets & Hoodies'},
+  {id:'all',label:'All Products'},{id:'shoes',label:'Shoes'},{id:'shirts',label:'Shirts'},{id:'tshirts',label:'T-Shirts & Polo'},
+  {id:'jeans',label:'Denim'},{id:'pants',label:'Pants'},{id:'shorts',label:'Quarter Shorts'},{id:'jackets',label:'Jackets & Hoodies'},
   {id:'threepiece',label:'Three Piece'},{id:'watches',label:'Watches'}
 ];
 const LOCAL_PRODUCTS = [
-  {"id": "n1", "title": "Premium Cotton Formal Shirt", "category": "shirts", "price": 1490, "oldPrice": 1890, "rating": 4.8, "reviews": 0, "badge": "PREMIUM", "image": "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "Premium quality 100% cotton formal shirt. Soft, breathable, tailored fit with sharp collar. অফিস ও অনুষ্ঠানের জন্য পারফেক্ট।"},
-  {"id": "n2", "title": "Premium Oxford Check Shirt", "category": "shirts", "price": 1390, "oldPrice": 1750, "rating": 4.8, "reviews": 0, "badge": "NEW", "image": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "Premium Oxford fabric check shirt with comfortable slim fit and strong stitching."},
-  {"id": "n3", "title": "Premium Slim Casual Shirt", "category": "shirts", "price": 1290, "oldPrice": 1650, "rating": 4.8, "reviews": 0, "badge": "BESTSELLER", "image": "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "Lightweight premium casual shirt, modern slim cut and soft hand-feel for daily wear."},
-  {"id": "n4", "title": "Stretch Slim Chino Pant", "category": "pants", "price": 1390, "oldPrice": 1790, "rating": 4.8, "reviews": 0, "badge": "NEW", "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "description": "Premium stretch cotton chino with smart tapered leg. Comfortable all day."},
-  {"id": "n5", "title": "Formal Premium Trouser Pant", "category": "pants", "price": 1590, "oldPrice": 1990, "rating": 4.8, "reviews": 0, "badge": "PREMIUM", "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "description": "Premium formal trouser with clean finish and perfect fall. Office ready."},
-  {"id": "n6", "title": "Urban Cargo Pant", "category": "pants", "price": 1490, "oldPrice": 1890, "rating": 4.8, "reviews": 0, "badge": "POPULAR", "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "description": "Durable cotton cargo pant with multiple pockets and relaxed fit."},
-  {"id": "n7", "title": "Royal Navy Three Piece Suit", "category": "threepiece", "price": 7990, "oldPrice": 9990, "rating": 4.8, "reviews": 0, "badge": "LIMITED", "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1594938374182-a57061dc6f3d?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "থ্রি পিস: কোট + ওয়েস্টকোট + প্যান্ট। Premium fabric, perfect for wedding & formal events."},
-  {"id": "n8", "title": "Charcoal Black Three Piece Suit", "category": "threepiece", "price": 8490, "oldPrice": 10490, "rating": 4.8, "reviews": 0, "badge": "PREMIUM", "image": "https://images.unsplash.com/photo-1594938374182-a57061dc6f3d?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1594938374182-a57061dc6f3d?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "থ্রি পিস: কোট + ওয়েস্টকোট + প্যান্ট। Elegant charcoal black, tailored fit."},
-  {"id": "n9", "title": "Classic Leather Strap Watch", "category": "watches", "price": 2490, "oldPrice": 3190, "rating": 4.8, "reviews": 0, "badge": "HOT", "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=700&q=80"], "sizes": ["Free Size"], "description": "Stylish classic analog watch with genuine-look leather strap and water resistant body."},
-  {"id": "n10", "title": "Chronograph Steel Watch", "category": "watches", "price": 2990, "oldPrice": 3790, "rating": 4.8, "reviews": 0, "badge": "TRENDING", "image": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=700&q=80"], "sizes": ["Free Size"], "description": "Premium stainless steel chronograph style watch with sharp dial and strong build."}
+  {"id": "s1", "title": "Jordan 1 Low Red", "category": "shoes", "price": 3113.5, "oldPrice": 4790, "rating": 4.8, "reviews": 0, "badge": "New", "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=700&q=80"], "sizes": ["40", "41", "42", "43", "44"], "colors": ["Red/Black", "Black"], "stock": 14, "description": "Classic low-top sneaker with red overlays, cushioned sole and durable stitching. Everyday street comfort."},
+  {"id": "s2", "title": "Jordan 1 Low Pain Green", "category": "shoes", "price": 3113.5, "oldPrice": 4790, "rating": 4.8, "reviews": 0, "badge": "New", "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=700&q=80"], "sizes": ["40", "41", "42", "43", "44"], "colors": ["Green/Black"], "stock": 8, "description": "Green and black low-top with soft padded collar and grippy rubber outsole."},
+  {"id": "s3", "title": "Air Force 1 Triple White", "category": "shoes", "price": 3490, "oldPrice": 4990, "rating": 4.8, "reviews": 0, "badge": "Hot", "image": "https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?auto=format&fit=crop&w=700&q=80"], "sizes": ["40", "41", "42", "43", "44"], "colors": ["White"], "stock": 20, "description": "All-white leather-look sneaker. Clean, versatile, goes with everything."},
+  {"id": "s4", "title": "Hoka Clifton Runner", "category": "shoes", "price": 4290, "oldPrice": 5990, "rating": 4.8, "reviews": 0, "badge": "Trending", "image": "https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1514989940723-e8e51635b782?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80"], "sizes": ["40", "41", "42", "43", "44"], "colors": ["Grey/Blue", "Black"], "stock": 5, "description": "Lightweight running shoe with thick cushioned midsole for all-day comfort."},
+  {"id": "s5", "title": "Everyday Casual Sneaker", "category": "shoes", "price": 2490, "oldPrice": 3290, "rating": 4.8, "reviews": 0, "badge": null, "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=700&q=80"], "sizes": ["40", "41", "42", "43", "44"], "colors": ["White", "Black", "Grey"], "stock": 30, "description": "Simple low-profile sneaker for daily wear. Breathable upper and flexible sole."},
+  {"id": "n1", "title": "Premium Cotton Formal Shirt", "category": "shirts", "price": 1490, "oldPrice": 1890, "rating": 4.8, "reviews": 0, "badge": "PREMIUM", "image": "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "Premium quality 100% cotton formal shirt. Soft, breathable, tailored fit with sharp collar. অফিস ও অনুষ্ঠানের জন্য পারফেক্ট।", "colors": ["White", "Sky Blue", "Black"], "stock": 24},
+  {"id": "n2", "title": "Premium Oxford Check Shirt", "category": "shirts", "price": 1390, "oldPrice": 1750, "rating": 4.8, "reviews": 0, "badge": "NEW", "image": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "Premium Oxford fabric check shirt with comfortable slim fit and strong stitching.", "colors": ["White", "Sky Blue", "Black"], "stock": 18},
+  {"id": "n3", "title": "Premium Slim Casual Shirt", "category": "shirts", "price": 1290, "oldPrice": 1650, "rating": 4.8, "reviews": 0, "badge": "BESTSELLER", "image": "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "Lightweight premium casual shirt, modern slim cut and soft hand-feel for daily wear.", "colors": ["White", "Sky Blue", "Black"], "stock": 9},
+  {"id": "t1", "title": "Heavyweight Oversized Tee", "category": "tshirts", "price": 690, "oldPrice": 890, "rating": 4.8, "reviews": 0, "badge": "Hot", "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=700&q=80"], "sizes": ["S", "M", "L", "XL", "XXL"], "colors": ["Black", "White", "Olive"], "stock": 45, "description": "240GSM combed cotton, dropped shoulders, pre-shrunk and anti-stretch collar."},
+  {"id": "t2", "title": "Signature Cotton Polo", "category": "tshirts", "price": 890, "oldPrice": 1150, "rating": 4.8, "reviews": 0, "badge": "New", "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=700&q=80"], "sizes": ["S", "M", "L", "XL", "XXL"], "colors": ["Navy", "White", "Black"], "stock": 7, "description": "Premium pique cotton polo with reinforced collar and clean finish."},
+  {"id": "n4", "title": "Stretch Slim Chino Pant", "category": "pants", "price": 1390, "oldPrice": 1790, "rating": 4.8, "reviews": 0, "badge": "NEW", "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "description": "Premium stretch cotton chino with smart tapered leg. Comfortable all day.", "colors": ["Black", "Khaki", "Navy"], "stock": 30},
+  {"id": "n5", "title": "Formal Premium Trouser Pant", "category": "pants", "price": 1590, "oldPrice": 1990, "rating": 4.8, "reviews": 0, "badge": "PREMIUM", "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "description": "Premium formal trouser with clean finish and perfect fall. Office ready.", "colors": ["Black", "Khaki", "Navy"], "stock": 12},
+  {"id": "n6", "title": "Urban Cargo Pant", "category": "pants", "price": 1490, "oldPrice": 1890, "rating": 4.8, "reviews": 0, "badge": "POPULAR", "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "description": "Durable cotton cargo pant with multiple pockets and relaxed fit.", "colors": ["Black", "Khaki", "Navy"], "stock": 40},
+  {"id": "j1", "title": "Raw Indigo Slim Jeans", "category": "jeans", "price": 1790, "oldPrice": 2190, "rating": 4.8, "reviews": 0, "badge": "Trending", "image": "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "colors": ["Indigo", "Black"], "stock": 16, "description": "Comfort-stretch denim, deep indigo wash, slim fit with strong stitching."},
+  {"id": "j2", "title": "Washed Black Tapered Jeans", "category": "jeans", "price": 1890, "oldPrice": 2350, "rating": 4.8, "reviews": 0, "badge": null, "image": "https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=700&q=80"], "sizes": ["30", "32", "34", "36"], "colors": ["Black"], "stock": 3, "description": "Charcoal black wash with a sharp tapered ankle."},
+  {"id": "q1", "title": "Men's Quarter Shorts", "category": "shorts", "price": 790, "oldPrice": 990, "rating": 4.8, "reviews": 0, "badge": "New", "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=700&q=80"], "sizes": ["S", "M", "L", "XL", "XXL"], "colors": ["Black", "Navy", "Khaki"], "stock": 35, "description": "Soft cotton quarter shorts with elastic drawstring waist. Perfect for summer."},
+  {"id": "q2", "title": "Cargo Quarter Shorts", "category": "shorts", "price": 990, "oldPrice": 1290, "rating": 4.8, "reviews": 0, "badge": "Popular", "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=700&q=80"], "sizes": ["S", "M", "L", "XL", "XXL"], "colors": ["Olive", "Black", "Beige"], "stock": 11, "description": "Relaxed cargo quarter shorts with side pockets, durable cotton twill."},
+  {"id": "c1", "title": "Casual Summer Set (Tee + Shorts)", "category": "shorts", "price": 1390, "oldPrice": 1790, "rating": 4.8, "reviews": 0, "badge": "Set", "image": "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=700&q=80"], "sizes": ["S", "M", "L", "XL", "XXL"], "colors": ["Black", "Grey"], "stock": 9, "description": "Matching casual wear set. Breathable tee with quarter shorts for relaxed days."},
+  {"id": "n7", "title": "Royal Navy Three Piece Suit", "category": "threepiece", "price": 7990, "oldPrice": 9990, "rating": 4.8, "reviews": 0, "badge": "LIMITED", "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1594938374182-a57061dc6f3d?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "থ্রি পিস: কোট + ওয়েস্টকোট + প্যান্ট। Premium fabric, perfect for wedding & formal events.", "colors": ["Navy", "Charcoal"], "stock": 6},
+  {"id": "n8", "title": "Charcoal Black Three Piece Suit", "category": "threepiece", "price": 8490, "oldPrice": 10490, "rating": 4.8, "reviews": 0, "badge": "PREMIUM", "image": "https://images.unsplash.com/photo-1594938374182-a57061dc6f3d?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1594938374182-a57061dc6f3d?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=700&q=80"], "sizes": ["M", "L", "XL", "XXL"], "description": "থ্রি পিস: কোট + ওয়েস্টকোট + প্যান্ট। Elegant charcoal black, tailored fit.", "colors": ["Navy", "Charcoal"], "stock": 15},
+  {"id": "n9", "title": "Classic Leather Strap Watch", "category": "watches", "price": 2490, "oldPrice": 3190, "rating": 4.8, "reviews": 0, "badge": "HOT", "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=700&q=80"], "sizes": ["Free Size"], "description": "Stylish classic analog watch with genuine-look leather strap and water resistant body.", "colors": ["Black", "Silver"], "stock": 22},
+  {"id": "n10", "title": "Chronograph Steel Watch", "category": "watches", "price": 2990, "oldPrice": 3790, "rating": 4.8, "reviews": 0, "badge": "TRENDING", "image": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=700&q=80", "images": ["https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=700&q=80", "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=700&q=80"], "sizes": ["Free Size"], "description": "Premium stainless steel chronograph style watch with sharp dial and strong build.", "colors": ["Black", "Silver"], "stock": 50}
 ];
 const SIZES = ['M','L','XL','XXL'];
 let FREE_SHIP = 3000;
@@ -855,7 +786,7 @@ const SHIP = {dhaka:80,outside:150};
 
 const state = { products:[...LOCAL_PRODUCTS], cart:[], wishlist:[], cat:'all', q:'', sort:'default', hero:0, user:null, pm:{id:null,size:'M',qty:1}, pendingCheckout:false, authTab:'login' };
 const $ = id => document.getElementById(id);
-const money = n => '৳' + Math.round(n).toLocaleString('en-US');
+const money = n => 'Tk ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:(Number(n)%1?2:0),maximumFractionDigits:2});
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const save = (k,v) => { try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} };
 const load = (k,d) => { try{const v=JSON.parse(localStorage.getItem(k)); return v ?? d}catch(e){return d} };
@@ -922,9 +853,9 @@ function renderProducts(){
 setInterval(()=>{ document.querySelectorAll('.pslide').forEach((el,k)=>{ const n=+el.dataset.n; if(n<2||el.closest('.pcard:hover')) return; let i=+el.dataset.i+1; el.style.transition='transform .8s cubic-bezier(.65,0,.35,1)'; el.style.transform=`translateX(-${i*100}%)`; el.dataset.i=i;
   const dots=el.parentElement.querySelectorAll('.pdot'); dots.forEach((d,j)=>{ const on=j===(i%n); d.classList.toggle('bg-white',on); d.classList.toggle('bg-white/50',!on); });
   if(i>=n){ setTimeout(()=>{ el.style.transition='none'; el.style.transform='translateX(0)'; el.dataset.i=0; },850); } }); },2800);
-function filterCategory(c){ state.cat=c; renderTabs(); renderProducts(); }
+function filterCategory(c){ hidePP(); state.cat=c; renderTabs(); renderProducts(); }
 function goShop(c){ filterCategory(c); $('shop').scrollIntoView({behavior:'smooth'}); }
-function handleSearch(v){ state.q=v; $('searchInput').value=v; $('mobileSearchInput').value=v; renderProducts(); }
+function handleSearch(v){ if(v&&document.body.classList.contains('pp-open')){ hidePP(); setTimeout(()=>$('shop').scrollIntoView(),30); } state.q=v; $('searchInput').value=v; $('mobileSearchInput').value=v; renderProducts(); }
 function setSort(v){ state.sort=v; renderProducts(); }
 function resetFilters(){ state.cat='all'; state.q=''; $('searchInput').value=''; $('mobileSearchInput').value=''; renderTabs(); renderProducts(); }
 
@@ -933,7 +864,7 @@ async function loadFirestoreProducts(){
   try{
     const snap=await getDocs(collection(db,'products'));
     const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()}));
-    if(items.length){ state.products=items.map(p=>({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); renderProducts(); } else { try{ const sd=await getDoc(doc(db,'settings','site')); if(sd.exists()&&sd.data().seeded){ state.products=[]; renderProducts(); } }catch(e){} }
+    if(items.length){ state.products=items.map(p=>({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); renderProducts(); openFromHash(); } else { try{ const sd=await getDoc(doc(db,'settings','site')); if(sd.exists()&&sd.data().seeded){ state.products=[]; renderProducts(); } }catch(e){} }
   }catch(e){ console.warn('Firestore products not loaded, using local data:',e.message); }
 }
 
@@ -945,7 +876,8 @@ async function loadSite(){
   try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
     if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:x.label}))); buildCatRow(); renderTabs(); } }catch(e){}
   renderMenu(); renderEid();
-  const st=state.site||{}; window.SHOPX={...(st.shopAddress?{addr:st.shopAddress}:{}),...(st.helpline?{phone:st.helpline}:{})}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
+  const st=state.site||{}; { const w=String(st.whatsapp||'').replace(/\D/g,''); if(w&&$('fabWa')) $('fabWa').href='https://wa.me/'+w; const hp=String(st.helpline||'').replace(/[^\d+]/g,''); if(hp&&$('fabTel')) $('fabTel').href='tel:'+hp; }
+  window.SHOPX={...(st.shopAddress?{addr:st.shopAddress}:{}),...(st.helpline?{phone:st.helpline}:{})}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
   updateCheckoutTotals();
   try{ const bs=await getDocs(collection(db,'banners')); const a=[]; bs.forEach(d=>a.push(d.data())); a.sort((x,y)=>(x.order||0)-(y.order||0));
     if(a.length){ const hero=$('hero'), anchor=hero.querySelector(':scope > button'), first=hero.querySelector('.hero-slide');
@@ -1041,7 +973,6 @@ function useMyLocation(){ const m=$('geoMsg'), b=$('geoBtn');
     done(); },
     err=>{ m.textContent=err.code===1?'Permission denied. Allow location access in your browser settings and try again.':'Could not get your location. Please try again outdoors or enter address manually.'; done(); },
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }
-function pmPic(i){ $('pmImage').src=state.pmImgs[i]; $('pmThumbs').querySelectorAll('img').forEach((im,n)=>{ im.classList.toggle('border-gold-500',n===i); im.classList.toggle('border-white/70',n!==i); }); }
 
 /* ===== v5: promo, eid, menu, fly-to-cart ===== */
 const pio=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in2'); pio.unobserve(en.target); } }),{threshold:.08,rootMargin:'0px 0px -4% 0px'});
@@ -1073,21 +1004,145 @@ function flyToCart(src){ const f=state.flyFrom||{left:innerWidth/2-30,top:innerH
   a.onfinish=()=>{ el.remove(); cb.classList.remove('cart-pop'); void cb.offsetWidth; cb.classList.add('cart-pop'); toast('Added to your bag',true); }; }
 document.addEventListener('click',e=>{ const t=e.target.closest('[onclick*="addToCart("]'); if(t) state.flyFrom=t.getBoundingClientRect(); },true);
 /* ================= PRODUCT MODAL ================= */
-function openProduct(id){
+/* ================= PRODUCT PAGE (full view, Shopify-style) ================= */
+const DOC_TITLE=document.title;
+const ppImgs=p=>(p.images&&p.images.length)?p.images:[p.image];
+const CSSCOL={Black:'#111827',White:'#ffffff',Navy:'#1e2a4a',Red:'#c62828',Green:'#1f7a4d',Blue:'#2b4fa3','Sky Blue':'#7ec8f0',Grey:'#9ca3af',Olive:'#708238',Beige:'#d6c3a1',Brown:'#6b4423',Khaki:'#bda77b',Charcoal:'#36454f',Indigo:'#2c3e75',Silver:'#c0c0c0','Red/Black':'#c62828','Green/Black':'#1f7a4d','Grey/Blue':'#6b7fa3'};
+function stockOf(p){ return (p.stock===undefined||p.stock===null||p.stock==='')?null:+p.stock; }
+function openProduct(id,push=true){
   const p=state.products.find(x=>x.id===id); if(!p) return;
-  state.pm={id,size:(p.sizes&&p.sizes[0])||'M',qty:1};
-  $('pmImage').style.opacity=1; $('pmImage').src=p.image; state.pmImgs=(p.images&&p.images.length>1)?p.images:[]; $('pmThumbs').innerHTML=state.pmImgs.map((u,i)=>`<img src="${esc(u)}" onclick="pmPic(${i})" class="w-12 h-12 rounded-lg object-cover border-2 cursor-pointer shadow-lg bg-white ${i?'border-white/70':'border-gold-500'}">`).join(''); $('pmCategory').textContent=(CATEGORIES.find(c=>c.id===p.category)||{}).label||p.category; $('pmShip').innerHTML='<i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>Delivery: Inside Dhaka '+money(SHIP.dhaka)+' · Outside Dhaka '+money(SHIP.outside); $('pmTitle').textContent=p.title;
-  $('pmRating').textContent=`${p.rating||4.5} (${p.reviews||0} reviews)`; $('pmPrice').textContent=money(p.price);
-  $('pmOld').textContent=p.oldPrice?money(p.oldPrice):''; const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0;
-  $('pmOff').textContent=off?`${off}% OFF`:''; $('pmOff').classList.toggle('hidden',!off); $('pmDesc').textContent=p.description||'Premium quality product from BANA FASHION.'; $('pmQty').textContent=1;
-  renderSizes();
-  const m=$('productModal'); m.classList.remove('hidden'); setTimeout(()=>m.classList.remove('opacity-0'),10);
+  state.pp={id,img:0,qty:1,size:(p.sizes&&p.sizes[0])||'M',color:(p.colors&&p.colors[0])||''};
+  renderPP();
+  document.body.classList.add('pp-open'); $('productPage').classList.remove('hidden'); window.scrollTo({top:0,behavior:'auto'});
+  if(push){ try{ history.pushState({pid:id},'','#product-'+encodeURIComponent(id)); }catch(e){} }
+  document.title=p.title+' | '+DOC_TITLE;
 }
-function renderSizes(){ const pp=state.products.find(x=>x.id===state.pm.id), SL=(pp&&pp.sizes&&pp.sizes.length)?pp.sizes:SIZES; $('pmSizes').innerHTML=SL.map(s=>`<button onclick="pmSize('${s}')" class="px-4 py-2 rounded-lg border text-xs font-extrabold transition-all ${state.pm.size===s?'bg-ink-900 text-gold-400 border-ink-900':'border-slate-200 hover:border-ink-900'}">${s}</button>`).join(''); }
-function pmSize(s){ state.pm.size=s; renderSizes(); }
-function pmQty(d){ state.pm.qty=Math.max(1,state.pm.qty+d); $('pmQty').textContent=state.pm.qty; }
-function pmAdd(order){ state.flyFrom=$('pmImage').getBoundingClientRect(); addToCart(state.pm.id,state.pm.qty,state.pm.size,order); closeProduct(); if(order) startCheckout(); }
-function closeProduct(){ const m=$('productModal'); m.classList.add('opacity-0'); setTimeout(()=>m.classList.add('hidden'),300); }
+function hidePP(){ if(!document.body.classList.contains('pp-open')) return; document.body.classList.remove('pp-open'); $('productPage').classList.add('hidden'); $('productPage').innerHTML=''; document.title=DOC_TITLE; }
+function closeProduct(){ if(history.state&&history.state.pid){ history.back(); } else { hidePP(); if(location.hash.startsWith('#product-')){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} } setTimeout(()=>{ const sh=$('shop'); if(sh) sh.scrollIntoView(); },30); } }
+function openFromHash(){ const m=location.hash.match(/^#product-(.+)$/); if(!m) return; const id=decodeURIComponent(m[1]); if(state.pp&&state.pp.id===id&&document.body.classList.contains('pp-open')) return; openProduct(id,false); }
+window.addEventListener('popstate',e=>{ const pid=e.state&&e.state.pid; if(pid) openProduct(pid,false); else hidePP(); });
+document.addEventListener('click',e=>{ const a=e.target.closest('a[href^="#"]'); if(!a||!document.body.classList.contains('pp-open')) return; const h=a.getAttribute('href'); if(!h||h.length<2||h.startsWith('#product-')) return; e.preventDefault(); hidePP(); try{ history.replaceState(null,'',location.pathname+location.search); }catch(_){} setTimeout(()=>{ const t=document.querySelector(h); if(t) t.scrollIntoView({behavior:'smooth'}); },30); });
+
+function ppStars(r,cls='text-gold-500'){ r=Math.round(r||0); return `<span class="${cls} text-xs">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'fa-solid':'fa-regular'} fa-star"></i>`).join('')}</span>`; }
+function ppVarsHTML(p){
+  const S=state.pp, sizes=(p.sizes&&p.sizes.length)?p.sizes:SIZES, cols=p.colors||[];
+  return (cols.length?`<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">Color: <span class="font-semibold text-slate-500 normal-case">${esc(S.color)}</span></div><div class="flex flex-wrap gap-2">${cols.map(c=>`<button onclick="ppColor('${esc(c).replace(/'/g,"\\'")}')" class="ppbtn flex items-center gap-2 px-3.5 py-2 rounded-full border-2 text-xs font-bold ${S.color===c?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}"><span class="w-3.5 h-3.5 rounded-full border border-slate-300" style="background:${CSSCOL[c]||'#e5e7eb'}"></span>${esc(c)}</button>`).join('')}</div></div>`:'')+
+  `<div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">Size: <span class="font-semibold text-slate-500 normal-case">${esc(S.size)}</span></div><div class="flex flex-wrap gap-2">${sizes.map(z=>`<button onclick="ppSize('${esc(z).replace(/'/g,"\\'")}')" class="ppbtn min-w-[3rem] px-4 py-2.5 rounded-lg border-2 text-xs font-extrabold ${S.size===z?'border-ink-900 bg-ink-900 text-white':'border-slate-200 hover:border-ink-900'}">${esc(z)}</button>`).join('')}</div></div>`;
+}
+function ppCurrent(){ return state.products.find(x=>x.id===state.pp.id); }
+function ppSize(z){ state.pp.size=z; $('ppVars').innerHTML=ppVarsHTML(ppCurrent()); }
+function ppColor(c){ state.pp.color=c; $('ppVars').innerHTML=ppVarsHTML(ppCurrent()); }
+function ppQty(d){ const p=ppCurrent(), st=stockOf(p), mx=(st&&st>0)?st:99; state.pp.qty=Math.max(1,Math.min(mx,state.pp.qty+d)); $('ppQ').textContent=state.pp.qty; }
+function ppGo(i,rel){ const p=ppCurrent(), n=ppImgs(p).length; if(rel) i=state.pp.img+i; state.pp.img=(i+n)%n; $('ppTrack').style.transform=`translateX(-${state.pp.img*100}%)`; document.querySelectorAll('.ppthumb').forEach((t,k)=>{ t.classList.toggle('border-ink-900',k===state.pp.img); t.classList.toggle('border-transparent',k!==state.pp.img); }); const dots=document.querySelectorAll('.ppdot'); dots.forEach((d,k)=>d.classList.toggle('bg-white',k===state.pp.img)); }
+function ppAdd(buy){
+  const p=ppCurrent(), S=state.pp, st=stockOf(p); if(st!==null&&st<=0){ toast('Sorry, this item is out of stock',false); return; }
+  const variant=S.size+(S.color?' / '+S.color:'');
+  state.flyFrom=$(buy?'ppBuy':'ppAddBtn').getBoundingClientRect();
+  addToCart(p.id,S.qty,variant,!!buy);
+  if(buy) startCheckout();
+}
+function ppHeart(btn,id){ toggleWishlist(id); const on=state.wishlist.includes(id); btn.className=btn.className.replace(/text-rose-500|text-slate-700/,on?'text-rose-500':'text-slate-700'); btn.querySelector('i').className=(on?'fa-solid':'fa-regular')+' fa-heart'; }
+function ppSlide(p){ const im=ppImgs(p), all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>`; }
+function ppRelCard(p,i){
+  const wl=state.wishlist.includes(p.id);
+  return `<div class="pcard group cursor-pointer" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
+    <div class="relative overflow-hidden rounded-xl bg-silver-100 aspect-[3/4]">
+      <span class="absolute top-2.5 left-2.5 z-10 px-2.5 py-1 bg-white text-ink-900 text-[11px] font-semibold rounded-sm">${esc(p.badge||'New')}</span>
+      <button onclick="event.stopPropagation();ppHeart(this,'${p.id}')" class="absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/95 flex items-center justify-center ${wl?'text-rose-500':'text-slate-700'}"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
+      ${ppSlide(p)}
+    </div>
+    <h3 class="mt-3 text-[13px] sm:text-sm font-medium text-ink-900 line-clamp-1">${esc(p.title)}</h3>
+    <div class="mt-1 text-[12px] sm:text-sm">${p.oldPrice?`<span class="text-slate-400 line-through mr-1.5">${money(p.oldPrice)}</span>`:''}<span class="font-bold text-red-600">${money(p.price)}</span></div>
+  </div>`;
+}
+function renderPP(){
+  const p=ppCurrent(), S=state.pp, im=ppImgs(p), st=stockOf(p);
+  const off=(p.oldPrice&&p.oldPrice>p.price)?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0;
+  const stockHTML=st===null?`<div class="flex items-center gap-2 text-emerald-600 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>In stock</div>`
+    :st<=0?`<div class="flex items-center gap-2 text-red-600 text-xs font-extrabold"><i class="fa-solid fa-circle-xmark"></i>Out of stock</div>`
+    :st<=10?`<div class="flex items-center gap-2 text-orange-600 text-xs font-extrabold animate-pulse"><i class="fa-solid fa-fire"></i>Hurry! Only ${st} left in stock</div>`
+    :`<div class="flex items-center gap-2 text-emerald-600 text-xs font-bold"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>In stock</div>`;
+  const dis=(st!==null&&st<=0)?'disabled':'';
+  const pay=['bkash','nagad','rocket','upay'].map(k=>{ const c=(typeof PCOL!=='undefined'&&PCOL[k])||['#555',k]; return `<span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold text-white" style="background:${c[0]}">${c[1]}</span>`; }).join('');
+  $('productPage').innerHTML=`<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
+    <button onclick="closeProduct()" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-ink-900"><i class="fa-solid fa-arrow-left"></i>Continue shopping</button>
+    <div class="grid md:grid-cols-2 gap-6 lg:gap-12 mt-4">
+      <div class="md:sticky md:top-24 self-start">
+        <div id="ppStage" class="relative overflow-hidden rounded-2xl bg-silver-100 aspect-[4/5]">
+          <div id="ppTrack" class="flex h-full" style="transition:transform .5s cubic-bezier(.65,0,.35,1)">${im.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>
+          ${p.badge?`<span class="absolute top-3 left-3 px-2.5 py-1 bg-white text-ink-900 text-[11px] font-semibold rounded-sm">${esc(p.badge)}</span>`:''}
+          ${off?`<span class="absolute top-3 right-3 px-2.5 py-1 rounded-md btn-gold text-[11px] font-extrabold">-${off}%</span>`:''}
+          ${im.length>1?`<button onclick="ppGo(-1,true)" aria-label="Previous" class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button><button onclick="ppGo(1,true)" aria-label="Next" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+          <div class="absolute bottom-3 inset-x-0 flex justify-center gap-1.5">${im.map((_,k)=>`<span class="ppdot w-2 h-2 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}
+        </div>
+        ${im.length>1?`<div class="flex gap-2.5 mt-3 overflow-x-auto pb-1">${im.map((u,k)=>`<button onclick="ppGo(${k})" aria-label="Photo ${k+1}" class="ppthumb shrink-0 w-16 sm:w-20 aspect-[4/5] rounded-lg overflow-hidden border-2 ${k?'border-transparent':'border-ink-900'} bg-silver-100"><img src="${esc(u)}" class="w-full h-full object-cover" onerror="this.style.opacity=0"></button>`).join('')}</div>`:''}
+      </div>
+      <div>
+        <div class="text-[11px] font-extrabold uppercase tracking-widest text-gold-600">${esc((CATEGORIES.find(c=>c.id===p.category)||{}).label||p.category)}</div>
+        <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-ink-900 mt-1 leading-tight">${esc(p.title)}</h1>
+        <div class="flex items-center gap-2 mt-2">${ppStars(p.rating)}<a href="#ppReviews" onclick="event.preventDefault();document.getElementById('ppReviews').scrollIntoView({behavior:'smooth'})" class="text-xs text-slate-500 underline" id="ppRateTxt">Reviews</a></div>
+        <div class="flex items-center flex-wrap gap-x-3 gap-y-1 mt-4">
+          ${p.oldPrice?`<span class="text-base text-slate-400 line-through">${money(p.oldPrice)}</span>`:''}
+          <span class="font-extrabold text-2xl sm:text-3xl text-red-600">${money(p.price)}</span>
+          ${off?`<span class="px-2 py-0.5 rounded-md bg-red-50 text-red-600 text-[11px] font-extrabold">Save ${off}%</span>`:''}
+        </div>
+        <div class="mt-3">${stockHTML}</div>
+        <div id="ppVars">${ppVarsHTML(p)}</div>
+        <div class="mt-5"><div class="text-xs font-extrabold mb-2 uppercase tracking-wider">Quantity</div>
+          <div class="inline-flex items-center border-2 border-slate-200 rounded-lg"><button onclick="ppQty(-1)" aria-label="Decrease" class="w-11 h-11 text-lg font-bold text-slate-500 hover:text-black">−</button><span id="ppQ" class="w-12 text-center font-extrabold">1</span><button onclick="ppQty(1)" aria-label="Increase" class="w-11 h-11 text-lg font-bold text-slate-500 hover:text-black">+</button></div></div>
+        <div class="grid gap-3 mt-6">
+          <button id="ppAddBtn" onclick="ppAdd(false)" ${dis} class="ppbtn w-full py-4 rounded-xl border-2 border-ink-900 text-ink-900 font-extrabold text-sm tracking-wider hover:bg-ink-900 hover:text-white disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bag-shopping mr-2"></i>ADD TO CART</button>
+          <button id="ppBuy" onclick="ppAdd(true)" ${dis} class="ppbtn w-full py-4 rounded-xl btn-gold font-extrabold text-sm tracking-wider shadow-lg shadow-gold-500/25 disabled:opacity-40 disabled:pointer-events-none"><i class="fa-solid fa-bolt mr-2"></i>BUY IT NOW</button>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-5 text-center">
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-hand-holding-dollar text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">Cash on Delivery</div></div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-truck-fast text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">Fast Delivery</div></div>
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><i class="fa-solid fa-phone-volume text-gold-600 text-lg"></i><div class="text-[11px] font-extrabold mt-1.5 leading-tight">Confirmation Call</div></div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 mt-4"><span class="text-[11px] font-bold text-slate-500 mr-1">We accept</span><span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-ink-900 text-white">COD</span>${pay}</div>
+        <div class="text-[11px] text-slate-500 mt-3"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>Delivery: Inside Dhaka ${money(SHIP.dhaka)} · Outside Dhaka ${money(SHIP.outside)}${FREE_SHIP<99999999?` · Free over ${money(FREE_SHIP)}`:''}</div>
+        <div class="mt-6 pt-5 border-t border-slate-200"><div class="text-xs font-extrabold uppercase tracking-wider mb-2">Product Details</div><p class="text-[13px] text-slate-600 leading-relaxed whitespace-pre-line">${esc(p.description||'Premium quality product from BANA FASHION.')}</p></div>
+      </div>
+    </div>
+    <section id="ppReviews" class="mt-14 pt-10 border-t border-slate-200 max-w-3xl mx-auto"></section>
+    <div class="flex items-center gap-4 mt-16 mb-8"><div class="flex-1 h-px bg-slate-200"></div><h2 class="text-xs sm:text-sm font-semibold tracking-[.35em] uppercase text-ink-900">You May Also Like</h2><div class="flex-1 h-px bg-slate-200"></div></div>
+    <div id="ppRelated" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"></div>
+  </div>`;
+  // swipe on gallery
+  const stg=$('ppStage'); let x0=null; stg.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true}); stg.addEventListener('touchend',e=>{ if(x0===null) return; const dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>40) ppGo(dx<0?1:-1,true); x0=null; });
+  const rel=[...state.products.filter(x=>x.id!==p.id&&x.category===p.category),...state.products.filter(x=>x.id!==p.id&&x.category!==p.category)].slice(0,8);
+  $('ppRelated').innerHTML=rel.map(ppRelCard).join(''); setTimeout(()=>$('ppRelated').querySelectorAll('.pcard').forEach(c=>pio.observe(c)),0);
+  loadReviews(p.id);
+}
+
+/* ---- reviews: Firestore 'reviews' collection when allowed, always mirrored in this browser ---- */
+async function loadReviews(pid){
+  let list=load('bana_rev_'+pid,[]);
+  if(FIREBASE_READY){ try{ const sn=await getDocs(query(collection(db,'reviews'),where('pid','==',pid))); const r=[]; sn.forEach(d=>r.push({id:d.id,...d.data()})); const ids=new Set(r.map(x=>x.id)); list=[...r,...list.filter(x=>!ids.has(x.id))]; }catch(e){} }
+  list.sort((a,b)=>(b.at||0)-(a.at||0)); if(state.pp.id!==pid) return; drawReviews(list);
+}
+function drawReviews(list){
+  const box=$('ppReviews'); if(!box) return; state.pp.rv=0;
+  const n=list.length, avg=n?list.reduce((a,r)=>a+(+r.rating||0),0)/n:0;
+  $('ppRateTxt').textContent=n?`${avg.toFixed(1)} (${n} review${n>1?'s':''})`:'No reviews yet';
+  box.innerHTML=`<div class="flex items-center justify-between gap-3 flex-wrap"><div><h2 class="font-display font-extrabold text-xl">Customer Reviews</h2>${n?`<div class="flex items-center gap-2 mt-1">${ppStars(avg)}<span class="text-xs text-slate-500">${avg.toFixed(1)} out of 5 · ${n} review${n>1?'s':''}</span></div>`:`<p class="text-sm text-slate-500 mt-1">Be the first to write a review</p>`}</div>
+    <button onclick="ppToggleForm()" class="px-5 py-2.5 rounded-xl bg-ink-900 text-white text-xs font-extrabold">Write a review</button></div>
+    <form id="ppForm" onsubmit="ppSubmitReview(event)" class="hidden mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+      <div><div class="text-xs font-bold mb-1">Your rating</div><div id="ppRateBtns" class="text-2xl text-gold-500">${[1,2,3,4,5].map(i=>`<button type="button" onclick="ppRate(${i})" class="px-0.5" aria-label="${i} star"><i class="fa-regular fa-star"></i></button>`).join('')}</div></div>
+      <input id="rvName" required maxlength="40" placeholder="Your name" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white">
+      <textarea id="rvText" required rows="3" maxlength="600" placeholder="Share your experience with this product" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"></textarea>
+      <button class="px-6 py-3 rounded-xl btn-gold text-xs font-extrabold">Submit review</button></form>
+    <div class="mt-6 space-y-4">${list.map(r=>`<div class="pb-4 border-b border-slate-100"><div class="flex items-center justify-between"><b class="text-sm">${esc(r.name)}</b>${ppStars(r.rating)}</div><p class="text-[13px] text-slate-600 mt-1.5 whitespace-pre-line">${esc(r.text)}</p><div class="text-[10px] text-slate-400 mt-1">${r.at?new Date(r.at).toLocaleDateString('en-GB'):''}</div></div>`).join('')}</div>`;
+}
+function ppToggleForm(){ $('ppForm').classList.toggle('hidden'); }
+function ppRate(i){ state.pp.rv=i; $('ppRateBtns').querySelectorAll('i').forEach((el,k)=>el.className=(k<i?'fa-solid':'fa-regular')+' fa-star'); }
+async function ppSubmitReview(e){
+  e.preventDefault(); if(!state.pp.rv){ toast('Please select a star rating',false); return; }
+  const pid=state.pp.id, rev={id:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),pid,name:$('rvName').value.trim(),rating:state.pp.rv,text:$('rvText').value.trim(),at:Date.now()};
+  const mine=load('bana_rev_'+pid,[]); mine.push(rev); save('bana_rev_'+pid,mine);
+  if(FIREBASE_READY){ try{ await setDoc(doc(db,'reviews',rev.id),{...rev,createdAt:serverTimestamp()}); }catch(err){} }
+  toast('Thank you for your review!'); loadReviews(pid);
+}
 
 /* ================= CART ================= */
 function addToCart(id,qty=1,size='M',silent=false){
@@ -1139,69 +1194,19 @@ function updateWishlist(){
 function toggleWishlistModal(){ $('wishlistModal').classList.toggle('hidden'); }
 
 /* ================= AUTH ================= */
-function setUser(u){
-  state.user=u;
-  $('accountIcon').className = u ? 'fa-solid fa-user-check text-lg text-gold-400' : 'fa-regular fa-user text-lg';
-  $('accountDot').classList.toggle('hidden',!u);
-  if(u && state.pendingCheckout){ state.pendingCheckout=false; closeAuth(); openCheckout(); }
-}
-if(FIREBASE_READY){
-  onAuthStateChanged(auth,u=>{ setUser(u?{uid:u.uid,name:u.displayName||(u.email||'').split('@')[0],email:u.email}:null); if(u) ensureUser(u); });
-} else {
-  setUser(load('bana_user',null));
-}
-function openAccount(){
-  $('demoNote').classList.toggle('hidden',FIREBASE_READY);
-  const u=state.user;
-  $('profileView').classList.toggle('hidden',!u); $('signinView').classList.toggle('hidden',!!u);
-  if(u){ $('authTitle').textContent='My Account'; $('authSub').textContent='You are signed in.'; $('profileName').textContent=u.name||'Customer'; $('profileEmail').textContent=u.email||''; $('profileAvatar').textContent=(u.name||'U')[0].toUpperCase(); }
-  else { $('authTitle').textContent = state.pendingCheckout ? 'Sign in to confirm your order' : 'Welcome to BANA FASHION'; $('authSub').textContent='Sign in or create an account to complete your purchase.'; }
-  $('authModal').classList.remove('hidden'); if(u) loadMyOrders();
-}
-function closeAuth(){ $('authModal').classList.add('hidden'); state.pendingCheckout=false; }
-function setAuthTab(t){
-  state.authTab=t; const reg=t==='register';
-  $('tabLogin').className='py-2 rounded-lg '+(reg?'text-silver-300':'btn-gold'); $('tabRegister').className='py-2 rounded-lg '+(reg?'btn-gold':'text-silver-300');
-  $('authName').classList.toggle('hidden',!reg); $('authSubmit').textContent=reg?'CREATE ACCOUNT':'SIGN IN';
-}
-const authErr = e => ({'auth/invalid-credential':'Wrong email or password','auth/email-already-in-use':'This email is already registered','auth/weak-password':'Password is too weak','auth/popup-closed-by-user':'Sign-in cancelled','auth/invalid-email':'Invalid email address','auth/user-not-found':'No account found','auth/wrong-password':'Wrong password'}[e.code]||e.message||'Something went wrong');
-async function submitAuth(e){
-  e.preventDefault();
-  const email=$('authEmail').value.trim(), pass=$('authPass').value, name=$('authName').value.trim(), reg=state.authTab==='register';
-  if(reg && !name){ toast('Please enter your name',false); return; }
-  try{
-    if(FIREBASE_READY){
-      if(reg){ const c=await createUserWithEmailAndPassword(auth,email,pass); await updateProfile(c.user,{displayName:name}); setUser({uid:c.user.uid,name,email}); }
-      else await signInWithEmailAndPassword(auth,email,pass);
-    } else {
-      const users=load('bana_users',{});
-      if(reg){ if(users[email]){ toast('This email is already registered',false); return; } users[email]={name,pass}; save('bana_users',users); }
-      else if(!users[email]||users[email].pass!==pass){ toast('Wrong email or password',false); return; }
-      const u={uid:email,name:users[email].name,email}; save('bana_user',u); setUser(u);
-    }
-    toast('Signed in successfully'); if(!state.pendingCheckout) closeAuth();
-  }catch(err){ toast(authErr(err),false); }
-}
-async function googleSignIn(){
-  if(!FIREBASE_READY){ toast('Add Firebase keys to enable Google sign-in. Use email for now.',false); return; }
-  try{ await signInWithPopup(auth,new GoogleAuthProvider()); toast('Signed in with Google'); if(!state.pendingCheckout) closeAuth(); }
-  catch(err){ toast(authErr(err),false); }
-}
-async function doSignOut(){
-  if(FIREBASE_READY) await signOut(auth); else { localStorage.removeItem('bana_user'); setUser(null); }
-  closeAuth(); toast('Signed out');
-}
+function setUser(u){ state.user=u; }
+/* No sign-in anywhere: guests order directly. A silent anonymous session is used only so Firestore rules that expect request.auth keep working. */
+state.user={uid:'guest',name:'',email:''};
+if(FIREBASE_READY){ try{ signInAnonymously(auth).catch(e=>console.warn('Anonymous auth is off in Firebase console:',e.code)); onAuthStateChanged(auth,u=>{ if(u) setUser({uid:u.uid,name:'',email:''}); }); }catch(e){} }
+function openAccount(){} function closeAuth(){} function setAuthTab(){} function submitAuth(){} function googleSignIn(){} function doSignOut(){}
 
 /* ================= CHECKOUT ================= */
 function startCheckout(){
   if(!state.cart.length){ toast('Your bag is empty',false); return; }
   if($('cartDrawer').classList.contains('hidden')===false) toggleCartDrawer();
-  if(!state.user){ state.pendingCheckout=true; openAccount(); return; }   // sign-in step comes at the end of the order flow
   openCheckout();
 }
 function openCheckout(){
-  const u=state.user; $('coUser').textContent=u.email||u.name;
-  if(!$('coName').value) $('coName').value=u.name||'';
   $('coItems').innerHTML=state.cart.map(i=>`<div class="flex items-center gap-2"><img src="${esc(i.image)}" class="w-10 h-10 rounded-lg object-cover bg-ink-800"><div class="flex-1 min-w-0"><div class="font-bold truncate">${esc(i.title)}</div><div class="text-slate-400">Size ${esc(i.size)} × ${i.qty}</div></div><div class="font-bold">${money(i.price*i.qty)}</div></div>`).join('');
   initDist(); updateCheckoutTotals(); $('checkoutModal').classList.remove('hidden'); $('checkoutModal').scrollTop=0; document.body.style.overflow='hidden';
 }
@@ -1210,10 +1215,9 @@ function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value];
 function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; if(state.promo&&s<(state.promo.minOrder||0)){ state.promo=null; $('promoMsg').textContent=''; } const dc=discAmt(); $('coDiscRow').classList.toggle('hidden',!dc); $('coDisc').textContent='-'+money(dc); if(state.promo) $('coDiscCode').textContent=state.promo.code; $('coTotal').textContent=money(s-dc+sh);
   $('noteIn').textContent=money(SHIP.dhaka); $('noteOut').textContent=money(SHIP.outside); $('noteFree').textContent=sh===0?'Your delivery is FREE - no advance payment needed.':(FREE_SHIP<99999999?'Free delivery on orders over '+money(FREE_SHIP)+'.':''); }
 const BD={"Dhaka":"Adabor,Badda,Banani,Bangshal,Bimanbandar,Cantonment,Chawkbazar,Dakshinkhan,Darus Salam,Demra,Dhamrai,Dhanmondi,Dohar,Gendaria,Gulshan,Hazaribagh,Jatrabari,Kadamtali,Kafrul,Kalabagan,Kamrangirchar,Keraniganj,Khilgaon,Khilkhet,Kotwali,Lalbagh,Mirpur,Mohammadpur,Motijheel,Nawabganj,New Market,Pallabi,Paltan,Ramna,Rampura,Sabujbagh,Savar,Shahbagh,Shyampur,Sutrapur,Tejgaon,Turag,Uttara,Uttar Khan,Wari","Gazipur":"Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur,Tongi","Narayanganj":"Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon","Narsingdi":"Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur","Manikganj":"Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair","Munshiganj":"Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari","Faridpur":"Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha","Gopalganj":"Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara","Madaripur":"Kalkini,Madaripur Sadar,Rajoir,Shibchar","Rajbari":"Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar","Shariatpur":"Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira","Tangail":"Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar","Kishoreganj":"Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail","Chattogram":"Anwara,Banshkhali,Boalkhali,Chandanaish,Chattogram City,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda","Cox's Bazar":"Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia","Cumilla":"Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Cumilla Sadar,Cumilla Sadar Dakshin,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohorgonj,Muradnagar,Nangalkot,Titas","Feni":"Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi","Brahmanbaria":"Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail","Noakhali":"Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar","Lakshmipur":"Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati","Chandpur":"Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti","Khagrachhari":"Dighinala,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh","Rangamati":"Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar","Bandarban":"Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi","Rajshahi":"Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Rajshahi City,Tanore","Chapainawabganj":"Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj","Naogaon":"Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar","Natore":"Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra","Pabna":"Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar","Sirajganj":"Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara","Bogura":"Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatola","Joypurhat":"Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi","Khulna":"Batiaghata,Dacope,Dighalia,Dumuria,Khulna City,Koyra,Paikgachha,Phultala,Rupsha,Terokhada","Bagerhat":"Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola","Satkhira":"Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala","Jashore":"Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha","Jhenaidah":"Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa","Magura":"Magura Sadar,Mohammadpur,Shalikha,Sreepur","Narail":"Kalia,Lohagara,Narail Sadar","Kushtia":"Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur","Chuadanga":"Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar","Meherpur":"Gangni,Meherpur Sadar,Mujibnagar","Barishal":"Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gournadi,Hizla,Mehendiganj,Muladi,Wazirpur","Bhola":"Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin","Jhalokati":"Jhalokati Sadar,Kathalia,Nalchity,Rajapur","Patuakhali":"Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali","Pirojpur":"Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar","Barguna":"Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali","Sylhet":"Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj","Moulvibazar":"Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal","Habiganj":"Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj","Sunamganj":"Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur","Rangpur":"Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj","Dinajpur":"Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Fulbari,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur","Kurigram":"Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur","Lalmonirhat":"Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram","Nilphamari":"Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur","Gaibandha":"Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj","Thakurgaon":"Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar","Panchagarh":"Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia","Mymensingh":"Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal","Jamalpur":"Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari","Netrokona":"Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala","Sherpur":"Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi"};
-function initDist(){ const el=$('coDist'); if(el.options.length>1) return; el.innerHTML='<option value="">Select district</option>'+Object.keys(BD).sort().map(d=>`<option>${d}</option>`).join(''); }
-function onDist(){ const d=$('coDist').value, box=$('coUpBox'), up=$('coUp'); $('coArea').value=(d==='Dhaka')?'dhaka':'outside';
-  if(!d){ box.classList.add('hidden'); up.required=false; } else { up.innerHTML='<option value="">Select upazila / thana</option>'+BD[d].split(',').map(x=>`<option>${x}</option>`).join(''); box.classList.remove('hidden'); up.required=true; }
-  updateCheckoutTotals(); }
+function initDist(){ setArea($('coArea').value||'dhaka'); }
+function onDist(){}
+function setArea(a){ $('coArea').value=a; $('coDist').value=a==='dhaka'?'Dhaka':'Outside Dhaka'; $('coUp').value=''; document.querySelectorAll('input[name=coAreaR]').forEach(r=>r.checked=(r.value===a)); $('areaPIn').textContent='Delivery '+money(SHIP.dhaka); $('areaPOut').textContent='Delivery '+money(SHIP.outside); updateCheckoutTotals(); }
 async function placeOrder(e){
   e.preventDefault();
   const phone=$('coPhone').value.replace(/[\s-]/g,'').replace(/^\+?88/,'');
@@ -1232,6 +1236,7 @@ async function placeOrder(e){
     const waUrl='https://wa.me/'+waNum+'?text='+encodeURIComponent(msg); $('successWa').href=waUrl;
     if(!(state.site&&state.site.waAuto===false)) setTimeout(()=>{ try{ window.open(waUrl,'_blank'); }catch(e){} },700);
     $('successId').textContent=orderId; state.lastOrder=order;
+    $('successSummary').innerHTML=order.items.map(i=>`<div class="flex justify-between gap-2"><span class="truncate">${esc(i.title)} <span class="text-slate-400">(${esc(i.size)}) ×${i.qty}</span></span><b>${money(i.price*i.qty)}</b></div>`).join('')+`<div class="border-t border-slate-200 pt-1.5 flex justify-between"><span class="text-slate-500">Delivery</span><b>${ship?money(ship):'FREE'}</b></div>`+(disc?`<div class="flex justify-between"><span class="text-emerald-600">Discount</span><b>-${money(disc)}</b></div>`:'')+`<div class="flex justify-between text-sm font-extrabold"><span>Total</span><span>${money(order.total)}</span></div><div class="border-t border-slate-200 pt-1.5 text-slate-500 leading-relaxed"><b class="text-ink-900">${esc(order.customerName)}</b> · ${esc(order.phone)}<br>${esc(order.address)} (${order.area==='dhaka'?'Inside Dhaka':'Outside Dhaka'})<br>Payment: ${esc(order.payment)}</div>`;
     state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='Auto-fill your district, area & address using GPS'; $('successModal').classList.remove('hidden');
   }catch(err){ console.error(err); if(pay&&err.code==='permission-denied') $('coTrxErr').textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; toast(err.code==='permission-denied'&&state.promo&&!pay?'This promo code is no longer valid. Please remove it and try again.':pay&&err.code==='permission-denied'?'এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!':'Could not place order: '+(err.message||'try again'),false); }
   btn.disabled=false; btn.textContent='CONFIRM ORDER';
@@ -1259,8 +1264,7 @@ function showMini(it){
   clearTimeout(miniTimer); miniTimer=setTimeout(hideMini,3600);
 }
 function hideMini(){ clearTimeout(miniTimer); $('miniCart').classList.add('mini-out'); }
-function toggleHelp(){ const m=$('helpMenu'); const closed=m.classList.toggle('closed'); $('helpIcon').className = closed ? 'fa-brands fa-whatsapp wa-rot' : 'fa-solid fa-xmark'; }
-document.addEventListener('click',e=>{ const f=$('helpFab'); if(f && !f.contains(e.target) && !$('helpMenu').classList.contains('closed')) toggleHelp(); });
+function toggleHelp(){}
 
 /* BANA / FASHION letters fade in & out on the first banner (loops with the slider) */
 function buildShatter(){
@@ -1328,11 +1332,11 @@ function runSplash(){
 runSplash(); buildPromos();
 
 /* expose handlers to inline onclick */
-Object.assign(window,{showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,pmSize,pmQty,pmAdd,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,pmPic,showLastInv,showMyInv,showInvoice,copyNum,chkTrx,updateCheckoutTotals,placeOrder});
+Object.assign(window,{ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleForm,ppSubmitReview,setArea,showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,showLastInv,showMyInv,showInvoice,copyNum,chkTrx,updateCheckoutTotals,placeOrder});
 
 /* init */
 state.cart=load('bana_cart',[]); state.wishlist=load('bana_wish',[]);
-buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); setupReveal(); loadFirestoreProducts(); loadSite(); verifyOrder();
+buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); setupReveal(); loadFirestoreProducts(); loadSite(); verifyOrder(); openFromHash();
 { const t0=performance.now(); const done=()=>{ const w=Math.max(0,2700-(performance.now()-t0)); setTimeout(()=>{ const p=$('preloader'); if(!p) return; p.classList.add('out'); setTimeout(()=>p.remove(),550); },w); }; if(document.readyState==='complete') done(); else window.addEventListener('load',done); }
 </script>
 </body>
