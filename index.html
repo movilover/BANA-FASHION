@@ -6,6 +6,7 @@
 <title>BANA FASHION | Premium Men's Fashion Brand</title>
 <meta name="description" content="BANA FASHION - Premium men's fashion brand from Shafipur Bazar, Kaliakoir, Gazipur. Shirts, T-shirts, Denim, Panjabi & more. Cash on Delivery all over Bangladesh.">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="icon" href="data:image/jpeg;base64,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">
 <script>
 /* tries logo.jpg -> logo.png -> ..., then falls back to the built-in mark */
@@ -175,6 +176,28 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 .shatter-letters span{display:inline-block;opacity:0}
 .hero-slide.active .shatter-letters span{animation:letterAssemble 2.8s cubic-bezier(.45,0,.2,1) .5s forwards}
 .shop-name{text-shadow:0 4px 30px rgba(0,0,0,.9),0 0 40px rgba(245,158,11,.35)}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body>*:not(#invWrap){display:none!important}body{background:#fff!important}#invWrap{position:static!important;background:#fff!important;padding:0!important;overflow:visible!important}.no-print{display:none!important}#invSheet{max-width:100%!important;border-radius:0!important;padding:0!important}}
+/* ===== v5 animations ===== */
+.cat-card.lit{animation:catIn .75s cubic-bezier(.16,1,.3,1) forwards!important;animation-delay:var(--d,0s)!important}
+@keyframes catIn{from{opacity:0;filter:brightness(.2);transform:translateY(34px) scale(.88)}to{opacity:1;filter:none;transform:none}}
+.cat-card.spot{transform:translateY(-6px) scale(1.04)!important;box-shadow:0 18px 40px -10px rgba(245,158,11,.55);transition:transform .5s cubic-bezier(.16,1,.3,1),box-shadow .5s}
+.cat-card.spot::after{border-color:rgba(245,158,11,.95)!important}
+.pcard:not(.in2){opacity:0!important}
+.pcard.in2{animation:fadeUp .65s cubic-bezier(.16,1,.3,1) var(--pd,0s) backwards}
+#mobileNav .mnav{opacity:0}
+#mobileNav.anim .mnav{animation:menuIn .55s cubic-bezier(.16,1,.3,1) forwards;animation-delay:calc(var(--i)*.07s + .15s)}
+@keyframes menuIn{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+#mobileMenu:not(.hidden)>div:last-child{animation:menuSlide .45s cubic-bezier(.16,1,.3,1)}
+@keyframes menuSlide{from{transform:translateX(-100%)}to{transform:none}}
+.help-menu:not(.closed)>*{animation:helpIn .5s cubic-bezier(.16,1,.3,1) both}
+.help-menu:not(.closed)>*:nth-child(1){animation-delay:.04s}.help-menu:not(.closed)>*:nth-child(2){animation-delay:.11s}.help-menu:not(.closed)>*:nth-child(3){animation-delay:.18s}.help-menu:not(.closed)>*:nth-child(4){animation-delay:.25s}
+@keyframes helpIn{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+.help-menu a{transition:transform .2s,box-shadow .2s}.help-menu a:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 12px 26px -8px rgba(0,0,0,.65)}
+@keyframes fabRing{0%{box-shadow:0 0 0 0 rgba(16,185,129,.55)}70%{box-shadow:0 0 0 18px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+#helpFab>button:last-of-type{animation:fabRing 2.6s infinite}
+@keyframes cartPop{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-10deg)}70%{transform:scale(.94)}100%{transform:scale(1)}}.cart-pop{animation:cartPop .55s}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.eid-card{background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(251,191,36,.25);backdrop-filter:blur(6px);transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s}.eid-card:hover{transform:translateY(-6px);border-color:rgba(251,191,36,.7);box-shadow:0 20px 40px -14px rgba(251,191,36,.35)}
 </style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
@@ -406,6 +429,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
 </section>
 
 <!-- PRODUCTS (4 per row on desktop) -->
+<section id="eid" class="hidden py-14 relative overflow-hidden" style="background:linear-gradient(135deg,#032b27,#0b3d36 45%,#14532d)">
+  <i class="fa-solid fa-moon absolute -top-4 right-8 text-[90px] text-gold-400/20"></i>
+  <i class="fa-solid fa-star absolute top-10 left-[12%] text-gold-400 text-xs" style="animation:twinkle 2.4s infinite"></i><i class="fa-solid fa-star absolute top-24 left-[40%] text-gold-400 text-[9px]" style="animation:twinkle 3s .6s infinite"></i><i class="fa-solid fa-star absolute top-16 right-[22%] text-gold-400 text-sm" style="animation:twinkle 2.8s 1.1s infinite"></i>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <div class="text-center mb-8 reveal"><span class="text-gold-400 font-extrabold text-xs uppercase tracking-[.3em]"><i class="fa-solid fa-moon mr-1"></i> Special Collection</span><h2 id="eidTitle" class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-1">Eid Collection</h2><p id="eidSub" class="text-emerald-100/70 text-sm mt-2"></p></div>
+    <div id="eidGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
+  </div>
+</section>
+
 <section id="shop" class="py-16 bg-silver-100">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-8 reveal">
@@ -567,7 +599,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
     <div class="pointer-events-auto relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 max-h-[92vh] overflow-y-auto">
       <button onclick="closeProduct()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-      <div class="h-72 md:h-auto bg-ink-800"><img id="pmImage" src="" alt="" class="w-full h-full object-cover" onerror="this.style.opacity=0"></div>
+      <div class="h-72 md:h-auto bg-ink-800 relative"><img id="pmImage" src="" alt="" class="w-full h-full object-cover" onerror="this.style.opacity=0"><div id="pmThumbs" class="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto justify-center"></div></div>
       <div class="p-6 sm:p-8 flex flex-col gap-4">
         <div>
           <span id="pmCategory" class="text-gold-600 font-extrabold text-[10px] uppercase tracking-widest"></span>
@@ -706,17 +738,24 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
             <div id="coUpBox" class="hidden"><label class="text-xs font-bold">Upazila / Thana *</label><select id="coUp" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-white"><option value="">Select upazila / thana</option></select></div></div>
           <input type="hidden" id="coArea" value="dhaka">
           <div><label class="text-xs font-bold">Full Address *</label><textarea id="coAddress" required rows="3" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="House no, road, village / area"></textarea></div>
+          <div class="rounded-2xl p-4 bg-gradient-to-br from-ink-900 to-ink-800 text-white border border-gold-500/30 flex items-center gap-3 shadow-lg">
+            <div class="w-12 h-12 rounded-xl btn-gold flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-location-crosshairs"></i></div>
+            <div class="flex-1 min-w-0"><div class="font-extrabold text-sm">Use my current location</div><div id="geoMsg" class="text-[11px] text-silver-400 leading-snug">Auto-fill your district, area &amp; address using GPS</div></div>
+            <button type="button" id="geoBtn" onclick="useMyLocation()" class="px-4 py-2.5 rounded-xl btn-gold text-xs font-extrabold shrink-0"><i class="fa-solid fa-satellite-dish mr-1"></i>Locate</button>
+          </div><input type="hidden" id="coLat"><input type="hidden" id="coLng">
           <div><label class="text-xs font-bold">Order Note (optional)</label><input id="coNote" class="mt-1 w-full px-4 py-3 rounded-xl border border-slate-200 text-sm" placeholder="Any special instruction"></div>
           <div id="coPayBox" class="space-y-3"><div class="text-xs font-bold">Payment Method *</div><div id="coPayOpts" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
-<div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="Your sender number (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)"><div class="text-[11px] text-slate-500">Each TrxID can be used only once.</div></div></div>
+<div id="coPayInfo" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2 text-xs"><div id="coPayMsg"></div><input id="coSender" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white" placeholder="Your sender number (01XXXXXXXXX)"><input id="coTrx" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase bg-white" placeholder="Transaction ID (TrxID)" oninput="chkTrx()"><div id="coTrxErr" class="text-[11px] font-extrabold text-red-500"></div><div class="text-[11px] text-slate-500">Each TrxID can be used only once.</div></div></div>
 <div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs flex gap-3"><i class="fa-solid fa-truck-fast text-sky-500 text-lg mt-0.5"></i><div class="font-bold text-slate-700">Delivery Charge<div class="font-semibold mt-1">Inside Dhaka: <span id="noteIn" class="text-sky-600"></span> &nbsp;|&nbsp; Outside Dhaka: <span id="noteOut" class="text-sky-600"></span></div><div id="noteFree" class="font-normal text-slate-500 mt-1"></div></div></div>
         </div>
         <div class="md:col-span-2 p-6 bg-slate-50 border-t md:border-t-0 md:border-l border-slate-200 flex flex-col">
           <h4 class="font-extrabold text-sm mb-3">Order Summary</h4>
           <div id="coItems" class="space-y-2 flex-1 max-h-56 overflow-y-auto text-xs"></div>
+          <div class="mt-3"><div class="flex gap-2"><input id="coPromo" class="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-slate-200 text-xs uppercase font-bold tracking-wider" placeholder="PROMO CODE"><button type="button" onclick="applyPromo()" class="px-4 rounded-xl bg-ink-900 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-ticket mr-1"></i>Apply</button></div><div id="promoMsg" class="text-[11px] mt-1 font-bold"></div></div>
           <div class="mt-4 pt-3 border-t border-slate-200 space-y-1.5 text-xs">
             <div class="flex justify-between"><span class="text-slate-500">Subtotal</span><span id="coSub" class="font-bold"></span></div>
             <div class="flex justify-between"><span class="text-slate-500">Delivery</span><span id="coShip" class="font-bold"></span></div>
+            <div id="coDiscRow" class="hidden"><div class="flex justify-between"><span class="text-emerald-600 font-bold"><i class="fa-solid fa-tag mr-1"></i><span id="coDiscCode">Promo</span></span><span id="coDisc" class="font-bold text-emerald-600"></span></div></div>
             <div class="flex justify-between text-base font-extrabold pt-2 border-t border-slate-200"><span>Total</span><span id="coTotal" class="text-gold-600"></span></div>
           </div>
           <button id="coSubmit" type="submit" class="mt-4 w-full py-4 rounded-xl btn-gold font-extrabold text-sm shadow-lg shadow-gold-500/25">CONFIRM ORDER</button>
@@ -736,7 +775,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
       <h3 class="font-display font-extrabold text-2xl mt-4">Order Confirmed!</h3>
       <p class="text-sm text-slate-500 mt-2">Thank you for shopping with BANA FASHION. We will call you shortly to confirm delivery.</p>
       <div class="mt-4 p-3 rounded-xl bg-slate-100 text-xs">Order ID<div id="successId" class="font-extrabold text-lg tracking-wider text-ink-900"></div></div>
-      <div class="mt-5 grid grid-cols-2 gap-3">
+      <button onclick="showLastInv()" class="mt-4 w-full py-3 rounded-xl bg-ink-900 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-file-invoice mr-1.5"></i>View / Print Invoice</button>
+      <div class="mt-3 grid grid-cols-2 gap-3">
         <a id="successWa" href="#" target="_blank" rel="noopener" class="py-3 rounded-xl bg-emerald-500 text-white text-xs font-extrabold"><i class="fa-brands fa-whatsapp mr-1"></i>Send on WhatsApp</a>
         <button onclick="document.getElementById('successModal').classList.add('hidden')" class="py-3 rounded-xl btn-gold text-xs font-extrabold">Continue Shopping</button>
       </div>
@@ -750,16 +790,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#F59E0B!import
   <div class="absolute left-0 top-0 bottom-0 w-4/5 max-w-xs bg-ink-900 text-white p-6 flex flex-col justify-between shadow-2xl">
     <div class="space-y-6">
       <div class="flex items-center justify-between"><span class="font-display font-extrabold text-xl tracking-[.1em]">BANA <span class="gold-text">FASHION</span></span><button onclick="toggleMobileMenu()"><i class="fa-solid fa-xmark text-xl text-silver-400"></i></button></div>
-      <nav class="flex flex-col gap-4 font-bold text-sm text-silver-300">
-        <a href="#hero" onclick="toggleMobileMenu()" class="hover:text-gold-400">Home</a>
-        <a href="#shop" onclick="filterCategory('all');toggleMobileMenu()" class="hover:text-gold-400">All Products</a>
-        <a href="#shop" onclick="filterCategory('shirts');toggleMobileMenu()" class="hover:text-gold-400">Shirts</a>
-        <a href="#shop" onclick="filterCategory('tshirts');toggleMobileMenu()" class="hover:text-gold-400">T-Shirts & Polo</a>
-        <a href="#shop" onclick="filterCategory('jeans');toggleMobileMenu()" class="hover:text-gold-400">Denim</a>
-        <a href="#shop" onclick="filterCategory('jackets');toggleMobileMenu()" class="hover:text-gold-400">Jackets & Hoodies</a>
-        <a href="#about" onclick="toggleMobileMenu()" class="hover:text-gold-400">About</a>
-        <a href="#helpline" onclick="toggleMobileMenu()" class="text-gold-400">Helpline</a>
-      </nav>
+      <nav id="mobileNav" class="flex flex-col gap-1 font-bold text-sm text-silver-300"></nav>
     </div>
     <a href="tel:+8801353808618" class="btn-gold py-3 rounded-xl text-center font-extrabold text-sm"><i class="fa-solid fa-phone mr-2"></i>01353-808618</a>
   </div>
@@ -856,17 +887,17 @@ function renderTabs(){
   $('filterTabs').innerHTML = CATEGORIES.map(c=>`<button onclick="filterCategory('${c.id}')" class="px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all ${state.cat===c.id?'bg-ink-900 text-gold-400 shadow-md':'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'}">${c.label}</button>`).join('');
 }
 function renderProducts(){
-  const grid=$('productGrid');
+  const grid=$('productGrid'); renderEid();
   let list=state.products.filter(p=>(state.cat==='all'||p.category===state.cat)&&(p.title+' '+(p.description||'')).toLowerCase().includes(state.q.toLowerCase()));
   if(state.sort==='low') list.sort((a,b)=>a.price-b.price);
   if(state.sort==='high') list.sort((a,b)=>b.price-a.price);
   if(state.sort==='rating') list.sort((a,b)=>(b.rating||0)-(a.rating||0));
   { const mx=(state.site&&state.site.maxProducts)||0; if(mx&&state.cat==='all'&&!state.q) list=list.slice(0,mx); }
-  $('emptyState').classList.toggle('hidden',list.length>0);
+  $('emptyState').classList.toggle('hidden',list.length>0); setTimeout(()=>grid.querySelectorAll('.pcard').forEach(c=>pio.observe(c)),0);
   grid.classList.toggle('hidden',list.length===0);
   grid.innerHTML=list.map((p,i)=>{
     const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0, wl=state.wishlist.includes(p.id);
-    return `<div class="reveal in group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer" style="animation:fadeUp .6s ${Math.min(i,7)*.06}s both" onclick="openProduct('${p.id}')">
+    return `<div class="pcard reveal in group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
       <div class="relative overflow-hidden bg-ink-800 aspect-[4/5]">
         ${p.badge?`<span class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/85 text-gold-400 font-extrabold text-[10px] uppercase tracking-wider">${esc(p.badge)}</span>`:''}
         ${off>0?`<span class="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-md btn-gold font-extrabold text-[10px]">-${off}%</span>`:''}
@@ -909,7 +940,8 @@ async function loadSite(){
   try{ const p=await getDoc(doc(db,'settings','payment')); if(p.exists()) state.payCfg=p.data(); }catch(e){}
   try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
     if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:x.label}))); buildCatRow(); renderTabs(); } }catch(e){}
-  const st=state.site||{}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
+  renderMenu(); renderEid();
+  const st=state.site||{}; window.SHOPX={...(st.shopAddress?{addr:st.shopAddress}:{}),...(st.helpline?{phone:st.helpline}:{})}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
   updateCheckoutTotals();
   try{ const bs=await getDocs(collection(db,'banners')); const a=[]; bs.forEach(d=>a.push(d.data())); a.sort((x,y)=>(x.order||0)-(y.order||0));
     if(a.length){ const hero=$('hero'), anchor=hero.querySelector(':scope > button'), first=hero.querySelector('.hero-slide');
@@ -922,30 +954,125 @@ async function loadSite(){
   renderProducts();
 }
 function buildCatRow(){ const r=$('catRow'); if(!r||!state.cats) return;
-  r.innerHTML=state.cats.slice(0,8).map((c,i)=>`<div onclick="goShop('${esc(c.id)}')" style="--d:${(i*.22).toFixed(2)}s" class="cat-card lit group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg"><img src="${esc(c.image)}" alt="${esc(c.label)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()"><div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left"><h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">${esc(c.label)}</h3></div></div>`).join(''); }
-const PCOL={bkash:['#E2136E','bKash'],nagad:['#F6921E','Nagad'],rocket:['#8C3494','Rocket']};
+  r.innerHTML=state.cats.slice(0,8).map((c,i)=>`<div onclick="goShop('${esc(c.id)}')" style="--d:${(i*.12).toFixed(2)}s" class="cat-card lit group relative rounded-xl sm:rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer bg-ink-800 shadow-lg"><img src="${esc(c.image)}" alt="${esc(c.label)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onerror="this.remove()"><div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-1.5 sm:p-5 text-center sm:text-left"><h3 class="font-display font-bold text-[9px] leading-tight sm:text-xl text-white">${esc(c.label)}</h3></div></div>`).join(''); }
+const PCOL={bkash:['#E2136E','bKash'],nagad:['#F6921E','Nagad'],rocket:['#8C3494','Rocket'],upay:['#EAB308','Upay']};
 function payIcon(k,m){ if(k==='cod') return '<span class="w-9 h-9 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-money-bill-wave"></i></span>';
   if(m&&m.logo) return `<img src="${esc(m.logo)}" class="w-9 h-9 rounded-lg object-contain bg-white shrink-0">`;
   const c=PCOL[k]; return `<span class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold text-[9px] shrink-0" style="background:${c[0]}">${c[1]}</span>`; }
-function renderPay(){ const cfg=state.payCfg||{}, act=['bkash','nagad','rocket'].filter(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false), ship=shipCost(), free=ship===0;
+function renderPay(){ const cfg=state.payCfg||{}, act=['bkash','nagad','rocket','upay'].filter(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false), ship=shipCost(), free=ship===0;
   if(free&&state.payM&&state.payM!=='cod') state.payM='cod';
   const req=!!(state.site&&state.site.requireAdvance&&act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
   if(state.payM&&state.payM!=='cod'&&!act.includes(state.payM)) state.payM='cod';
   state.payM=state.payM||'cod';
   $('coPayOpts').innerHTML=(req?[]:['cod']).concat(act).map(k=>{ const on=state.payM===k, dis=free&&k!=='cod'; return `<button type="button" ${dis?'disabled':`onclick="setPayM('${k}')"`} class="flex items-center gap-2 p-2.5 rounded-xl border-2 text-left font-bold text-xs transition-all ${on?'border-gold-500 bg-gold-500/10':'border-slate-200 bg-white'} ${dis?'opacity-40':''}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'Cash on Delivery':PCOL[k][1]}</span></button>`; }).join('');
   const adv=state.payM!=='cod'; $('coPayInfo').classList.toggle('hidden',!adv);
-  $('coPayMsg').innerHTML=adv?`Please <b>Send Money</b> the delivery charge <b>${money(ship)}</b> to ${PCOL[state.payM][1]}: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b>, then enter your number and TrxID below. The rest is Cash on Delivery.`:'';
+  $('coPayMsg').innerHTML=adv?`Please <b>Send Money</b> the delivery charge <b>${money(ship)}</b> to ${PCOL[state.payM][1]}: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b> <button type="button" onclick="copyNum('${esc(cfg[state.payM].number)}')" class="ml-1 px-2.5 py-1 rounded-lg bg-ink-900 text-gold-400 text-[11px] font-extrabold"><i class="fa-regular fa-copy mr-1"></i>Copy</button>, then enter your number and TrxID below. The rest is Cash on Delivery.`:'';
 }
 function setPayM(k){ state.payM=k; renderPay(); }
 async function loadMyOrders(){ const box=$('myOrders'); if(!box||!FIREBASE_READY||!state.user) return; box.innerHTML='<div class="text-silver-400">Loading...</div>';
-  try{ const s=await getDocs(query(collection(db,'orders'),where('uid','==',state.user.uid))); const a=[]; s.forEach(d=>a.push(d.data())); a.sort((x,y)=>(y.createdAt?.seconds||0)-(x.createdAt?.seconds||0));
-    box.innerHTML=a.map(o=>`<div class="p-3 rounded-xl bg-white/5 border border-white/10"><div class="flex justify-between font-bold"><span>${esc(o.orderId)}</span><span class="text-gold-400 uppercase">${esc(o.status)}</span></div><div class="text-silver-400">${money(o.total)}${o.deliveryPaid?' · Delivery charge paid ✔':''}</div>${o.courier&&o.courier.tracking?`<a target="_blank" rel="noopener" class="text-gold-400 underline" href="https://steadfast.com.bd/t/${encodeURIComponent(o.courier.tracking)}">${esc(o.courier.name||'Courier')}: ${esc(o.courier.tracking)} — Track</a>`:''}</div>`).join('')||'<div class="text-silver-400">No orders yet</div>';
+  try{ const s=await getDocs(query(collection(db,'orders'),where('uid','==',state.user.uid))); const a=[]; s.forEach(d=>a.push(d.data())); a.sort((x,y)=>(y.createdAt?.seconds||0)-(x.createdAt?.seconds||0)); state.my=a;
+    box.innerHTML=a.map((o,i)=>`<div class="p-3 rounded-xl bg-white/5 border border-white/10"><div class="flex justify-between font-bold"><span>${esc(o.orderId)}</span><span class="text-gold-400 uppercase">${esc(o.status)}</span></div><div class="text-silver-400">${money(o.total)}${o.deliveryPaid?' · Delivery charge paid ✔':''}</div><button onclick="showMyInv(${i})" class="text-gold-400 font-bold mt-1"><i class="fa-solid fa-file-invoice mr-1"></i>Invoice</button>${o.courier&&o.courier.tracking?`<a target="_blank" rel="noopener" class="text-gold-400 underline" href="https://steadfast.com.bd/t/${encodeURIComponent(o.courier.tracking)}">${esc(o.courier.name||'Courier')}: ${esc(o.courier.tracking)} — Track</a>`:''}</div>`).join('')||'<div class="text-silver-400">No orders yet</div>';
   }catch(e){ box.innerHTML=''; } }
+
+/* ===== INVOICE + QR ===== */
+const BNUM=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]), BT=n=>'৳'+BNUM(Math.round(n||0).toLocaleString('en-US'));
+const INV_PAY={bkash:'বিকাশ (bKash)',nagad:'নগদ (Nagad)',rocket:'রকেট (Rocket)',upay:'উপায় (Upay)'};
+const INV_ST={pending:'অপেক্ষমান',confirmed:'কনফার্মড',shipped:'শিপড',delivered:'ডেলিভারড',cancelled:'বাতিল',returned:'রিটার্ন'};
+const SX=()=>Object.assign({addr:'শফিপুর বাজার, কালিয়াকৈর, গাজীপুর',phone:'+৮৮০ ১৮৭৩-৯৫৮৩৩৯'},window.SHOPX||{});
+function invHTML(o){
+  const d=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate():new Date(o.createdAt||Date.now()), pay=o.pay, due=(pay&&o.deliveryPaid)?(o.subtotal-(o.discount||0)):o.total;
+  return `<div class="flex flex-col sm:flex-row justify-between gap-5 pb-5 border-b-2" style="border-color:#D99B00">
+  <div><div class="flex items-center gap-3"><img src="logo.png" alt="BANA FASHION" class="w-14 h-14 rounded-xl object-contain bg-black p-1" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl text-black',style:'background:#FFB800',textContent:'BF'}))"><div><div class="text-2xl font-extrabold tracking-wider">BANA <span style="color:#D99B00">FASHION</span></div><div class="text-xs text-gray-500">প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</div></div></div>
+  <div class="text-xs text-gray-600 mt-3 leading-relaxed"><i class="fa-solid fa-location-dot mr-1" style="color:#D99B00"></i>${esc(SX().addr)}<br><i class="fa-solid fa-phone mr-1" style="color:#D99B00"></i>হেল্পলাইন: <b>${esc(SX().phone)}</b></div></div>
+  <div class="sm:text-right"><span class="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest" style="background:#FFF3CD;color:#8a6100">ক্যাশ মেমো / INVOICE</span>
+  <div class="text-[10px] text-gray-500 mt-2">অর্ডার আইডি</div><div class="font-mono font-bold text-lg">${esc(o.orderId)}</div><div class="text-xs text-gray-500">তারিখ: ${d.toLocaleDateString('bn-BD',{day:'numeric',month:'long',year:'numeric'})}</div>
+  <div class="inline-block mt-2 p-1.5 border rounded-lg bg-white"><div id="invQR"></div></div><div class="text-[10px] text-gray-500">স্ক্যান করে অর্ডার যাচাই করুন</div></div></div>
+  <div class="grid sm:grid-cols-2 gap-4 p-4 rounded-xl text-xs" style="background:#f8f9fa">
+  <div class="space-y-1"><div class="font-bold border-b pb-1 mb-1" style="color:#D99B00">কাস্টমার তথ্য</div><div class="text-sm font-bold">${esc(o.customerName)}</div><div>মোবাইল: ${esc(o.phone)}</div><div>ঠিকানা: ${esc(o.address)}${o.upazila?', '+esc(o.upazila):''}${o.district?', '+esc(o.district):''}</div></div>
+  <div class="space-y-1"><div class="font-bold border-b pb-1 mb-1" style="color:#D99B00">পেমেন্ট তথ্য</div>
+  ${pay?`<div>ডেলিভারি চার্জ: <b>${INV_PAY[pay.method]||esc(pay.method)}</b></div><div>ট্রানজেকশন আইডি: <b class="font-mono">${esc(pay.trxId)}</b></div><div>অবস্থা: <b style="color:${o.deliveryPaid?'#059669':'#d97706'}">${o.deliveryPaid?'ডেলিভারি চার্জ পরিশোধিত (PAID)':'ভেরিফিকেশন বাকি'}</b></div>`:'<div>পেমেন্ট মাধ্যম: <b>ক্যাশ অন ডেলিভারি</b></div>'}
+  <div>অর্ডার স্ট্যাটাস: <b>${INV_ST[o.status]||esc(o.status)}</b></div></div></div>
+  <div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="text-left" style="background:#111;color:#FFB800"><th class="p-2.5">#</th><th class="p-2.5">প্রোডাক্ট</th><th class="p-2.5 text-center">সাইজ</th><th class="p-2.5 text-center">পরিমাণ</th><th class="p-2.5 text-right">একক মূল্য</th><th class="p-2.5 text-right">মোট</th></tr></thead><tbody>
+  ${(o.items||[]).map((i,n)=>`<tr class="border-b"><td class="p-2.5">${BNUM(n+1)}</td><td class="p-2.5 font-semibold">${esc(i.title)}</td><td class="p-2.5 text-center">${esc(i.size)}</td><td class="p-2.5 text-center">${BNUM(i.qty)}</td><td class="p-2.5 text-right">${BT(i.price)}</td><td class="p-2.5 text-right font-bold">${BT(i.price*i.qty)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="flex flex-col sm:flex-row justify-between gap-4 text-xs"><div class="text-gray-600 space-y-1 max-w-xs"><b>শর্তাবলী:</b><div>১. ডেলিভারিম্যানের সামনে দেখে চেক করে রিসিভ করুন।</div><div>২. সাইজ পরিবর্তনের জন্য ৩ দিনের মধ্যে যোগাযোগ করুন।</div></div>
+  <div class="w-full sm:w-64 p-4 rounded-xl space-y-2" style="background:#f8f9fa"><div class="flex justify-between"><span>সাবটোটাল:</span><span>${BT(o.subtotal)}</span></div><div class="flex justify-between"><span>ডেলিভারি চার্জ:</span><span>${o.delivery?BT(o.delivery):'ফ্রি'}</span></div>${o.discount?`<div class="flex justify-between" style="color:#059669"><span>প্রোমো ডিসকাউন্ট${o.promo?' ('+esc(o.promo.code)+')':''}:</span><span>-${BT(o.discount)}</span></div>`:''}
+  <div class="flex justify-between text-base font-bold border-t pt-2"><span>সর্বমোট:</span><span style="color:#D99B00">${BT(o.total)}</span></div><div class="flex justify-between font-bold"><span>ক্যাশ অন ডেলিভারিতে দেবেন:</span><span>${BT(due)}</span></div></div></div>
+  <div class="pt-6 border-t flex justify-between items-end text-xs text-gray-500"><div class="text-center"><div class="w-32 border-b border-gray-400 mb-1"></div>গ্রাহকের স্বাক্ষর</div><div class="text-center"><div class="w-32 border-b mb-1" style="border-color:#D99B00"></div><b style="color:#D99B00">Bana Fashion Authorized</b></div></div>`;
+}
+function showInvoice(o){ const old=document.getElementById('invWrap'); if(old) old.remove(); const w=document.createElement('div'); w.id='invWrap'; w.className='fixed inset-0 z-[120] bg-black/85 overflow-y-auto p-3 sm:p-6';
+  w.innerHTML=`<div class="max-w-3xl mx-auto flex gap-2 justify-end mb-3 no-print"><button onclick="window.print()" class="font-bold px-5 py-2.5 rounded-xl text-sm" style="background:#FFB800;color:#000"><i class="fa-solid fa-print mr-2"></i>প্রিন্ট / ডাউনলোড</button><button onclick="document.getElementById('invWrap').remove()" class="bg-white/15 text-white font-bold px-4 py-2.5 rounded-xl text-sm">বন্ধ করুন</button></div><div id="invSheet" class="max-w-3xl mx-auto bg-white text-black rounded-2xl p-6 sm:p-10 space-y-6" style="font-family:'Hind Siliguri',sans-serif">${invHTML(o)}</div>`;
+  document.body.appendChild(w); try{ new QRCode(document.getElementById('invQR'),{text:location.origin+location.pathname+'?verify='+encodeURIComponent(o.orderId),width:88,height:88,correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+
+function showLastInv(){ if(state.lastOrder) showInvoice({...state.lastOrder,createdAt:new Date()}); }
+function showMyInv(i){ if(state.my&&state.my[i]) showInvoice(state.my[i]); }
+function copyNum(n){ const done=()=>toast('Number copied: '+n); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(n).then(done,done); else { const t=document.createElement('textarea'); t.value=n; document.body.appendChild(t); t.select(); try{document.execCommand('copy')}catch(e){} t.remove(); done(); } }
+let trxT; function chkTrx(){ clearTimeout(trxT); const el=$('coTrxErr'); el.textContent=''; const t=$('coTrx').value.trim().toUpperCase(); if(!FIREBASE_READY||!/^[A-Z0-9]{6,20}$/.test(t)) return;
+  trxT=setTimeout(async()=>{ try{ const sn=await getDoc(doc(db,'trx',t)); if(sn.exists()) el.textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; }catch(e){} },400); }
+async function verifyOrder(){ const id=new URLSearchParams(location.search).get('verify'); if(!id||!FIREBASE_READY) return; let r=null; try{ const sn=await getDoc(doc(db,'receipts',id)); if(sn.exists()) r=sn.data(); }catch(e){}
+  const w=document.createElement('div'); w.className='fixed inset-0 z-[130] bg-black/85 flex items-center justify-center p-4';
+  w.innerHTML=`<div class="pop bg-white rounded-3xl p-8 max-w-sm w-full text-center"><div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${r?'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-500'}"><i class="fa-solid ${r?'fa-circle-check':'fa-circle-xmark'}"></i></div><h3 class="font-display font-extrabold text-xl mt-3">${r?'Order Verified':'Invalid Order'}</h3>${r?`<div class="mt-3 p-3 rounded-xl bg-slate-100 text-xs space-y-1"><div>Order ID: <b class="font-mono">${esc(r.orderId)}</b></div><div>Customer: <b>${esc(r.name||'')}</b></div><div>Status: <b class="uppercase text-gold-600">${esc(r.status)}</b></div><div>Total: <b>${money(r.total)}</b></div></div>`:`<p class="text-xs text-slate-500 mt-2">No order found with this ID: ${esc(id)}</p>`}<button onclick="this.closest('.fixed').remove()" class="mt-5 w-full py-3 rounded-xl btn-gold font-extrabold text-xs">Close</button></div>`; document.body.appendChild(w); }
+
+/* ===== GPS LOCATION AUTO-FILL ===== */
+const DALIAS={chittagong:'Chattogram',comilla:'Cumilla',bogra:'Bogura',jessore:'Jashore',barisal:'Barishal',jhalakathi:'Jhalokati',jhalokathi:'Jhalokati','chapai nawabganj':'Chapainawabganj',netrakona:'Netrokona',maulvibazar:'Moulvibazar',"cox's bazar":"Cox's Bazar",coxsbazar:"Cox's Bazar",narsinghdi:'Narsingdi',laxmipur:'Lakshmipur',sirajgonj:'Sirajganj',khagrachari:'Khagrachhari',kishorganj:'Kishoreganj',gazipur:'Gazipur'};
+const geoNorm=x=>String(x||'').toLowerCase().replace(/\b(district|division|city corporation|zila|upazila|upazilla|thana|police station|sadar)\b/g,'').replace(/\s+/g,' ').trim();
+function geoDist(a){ const keys=Object.keys(BD); const c=[a.state_district,a.county,a.city,a.municipality,a.town,a.state&&!/division/i.test(a.state)?a.state:''];
+  for(const n0 of c){ const n=geoNorm(n0); if(!n) continue; if(DALIAS[n]) return DALIAS[n]; const k=keys.find(k=>geoNorm(k)===n); if(k) return k; }
+  for(const n0 of c){ const n=geoNorm(n0); if(!n) continue; const k=keys.find(k=>n.includes(geoNorm(k))); if(k) return k; }
+  if(/dhaka/i.test(a.state||'')&&(a.city_district||a.suburb)) return 'Dhaka'; return ''; }
+function geoUp(d,a){ const list=BD[d].split(','); const c=[a.city_district,a.suburb,a.quarter,a.neighbourhood,a.county,a.municipality,a.town,a.village,a.city,a.state_district];
+  for(const n0 of c){ const n=geoNorm(n0); if(!n) continue; const k=list.find(u=>geoNorm(u)===n)||list.find(u=>geoNorm(u).length>3&&(n.includes(geoNorm(u))||geoNorm(u).includes(n))); if(k) return k; } return ''; }
+function useMyLocation(){ const m=$('geoMsg'), b=$('geoBtn');
+  if(!navigator.geolocation){ m.textContent='Location is not supported on this device/browser.'; return; }
+  m.textContent='Locating via GPS... please allow location access'; b.disabled=true; b.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Locating';
+  const done=()=>{ b.disabled=false; b.innerHTML='<i class="fa-solid fa-satellite-dish mr-1"></i>Locate'; };
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const {latitude:la,longitude:lo,accuracy:ac}=pos.coords; $('coLat').value=la.toFixed(6); $('coLng').value=lo.toFixed(6);
+    try{ const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${la}&lon=${lo}&zoom=18&addressdetails=1&accept-language=en`); const j=await r.json(), a=j.address||{};
+      const d=geoDist(a); let up='';
+      if(d){ $('coDist').value=d; onDist(); up=geoUp(d,a); if(up) $('coUp').value=up; }
+      const street=[a.house_number,a.road,a.neighbourhood||a.quarter,a.suburb||a.village].filter(Boolean).join(', ')||(j.display_name||'').split(',').slice(0,3).join(',');
+      if(street&&!$('coAddress').value.trim()) $('coAddress').value=street;
+      m.innerHTML=d?`<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check mr-1"></i>${up?up+', ':''}${d}</span> · accuracy ~${Math.round(ac)}m${up?'':'<br>Please choose your upazila / thana.'}`:'Location saved, but area not recognised. Please select your district manually.';
+    }catch(e){ m.textContent='GPS point saved (map link will be sent). Could not read the address - please fill it manually.'; }
+    done(); },
+    err=>{ m.textContent=err.code===1?'Permission denied. Allow location access in your browser settings and try again.':'Could not get your location. Please try again outdoors or enter address manually.'; done(); },
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }
+function pmPic(i){ $('pmImage').src=state.pmImgs[i]; $('pmThumbs').querySelectorAll('img').forEach((im,n)=>{ im.classList.toggle('border-gold-500',n===i); im.classList.toggle('border-white/70',n!==i); }); }
+
+/* ===== v5: promo, eid, menu, fly-to-cart ===== */
+const pio=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in2'); pio.unobserve(en.target); } }),{threshold:.08,rootMargin:'0px 0px -4% 0px'});
+function discAmt(){ const p=state.promo; if(!p) return 0; const sub=subtotal(); if(sub<(p.minOrder||0)) return 0; let d=p.type==='percent'?Math.round(sub*p.value/100):p.value; if(p.type==='percent'&&p.maxDiscount) d=Math.min(d,p.maxDiscount); return Math.max(0,Math.min(d,sub)); }
+async function applyPromo(){ const code=$('coPromo').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), m=$('promoMsg'); const bad=t=>{ state.promo=null; m.className='text-[11px] mt-1 font-bold text-red-500'; m.textContent=t; updateCheckoutTotals(); };
+  if(!code){ state.promo=null; m.textContent=''; updateCheckoutTotals(); return; } if(!FIREBASE_READY||!state.user) return bad('Please sign in to use a promo code');
+  m.className='text-[11px] mt-1 font-bold text-slate-500'; m.textContent='Checking...';
+  try{ const sn=await getDoc(doc(db,'promos',code)); if(!sn.exists()) return bad('Invalid promo code'); const p=sn.data();
+    if(p.active===false) return bad('This promo code is not active');
+    if(p.expiry&&new Date(p.expiry+'T23:59:59')<new Date()) return bad('This promo code has expired');
+    if(p.limit&&(p.used||0)>=p.limit) return bad('This promo code has reached its usage limit');
+    if(subtotal()<(p.minOrder||0)) return bad('Minimum order '+money(p.minOrder)+' required for this code');
+    const u=await getDoc(doc(db,'promoUses',code+'_'+state.user.uid)); if(u.exists()) return bad('You have already used this promo code');
+    state.promo={code,type:p.type,value:p.value,minOrder:p.minOrder||0,maxDiscount:p.maxDiscount||0}; updateCheckoutTotals();
+    m.className='text-[11px] mt-1 font-bold text-emerald-600'; m.innerHTML='<i class="fa-solid fa-circle-check mr-1"></i>'+code+' applied! You save '+money(discAmt());
+  }catch(e){ bad('Could not verify the promo code. Try again.'); } }
+function renderEid(){ const st=state.site||{}, list=state.products.filter(p=>p.eid), sec=$('eid'); if(!sec) return;
+  const on=st.eidOn&&list.length; sec.classList.toggle('hidden',!on); if(!on) return;
+  $('eidTitle').textContent=st.eidTitle||'Eid Collection'; $('eidSub').textContent=st.eidSub||'Celebrate Eid in style - handpicked festive collection';
+  $('eidGrid').innerHTML=list.map((p,i)=>`<div class="eid-card rounded-2xl overflow-hidden cursor-pointer reveal in" style="animation:fadeUp .6s ${(i%4)*.08}s backwards" onclick="openProduct('${p.id}')"><div class="aspect-[4/5] overflow-hidden relative bg-ink-800"><img src="${esc(p.image)}" alt="" loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"><span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-gold-500 text-black font-extrabold text-[10px]"><i class="fa-solid fa-moon mr-1"></i>EID</span></div><div class="p-3"><div class="text-white font-bold text-sm truncate">${esc(p.title)}</div><div class="mt-1 flex items-center gap-2"><span class="text-gold-400 font-extrabold">${money(p.price)}</span>${p.oldPrice?`<span class="text-[11px] text-white/40 line-through">${money(p.oldPrice)}</span>`:''}</div></div></div>`).join(''); }
+function renderMenu(){ const nav=$('mobileNav'); if(!nav) return; const st=state.site||{};
+  const it=[['#hero','Home','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'Eid Collection','fa-moon','']]:[]),['#shop','All Products','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory('${c.id}');`]),['#about','About','fa-circle-info',''],['#helpline','Helpline','fa-headset','']];
+  nav.innerHTML=it.map((x,i)=>`<a href="${x[0]}" onclick="${x[3]}toggleMobileMenu()" style="--i:${i}" class="mnav flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-gold-400 ${x[1]==='Helpline'?'text-gold-400':''}"><i class="fa-solid ${x[2]} w-5 text-center text-gold-400/80"></i>${esc(x[1])}</a>`).join(''); }
+function flyToCart(src){ const f=state.flyFrom||{left:innerWidth/2-30,top:innerHeight/2,width:60,height:60}, cb=$('cartBadge').parentElement, t=cb.getBoundingClientRect();
+  const el=document.createElement('img'); el.src=src; const sx=f.left+f.width/2, sy=f.top+f.height/2;
+  el.style.cssText=`position:fixed;z-index:200;left:${sx-32}px;top:${sy-32}px;width:64px;height:64px;border-radius:16px;object-fit:cover;border:2px solid #F59E0B;box-shadow:0 12px 30px rgba(0,0,0,.45);pointer-events:none`; document.body.appendChild(el);
+  const dx=t.left+t.width/2-sx, dy=t.top+t.height/2-sy;
+  const a=el.animate([{transform:'translate(0,0) scale(1) rotate(0)',opacity:1},{transform:`translate(${dx*.45}px,${dy*.45-90}px) scale(.75) rotate(14deg)`,opacity:1,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.14) rotate(28deg)`,opacity:.35}],{duration:900,easing:'cubic-bezier(.55,0,.25,1)'});
+  a.onfinish=()=>{ el.remove(); cb.classList.remove('cart-pop'); void cb.offsetWidth; cb.classList.add('cart-pop'); toast('Added to your bag',true); }; }
+document.addEventListener('click',e=>{ const t=e.target.closest('[onclick*="addToCart("]'); if(t) state.flyFrom=t.getBoundingClientRect(); },true);
 /* ================= PRODUCT MODAL ================= */
 function openProduct(id){
   const p=state.products.find(x=>x.id===id); if(!p) return;
   state.pm={id,size:(p.sizes&&p.sizes[0])||'M',qty:1};
-  $('pmImage').style.opacity=1; $('pmImage').src=p.image; $('pmCategory').textContent=(CATEGORIES.find(c=>c.id===p.category)||{}).label||p.category; $('pmShip').innerHTML='<i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>Delivery: Inside Dhaka '+money(SHIP.dhaka)+' · Outside Dhaka '+money(SHIP.outside); $('pmTitle').textContent=p.title;
+  $('pmImage').style.opacity=1; $('pmImage').src=p.image; state.pmImgs=(p.images&&p.images.length>1)?p.images:[]; $('pmThumbs').innerHTML=state.pmImgs.map((u,i)=>`<img src="${esc(u)}" onclick="pmPic(${i})" class="w-12 h-12 rounded-lg object-cover border-2 cursor-pointer shadow-lg bg-white ${i?'border-white/70':'border-gold-500'}">`).join(''); $('pmCategory').textContent=(CATEGORIES.find(c=>c.id===p.category)||{}).label||p.category; $('pmShip').innerHTML='<i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>Delivery: Inside Dhaka '+money(SHIP.dhaka)+' · Outside Dhaka '+money(SHIP.outside); $('pmTitle').textContent=p.title;
   $('pmRating').textContent=`${p.rating||4.5} (${p.reviews||0} reviews)`; $('pmPrice').textContent=money(p.price);
   $('pmOld').textContent=p.oldPrice?money(p.oldPrice):''; const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0;
   $('pmOff').textContent=off?`${off}% OFF`:''; $('pmOff').classList.toggle('hidden',!off); $('pmDesc').textContent=p.description||'Premium quality product from BANA FASHION.'; $('pmQty').textContent=1;
@@ -955,7 +1082,7 @@ function openProduct(id){
 function renderSizes(){ const pp=state.products.find(x=>x.id===state.pm.id), SL=(pp&&pp.sizes&&pp.sizes.length)?pp.sizes:SIZES; $('pmSizes').innerHTML=SL.map(s=>`<button onclick="pmSize('${s}')" class="px-4 py-2 rounded-lg border text-xs font-extrabold transition-all ${state.pm.size===s?'bg-ink-900 text-gold-400 border-ink-900':'border-slate-200 hover:border-ink-900'}">${s}</button>`).join(''); }
 function pmSize(s){ state.pm.size=s; renderSizes(); }
 function pmQty(d){ state.pm.qty=Math.max(1,state.pm.qty+d); $('pmQty').textContent=state.pm.qty; }
-function pmAdd(order){ addToCart(state.pm.id,state.pm.qty,state.pm.size,order); closeProduct(); if(order) startCheckout(); }
+function pmAdd(order){ state.flyFrom=$('pmImage').getBoundingClientRect(); addToCart(state.pm.id,state.pm.qty,state.pm.size,order); closeProduct(); if(order) startCheckout(); }
 function closeProduct(){ const m=$('productModal'); m.classList.add('opacity-0'); setTimeout(()=>m.classList.add('hidden'),300); }
 
 /* ================= CART ================= */
@@ -1076,7 +1203,7 @@ function openCheckout(){
 }
 function closeCheckout(){ $('checkoutModal').classList.add('hidden'); document.body.style.overflow=''; }
 function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value]; }
-function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; $('coTotal').textContent=money(s+sh);
+function updateCheckoutTotals(){ renderPay(); const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'FREE'; if(state.promo&&s<(state.promo.minOrder||0)){ state.promo=null; $('promoMsg').textContent=''; } const dc=discAmt(); $('coDiscRow').classList.toggle('hidden',!dc); $('coDisc').textContent='-'+money(dc); if(state.promo) $('coDiscCode').textContent=state.promo.code; $('coTotal').textContent=money(s-dc+sh);
   $('noteIn').textContent=money(SHIP.dhaka); $('noteOut').textContent=money(SHIP.outside); $('noteFree').textContent=sh===0?'Your delivery is FREE - no advance payment needed.':(FREE_SHIP<99999999?'Free delivery on orders over '+money(FREE_SHIP)+'.':''); }
 const BD={"Dhaka":"Adabor,Badda,Banani,Bangshal,Bimanbandar,Cantonment,Chawkbazar,Dakshinkhan,Darus Salam,Demra,Dhamrai,Dhanmondi,Dohar,Gendaria,Gulshan,Hazaribagh,Jatrabari,Kadamtali,Kafrul,Kalabagan,Kamrangirchar,Keraniganj,Khilgaon,Khilkhet,Kotwali,Lalbagh,Mirpur,Mohammadpur,Motijheel,Nawabganj,New Market,Pallabi,Paltan,Ramna,Rampura,Sabujbagh,Savar,Shahbagh,Shyampur,Sutrapur,Tejgaon,Turag,Uttara,Uttar Khan,Wari","Gazipur":"Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur,Tongi","Narayanganj":"Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon","Narsingdi":"Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur","Manikganj":"Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair","Munshiganj":"Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari","Faridpur":"Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha","Gopalganj":"Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara","Madaripur":"Kalkini,Madaripur Sadar,Rajoir,Shibchar","Rajbari":"Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar","Shariatpur":"Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira","Tangail":"Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar","Kishoreganj":"Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail","Chattogram":"Anwara,Banshkhali,Boalkhali,Chandanaish,Chattogram City,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda","Cox's Bazar":"Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia","Cumilla":"Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Cumilla Sadar,Cumilla Sadar Dakshin,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohorgonj,Muradnagar,Nangalkot,Titas","Feni":"Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi","Brahmanbaria":"Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail","Noakhali":"Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar","Lakshmipur":"Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati","Chandpur":"Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti","Khagrachhari":"Dighinala,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh","Rangamati":"Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar","Bandarban":"Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi","Rajshahi":"Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Rajshahi City,Tanore","Chapainawabganj":"Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj","Naogaon":"Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar","Natore":"Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra","Pabna":"Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar","Sirajganj":"Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara","Bogura":"Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatola","Joypurhat":"Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi","Khulna":"Batiaghata,Dacope,Dighalia,Dumuria,Khulna City,Koyra,Paikgachha,Phultala,Rupsha,Terokhada","Bagerhat":"Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola","Satkhira":"Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala","Jashore":"Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha","Jhenaidah":"Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa","Magura":"Magura Sadar,Mohammadpur,Shalikha,Sreepur","Narail":"Kalia,Lohagara,Narail Sadar","Kushtia":"Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur","Chuadanga":"Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar","Meherpur":"Gangni,Meherpur Sadar,Mujibnagar","Barishal":"Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gournadi,Hizla,Mehendiganj,Muladi,Wazirpur","Bhola":"Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin","Jhalokati":"Jhalokati Sadar,Kathalia,Nalchity,Rajapur","Patuakhali":"Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali","Pirojpur":"Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar","Barguna":"Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali","Sylhet":"Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj","Moulvibazar":"Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal","Habiganj":"Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj","Sunamganj":"Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur","Rangpur":"Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj","Dinajpur":"Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Fulbari,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur","Kurigram":"Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur","Lalmonirhat":"Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram","Nilphamari":"Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur","Gaibandha":"Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj","Thakurgaon":"Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar","Panchagarh":"Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia","Mymensingh":"Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal","Jamalpur":"Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari","Netrokona":"Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala","Sherpur":"Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi"};
 function initDist(){ const el=$('coDist'); if(el.options.length>1) return; el.innerHTML='<option value="">Select district</option>'+Object.keys(BD).sort().map(d=>`<option>${d}</option>`).join(''); }
@@ -1088,24 +1215,26 @@ async function placeOrder(e){
   const phone=$('coPhone').value.replace(/[\s-]/g,'').replace(/^\+?88/,'');
   if(!/^01[3-9]\d{8}$/.test(phone)){ toast('Enter a valid Bangladeshi mobile number (01XXXXXXXXX)',false); return; }
   let pay=null; if(state.payM&&state.payM!=='cod'&&shipCost()>0){ const sender=$('coSender').value.replace(/[\s-]/g,''), trx=$('coTrx').value.trim().toUpperCase();
-    if(!/^01[3-9]\d{8}$/.test(sender)||!/^[A-Z0-9]{6,20}$/.test(trx)){ toast('Enter your sender number and TrxID',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
+    if(!/^01[3-9]\d{8}$/.test(sender)||!/^[A-Z0-9]{6,20}$/.test(trx)){ toast('Enter your sender number and TrxID',false); return; } if($('coTrxErr').textContent){ toast($('coTrxErr').textContent,false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
   const btn=$('coSubmit'); btn.disabled=true; btn.textContent='PLACING ORDER...';
-  const sub=subtotal(), ship=shipCost(), orderId='BF-'+Date.now().toString(36).toUpperCase();
-  const order={orderId,uid:state.user.uid,email:state.user.email||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,district:$('coDist').value,upazila:$('coUp').value,address:$('coAddress').value.trim(),note:$('coNote').value.trim(),
-    items:state.cart.map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,delivery:ship,total:sub+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
+  const sub=subtotal(), ship=shipCost(), disc=discAmt(), orderId='BF-'+Date.now().toString(36).toUpperCase();
+  const order={orderId,uid:state.user.uid,email:state.user.email||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,district:$('coDist').value,upazila:$('coUp').value,address:$('coAddress').value.trim(),geo:$('coLat').value?{lat:+$('coLat').value,lng:+$('coLng').value}:null,note:$('coNote').value.trim(),
+    items:state.cart.map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,discount:disc,promo:(disc&&state.promo)?{code:state.promo.code,type:state.promo.type,value:state.promo.value}:null,delivery:ship,total:sub-disc+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
   try{
-    if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); if(pay) bt.set(doc(db,'trx',pay.trxId),{uid:state.user.uid,orderId,at:serverTimestamp()}); await bt.commit(); }
+    if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); if(pay) bt.set(doc(db,'trx',pay.trxId),{uid:state.user.uid,orderId,at:serverTimestamp()}); bt.set(doc(db,'receipts',orderId),{orderId,uid:state.user.uid,status:'pending',total:order.total,name:(order.customerName||'').split(' ')[0],createdAt:serverTimestamp()}); if(disc&&state.promo){ bt.update(doc(db,'promos',state.promo.code),{used:increment(1)}); bt.set(doc(db,'promoUses',state.promo.code+'_'+state.user.uid),{uid:state.user.uid,orderId,at:serverTimestamp()}); } await bt.commit(); }
     else { const all=load('bana_orders',[]); all.push({...order,createdAt:new Date().toISOString()}); save('bana_orders',all); }
-    const lines=order.items.map(i=>`• ${i.title} (${i.size}) x${i.qty}`).join('%0A');
-    $('successWa').href=`https://wa.me/8801353808618?text=${encodeURIComponent('')}${'New BANA FASHION order '+orderId}%0A${lines}%0ATotal: ${order.total} BDT%0AName: ${encodeURIComponent(order.customerName)}%0APhone: ${phone}`;
-    $('successId').textContent=orderId;
-    state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); $('successModal').classList.remove('hidden');
-  }catch(err){ console.error(err); toast(pay&&err.code==='permission-denied'?'This TrxID is already used or invalid. Please check your TrxID.':'Could not place order: '+(err.message||'try again'),false); }
+    const waNum=String((state.site&&state.site.whatsapp)||'8801353808618').replace(/\D/g,'');
+    const msg=['*NEW ORDER - BANA FASHION*','Order ID: '+orderId,'Name: '+order.customerName,'Phone: '+phone,'Address: '+order.address+', '+order.upazila+', '+order.district,order.geo?'Location: https://www.google.com/maps?q='+order.geo.lat+','+order.geo.lng:'','',...order.items.map(i=>'• '+i.title+' ('+i.size+') x'+i.qty+' = '+money(i.price*i.qty)),'','Delivery: '+(ship?money(ship):'FREE'),...(disc?['Promo '+state.promo.code+': -'+money(disc)]:[]),'*Total: '+money(order.total)+'*','Payment: '+order.payment+(pay?' | TrxID: '+pay.trxId:'')].filter(x=>x!==undefined).join('\n');
+    const waUrl='https://wa.me/'+waNum+'?text='+encodeURIComponent(msg); $('successWa').href=waUrl;
+    if(!(state.site&&state.site.waAuto===false)) setTimeout(()=>{ try{ window.open(waUrl,'_blank'); }catch(e){} },700);
+    $('successId').textContent=orderId; state.lastOrder=order;
+    state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='Auto-fill your district, area & address using GPS'; $('successModal').classList.remove('hidden');
+  }catch(err){ console.error(err); if(pay&&err.code==='permission-denied') $('coTrxErr').textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; toast(err.code==='permission-denied'&&state.promo&&!pay?'This promo code is no longer valid. Please remove it and try again.':pay&&err.code==='permission-denied'?'এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!':'Could not place order: '+(err.message||'try again'),false); }
   btn.disabled=false; btn.textContent='CONFIRM ORDER';
 }
 
 /* ================= MISC ================= */
-function toggleMobileMenu(){ $('mobileMenu').classList.toggle('hidden'); }
+function toggleMobileMenu(){ const m=$('mobileMenu'); m.classList.toggle('hidden'); if(!m.classList.contains('hidden')){ const n=$('mobileNav'); n.classList.remove('anim'); void n.offsetWidth; n.classList.add('anim'); } }
 function setupReveal(){
   const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); if(en.target.querySelector('.counter')) en.target.querySelectorAll('.counter').forEach(runCounter); io.unobserve(en.target); } }),{threshold:.15});
   document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
@@ -1117,6 +1246,7 @@ window.addEventListener('scroll',()=>{ const t=$('toTop'); const show=window.scr
 /* ================= v2: MINI CART, BRAND LETTERS, CATEGORY LIGHTS, HELP ================= */
 let miniTimer;
 function showMini(it){
+  flyToCart(it.image); return;
   $('miniImg').style.opacity=1; $('miniImg').src=it.image; $('miniTitle').textContent=it.title;
   $('miniMeta').textContent='Size '+it.size+' · Qty '+it.qty; $('miniPrice').textContent=money(it.price*it.qty);
   const n=state.cart.reduce((a,i)=>a+i.qty,0); $('miniCount').textContent=n+(n===1?' item':' items')+' in your bag'; $('miniSub').textContent='Subtotal '+money(subtotal());
@@ -1144,12 +1274,11 @@ function buildLetters(){
 }
 /* categories: dark first, then lights come on one by one; re-plays each time they scroll into view */
 function setupCats(){
-  const row=$('catRow'); if(!row) return;
-  const io=new IntersectionObserver(es=>es.forEach(en=>{
-    const cards=row.querySelectorAll('.cat-card');
-    if(en.isIntersecting){ cards.forEach(c=>c.classList.add('lit')); }
-    else { cards.forEach(c=>c.classList.remove('lit')); }
-  }),{threshold:.35});
+  const row=$('catRow'); if(!row) return; let spotT;
+  const io=new IntersectionObserver(es=>es.forEach(en=>{ const cards=row.querySelectorAll('.cat-card');
+    if(en.isIntersecting){ cards.forEach((c,i)=>{ c.style.setProperty('--d',(i*.12)+'s'); c.classList.add('lit'); }); let k=0; clearInterval(spotT);
+      spotT=setInterval(()=>{ const cs=row.querySelectorAll('.cat-card'); cs.forEach(c=>c.classList.remove('spot')); if(cs.length){ cs[k%cs.length].classList.add('spot'); k++; } },2200); }
+    else { cards.forEach(c=>c.classList.remove('lit','spot')); clearInterval(spotT); } }),{threshold:.12});
   io.observe(row);
 }
 window.addEventListener('scroll',()=>{ const h=document.documentElement; const pct=h.scrollTop/((h.scrollHeight-h.clientHeight)||1)*100; $('scrollBar').style.width=pct+'%'; },{passive:true});
@@ -1195,11 +1324,11 @@ function runSplash(){
 runSplash(); buildPromos();
 
 /* expose handlers to inline onclick */
-Object.assign(window,{showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,pmSize,pmQty,pmAdd,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,updateCheckoutTotals,placeOrder});
+Object.assign(window,{showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,pmSize,pmQty,pmAdd,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,pmPic,showLastInv,showMyInv,showInvoice,copyNum,chkTrx,updateCheckoutTotals,placeOrder});
 
 /* init */
 state.cart=load('bana_cart',[]); state.wishlist=load('bana_wish',[]);
-buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); showHero(0); setupReveal(); loadFirestoreProducts(); loadSite();
+buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); setupReveal(); loadFirestoreProducts(); loadSite(); verifyOrder();
 { const t0=performance.now(); const done=()=>{ const w=Math.max(0,2700-(performance.now()-t0)); setTimeout(()=>{ const p=$('preloader'); if(!p) return; p.classList.add('out'); setTimeout(()=>p.remove(),550); },w); }; if(document.readyState==='complete') done(); else window.addEventListener('load',done); }
 </script>
 </body>
