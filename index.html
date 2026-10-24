@@ -570,6 +570,57 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
 @media(max-width:640px){.gs-sec{padding:0 0 10px}.gs-card{max-width:none;margin:0;border-radius:0;border-left:0;border-right:0;box-shadow:none}}
 @media(min-width:641px){.gs-ftrack{animation:none;width:auto;margin:0 auto;justify-content:center}.gs-ftrack .gs-flag:last-child,.gs-ftrack .gs-flag:nth-child(7){margin-right:0}.gs-dup{display:none}.gs-flags{-webkit-mask-image:none;mask-image:none}}
 @media(prefers-reduced-motion:reduce){.gs-ftrack{width:auto;flex-wrap:wrap;justify-content:center;row-gap:5px}.gs-dup{display:none}}
+
+/* ===== v9: circle-glow categories, fishing-rod ORDER NOW, smoother product reveal ===== */
+#catRow{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:24px 10px!important;padding:6px 0 4px;justify-items:center}
+#catRow.many{display:grid!important;overflow:visible!important}
+#catRow .cat-card{width:100%;background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;gap:10px!important;overflow:visible!important;opacity:0;transform:translateY(28px) scale(.5);filter:none!important;animation:none}
+#catRow .cat-card::before,#catRow .cat-card::after{display:none!important}
+#catRow .cat-card.lit{animation:cgIn .85s cubic-bezier(.34,1.45,.55,1) var(--d,0s) forwards!important}
+#catRow .cat-card.shown{opacity:1;transform:none}
+#catRow .cat-card:hover,#catRow .cat-card.spot{transform:none!important;box-shadow:none!important}
+@keyframes cgIn{0%{opacity:0;transform:translateY(28px) scale(.5) rotate(-12deg)}55%{opacity:1}100%{opacity:1;transform:none}}
+#catRow .cat-ic{position:relative;width:min(100%,108px)!important;height:auto!important;aspect-ratio:1/1;border-radius:50%!important;border:2.5px solid #D4AF37!important;background:#0b0b0b!important;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px!important;color:#FFB800;box-shadow:0 0 0 3px rgba(212,175,55,.12),0 0 20px rgba(245,158,11,.35)!important;animation:cgGlow 3.6s ease-in-out var(--f,0s) infinite!important;transition:transform .45s cubic-bezier(.16,1,.3,1)}
+#catRow .cat-ic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transition:transform .6s cubic-bezier(.16,1,.3,1)}
+#catRow .cat-card:hover .cat-ic{transform:scale(1.07)!important;animation:cgGlow 3.6s ease-in-out var(--f,0s) infinite!important}
+#catRow .cat-card:hover .cat-ic img{transform:scale(1.1)}
+#catRow .cat-card:active .cat-ic{transform:scale(.96)!important}
+@keyframes cgGlow{0%,100%{box-shadow:0 0 0 3px rgba(212,175,55,.10),0 0 14px rgba(245,158,11,.26)}50%{box-shadow:0 0 0 4px rgba(212,175,55,.22),0 0 30px rgba(245,158,11,.62)}}
+#catRow .cat-name{font-size:13.5px!important;font-weight:700!important;color:#fff!important;margin-top:2px!important;letter-spacing:.01em}
+#catRow .cat-cnt{font-size:10px;color:#9ca3af;margin-top:-4px}
+#catRow .cat-card.lit .cat-name,#catRow .cat-card.lit .cat-cnt{animation:cgTxt .6s ease backwards;animation-delay:calc(var(--d,0s) + .35s)}
+@keyframes cgTxt{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(min-width:640px){#catRow{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:30px 16px!important}#catRow .cat-ic{width:min(100%,128px)!important;font-size:40px!important}#catRow .cat-name{font-size:15px!important}}
+@media(min-width:1024px){#catRow{grid-template-columns:repeat(6,minmax(0,1fr))!important}}
+
+/* fishing rod + swinging ORDER NOW float (banner 2) */
+.rod-wrap{position:relative;width:220px;height:70px;margin:4px auto 0}
+.rod-stick{position:absolute;left:50%;top:6px;width:112px;height:5px;border-radius:5px;background:linear-gradient(90deg,#f6e3a1,#c9962a 45%,#6b4410);transform-origin:0 50%;transform:rotate(-11deg) translateX(46px);opacity:0;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.rod-stick::before{content:"";position:absolute;left:-3px;top:-1px;width:7px;height:7px;border-radius:50%;background:#f6e3a1;box-shadow:0 0 8px rgba(245,158,11,.8)}
+.rod-stick::after{content:"";position:absolute;right:0;top:-2px;width:34px;height:9px;border-radius:5px;background:linear-gradient(#2a2118,#0e0b08);border:1px solid rgba(212,175,55,.5)}
+.rod-reel{position:absolute;right:38px;top:7px;width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe28a,#a8741a);border:1px solid #3a2808}
+.rod-swing{position:absolute;left:50%;top:8px;width:0;height:0;transform-origin:0 0}
+.rod-line{position:absolute;left:-.75px;top:0;width:1.5px;height:26px;background:linear-gradient(rgba(255,255,255,.95),rgba(255,255,255,.55));transform-origin:50% 0;transform:scaleY(0)}
+.rod-float{position:absolute;left:-58px;top:23px;width:116px;display:flex;flex-direction:column;align-items:center;opacity:0;text-decoration:none}
+.rod-hook{width:9px;height:9px;border-radius:50%;border:2px solid #e5e7eb;margin-bottom:-2px;z-index:1;box-shadow:0 0 6px rgba(255,255,255,.4)}
+.rod-body{display:block;width:100%;text-align:center;padding:9px 0;border-radius:999px;background:linear-gradient(135deg,#FBBF24,#D97706);color:#0D0D0D;font:800 12.5px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 8px 22px -6px rgba(245,158,11,.7),inset 0 1px 0 rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.25)}
+.rod-float:active .rod-body{filter:brightness(.92)}
+.hero-slide.shop-banner.active .rod-stick{animation:rodIn .8s cubic-bezier(.16,1,.3,1) 1.35s forwards}
+.hero-slide.shop-banner.active .rod-line{animation:lineDrop .75s cubic-bezier(.3,.8,.3,1) 1.95s forwards}
+.hero-slide.shop-banner.active .rod-float{animation:floatDrop .7s cubic-bezier(.34,1.56,.64,1) 2.45s forwards}
+.hero-slide.shop-banner.active .rod-swing{animation:rodSwing 3.2s ease-in-out 3.2s infinite}
+@keyframes rodIn{from{opacity:0;transform:rotate(-11deg) translateX(46px)}to{opacity:1;transform:rotate(-11deg) translateX(0)}}
+@keyframes lineDrop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes floatDrop{from{opacity:0;transform:translateY(-16px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes rodSwing{0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}}
+.hero-slide.leaving .rod-stick,.hero-slide.leaving .rod-float{opacity:1}
+.hero-slide.leaving .rod-line{transform:scaleY(1)}
+
+/* products: one clean staggered reveal, no flash */
+#productGrid .pcard{animation:none}
+#productGrid .pcard:not(.in2){opacity:0!important;transform:translateY(30px) scale(.97)}
+#productGrid .pcard.in2{animation:pcIn .75s cubic-bezier(.16,1,.3,1) var(--pd,0s) backwards}
+@keyframes pcIn{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
@@ -711,7 +762,13 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
     <div class="relative z-10 w-full text-center px-4 pb-8 sm:pb-10">
       <div class="shop-name font-display font-extrabold text-white text-[1.8rem] sm:text-5xl lg:text-6xl tracking-[.08em]"><span class="shatter-letters" data-w="BANA FASHION"></span></div>
       <div class="a a3 mt-1 text-[10px] sm:text-sm text-gold-400 font-bold tracking-[.35em] uppercase">প্রিমিয়াম মেনস ফ্যাশন</div>
-      <div class="a a4 mt-3"><a href="#shop" onclick="filterCategory('all')" class="btn-gold inline-block px-7 py-2.5 rounded-xl font-extrabold text-sm tracking-wide shadow-xl shadow-gold-500/25">এখনই কিনুন <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></a></div>
+      <div class="rod-wrap" aria-label="Order Now">
+        <span class="rod-stick"><i class="rod-reel"></i></span>
+        <div class="rod-swing">
+          <span class="rod-line"></span>
+          <a href="#shop" onclick="filterCategory('all')" class="rod-float"><span class="rod-hook"></span><span class="rod-body">Order Now</span></a>
+        </div>
+      </div>
     </div>
   </div>
   <!-- Banner 2 -->
@@ -1234,7 +1291,7 @@ function showHero(i){
   state.hero=(i+slides.length)%slides.length;
   { const prev=document.querySelector('.hero-slide.active'); slides.forEach((s,idx)=>{ const on=idx===state.hero; s.classList.toggle('leaving',!on&&s===prev); s.classList.toggle('active',on); }); }
   bars.forEach((b,idx)=>{ b.classList.remove('run'); b.style.width = idx<state.hero?'100%':'0'; if(idx===state.hero){ void b.offsetWidth; b.style.width=''; b.classList.add('run'); } });
-  const dur=+(slides[state.hero].dataset.dur)||HERO_DEFAULT; const ab=bars[state.hero]; if(ab) ab.style.animationDuration=dur+'ms';
+  let dur=+(slides[state.hero].dataset.dur)||HERO_DEFAULT; if(state.hero===2) dur=Math.max(dur,6000); const ab=bars[state.hero]; if(ab) ab.style.animationDuration=dur+'ms';
   clearTimeout(heroTimer); heroTimer=setTimeout(()=>showHero(state.hero+1),dur);
 }
 const nextHeroSlide=()=>showHero(state.hero+1), prevHeroSlide=()=>showHero(state.hero-1), goToHeroSlide=i=>showHero(i);
@@ -1334,7 +1391,7 @@ async function loadSite(){
   try{ const s=await getDoc(doc(db,'settings','site')); if(s.exists()) state.site=s.data(); }catch(e){}
   try{ const p=await getDoc(doc(db,'settings','payment')); if(p.exists()) state.payCfg=p.data(); }catch(e){}
   try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
-    if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; for(const k in _catKeys) delete _catKeys[k]; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:catLabel(x)}))); buildCatRow(); renderTabs(); } }catch(e){}
+    if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; for(const k in _catKeys) delete _catKeys[k]; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:catLabel(x)}))); buildCatRow(); renderTabs(); } }catch(e){} _catsFinal=true; buildCatRow();
   renderMenu(); renderEid();
   const st=state.site||{}; { const w=String(st.whatsapp||'').replace(/\D/g,''); if(w&&$('fabWa')) $('fabWa').href='https://wa.me/'+w; const hp=String(st.helpline||'').replace(/[^\d+]/g,''); if(hp&&$('fabTel')) $('fabTel').href='tel:'+hp; }
   window.SHOPX={...(st.shopAddress?{addr:st.shopAddress}:{}),...(st.helpline?{phone:st.helpline}:{})}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
@@ -1353,12 +1410,22 @@ const SVG_TIE='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentCo
 const SVG_PANT='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M7 2h10l1 20h-4.6L12 9.5 10.6 22H6z"/></svg>';
 const CAT_ICONS=[[/t-?shirt|টি-?শার্ট|polo|পোলো/i,'<i class="fa-solid fa-vest"></i>'],[/panjabi|punjabi|পাঞ্জাবি|kurta/i,SVG_TIE],[/shirt|শার্ট/i,'<i class="fa-solid fa-shirt"></i>'],[/pant|প্যান্ট|jeans|জিন্স|trouser|shorts|শর্টস/i,SVG_PANT],[/watch|ঘড়ি/i,'<i class="fa-solid fa-stopwatch"></i>'],[/suit|সুট|jacket|hoodie|জ্যাকেট|হুডি|coat|three|থ্রি/i,'<i class="fa-solid fa-user-tie"></i>'],[/shoe|জুতা|sneaker|sandal/i,'<i class="fa-solid fa-shoe-prints"></i>'],[/belt|wallet|bag|ব্যাগ|বেল্ট/i,'<i class="fa-solid fa-bag-shopping"></i>']];
 function catIcon(c){ const t=(c.id||'')+' '+catLabel(c)+' '+(CATBN[c.id]||''); for(const [re,ic] of CAT_ICONS) if(re.test(t)) return ic; return '<i class="fa-solid fa-tags"></i>'; }
+let _catSig='', _catsFinal=false, _catWait=0, _catsPlayed=false;
 function buildCatRow(){ const r=$('catRow'); if(!r) return;
-  let list=(state.cats&&state.cats.length)?state.cats:CATEGORIES.filter(c=>state.products.some(p=>p.category===c.id));
+  const hasCats=!!(state.cats&&state.cats.length);
+  /* wait for the real category list (admin order) so cards never render in one order and then jump to another */
+  if(!hasCats&&!_catsFinal){ if(!_catWait) _catWait=setTimeout(()=>{ _catsFinal=true; _catWait=0; buildCatRow(); },2500); return; }
+  let list=hasCats?state.cats:CATEGORIES.filter(c=>state.products.some(p=>p.category===c.id));
   list=list.filter(c=>c.id!=='all').slice(0,24);
   const sec=$('categories'); if(sec) sec.classList.toggle('hidden',!list.length);
-  r.innerHTML=list.map((c,i)=>{ const name=catLabel(c)||String(c.id||''); const n=state.products.filter(p=>p.category===c.id).length;
-    return `<div onclick="goShop('${esc(c.id)}')" style="--d:${(i*.09).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}</span><h3 class="cat-name">${esc(name)}</h3>${n?`<span class="cat-cnt">${bnum(n)}+ পণ্য</span>`:''}</div>`; }).join(''); if(catsInView) playCats(); }
+  const cnt=c=>state.products.filter(p=>p.category===c.id).length;
+  const sig=list.map(c=>c.id+'|'+(c.image||'')+'|'+catLabel(c)).join('~');
+  if(sig===_catSig&&r.children.length){ list.forEach(c=>{ const el=r.querySelector('[data-cid="'+String(c.id).replace(/"/g,'')+'"] .cat-cnt'); if(el){ const n=cnt(c); el.textContent=n?bnum(n)+'+ পণ্য':''; } }); return; }
+  _catSig=sig;
+  r.innerHTML=list.map((c,i)=>{ const name=catLabel(c)||String(c.id||''); const n=cnt(c);
+    const pr=state.products.find(p=>p.category===c.id); const im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
+    return `<div onclick="goShop('${esc(c.id)}')" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(im)}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
+  if(catsInView||_catsPlayed) playCats(); }
 /* ===== pencil-writing text + Bengali spacing fix ===== */
 /* section headings are plain text now (the animated pencil icon was removed) */
 function pencilInit(){ document.querySelectorAll('.penned').forEach(el=>{ const s=el.querySelector('.pen'); if(s) el.innerHTML=s.innerHTML; el.classList.remove('penned'); }); }
@@ -1494,7 +1561,7 @@ function useMyLocation(){ const m=$('geoMsg'), b=$('geoBtn');
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}); }
 
 /* ===== v5: promo, eid, menu, fly-to-cart ===== */
-const pio=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in2'); pio.unobserve(en.target); } }),{threshold:.08,rootMargin:'0px 0px -4% 0px'});
+const pio=new IntersectionObserver(es=>{ let k=0; es.forEach(en=>{ if(en.isIntersecting){ en.target.style.setProperty('--pd',(Math.min(k,7)*.09).toFixed(2)+'s'); k++; en.target.classList.add('in2'); pio.unobserve(en.target); } }); },{threshold:.08,rootMargin:'0px 0px -4% 0px'});
 function discAmt(){ const p=state.promo; if(!p) return 0; const sub=subtotal(); if(sub<(p.minOrder||0)) return 0; let d=p.type==='percent'?Math.round(sub*p.value/100):p.value; if(p.type==='percent'&&p.maxDiscount) d=Math.min(d,p.maxDiscount); return Math.max(0,Math.min(d,sub)); }
 async function applyPromo(){ const code=$('coPromo').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), m=$('promoMsg'); const bad=t=>{ state.promo=null; m.className='text-[11px] mt-1 font-bold text-red-400'; m.textContent=t; updateCheckoutTotals(); };
   if(!code){ state.promo=null; m.textContent=''; updateCheckoutTotals(); return; } if(!FIREBASE_READY||!state.user) return bad('প্রোমো কোড ব্যবহার করা যাচ্ছে না, একটু পরে চেষ্টা করুন');
@@ -1972,23 +2039,21 @@ function buildLetters(){
   });
 }
 /* categories: dark first, then lights come on one by one; re-plays each time they scroll into view */
-function stopCats(){ clearTimeout(catSeqT); clearInterval(spotT); const row=$('catRow'); if(row) row.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('lit','shown','spot')); }
-/* cards start hidden, then appear strictly in DOM order (left -> right, top -> bottom), each one after the previous */
+function stopCats(){ clearTimeout(catSeqT); clearInterval(spotT); }
+/* cards appear strictly in order (left -> right, top -> bottom), once; later rebuilds just show them settled */
 function playCats(){
-  const row=$('catRow'); if(!row) return; stopCats();
+  const row=$('catRow'); if(!row) return;
   const cards=[...row.querySelectorAll('.cat-card')]; if(!cards.length) return;
-  void row.offsetWidth;                                           /* restart the CSS animation cleanly */
-  const step=Math.min(.12,1.5/cards.length);                      /* long lists get a tighter stagger */
-  cards.forEach((c,i)=>{ c.style.setProperty('--d',(.08+i*step).toFixed(2)+'s'); c.classList.add('lit'); });
-  const total=(.08+cards.length*step+.75)*1000;
-  catSeqT=setTimeout(()=>{ let k=0; spotT=setInterval(()=>{ const cs=row.querySelectorAll('.cat-card'); cs.forEach(c=>c.classList.remove('spot')); if(cs.length){ cs[k%cs.length].classList.add('spot'); k++; } },2200); },total+300);
+  if(_catsPlayed){ cards.forEach(c=>{ c.classList.remove('lit'); c.classList.add('shown'); }); return; }
+  _catsPlayed=true; void row.offsetWidth;
+  const step=Math.min(.14,1.6/cards.length);
+  cards.forEach((c,i)=>{ c.style.setProperty('--d',(.1+i*step).toFixed(2)+'s'); c.classList.add('lit'); });
 }
 function setupCats(){
   const row=$('catRow'); if(!row) return;
-  row.addEventListener('animationend',e=>{ const c=e.target; if(e.animationName==='catIn'&&c.classList&&c.classList.contains('cat-card')){ c.classList.add('shown'); c.classList.remove('lit'); } });
+  row.addEventListener('animationend',e=>{ const c=e.target; if(e.animationName==='cgIn'&&c.classList&&c.classList.contains('cat-card')){ c.classList.add('shown'); c.classList.remove('lit'); } });
   const io=new IntersectionObserver(es=>es.forEach(en=>{
-    if(en.intersectionRatio>=.12&&!catsInView){ catsInView=true; playCats(); }
-    else if(en.intersectionRatio===0&&catsInView){ catsInView=false; stopCats(); } }),{threshold:[0,.12]});
+    if(en.intersectionRatio>=.15&&!catsInView){ catsInView=true; playCats(); io.disconnect(); } }),{threshold:[0,.15]});
   io.observe(row);
 }
 window.addEventListener('scroll',()=>{ const h=document.documentElement; const pct=h.scrollTop/((h.scrollHeight-h.clientHeight)||1)*100; $('scrollBar').style.width=pct+'%'; },{passive:true});
