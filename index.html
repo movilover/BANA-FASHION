@@ -2,8 +2,37 @@
 <html lang="bn" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0a">
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js">
+<script>
+/* PRODUCT PREFETCH: the product list starts downloading at the very first byte (in parallel with the Firebase SDK) and is cached in IndexedDB,
+   so repeat visits paint the products instantly and the fresh list is swapped in silently. If this fails, the normal Firebase SDK path is used. */
+(function(){
+  var KEY="AIzaSyBwMWJ-OMMVR-aeiP9mrwGCqpGzxuranFI", PID="bana-fashion", W=window;
+  function idb(){ return new Promise(function(ok,no){ try{ var r=indexedDB.open('bf_cache',1); r.onupgradeneeded=function(){ r.result.createObjectStore('kv'); }; r.onsuccess=function(){ ok(r.result); }; r.onerror=function(){ no(r.error); }; }catch(e){ no(e); } }); }
+  function get(k){ return idb().then(function(d){ return new Promise(function(ok){ var q=d.transaction('kv').objectStore('kv').get(k); q.onsuccess=function(){ ok(q.result||null); }; q.onerror=function(){ ok(null); }; }); }).catch(function(){ return null; }); }
+  function set(k,v){ return idb().then(function(d){ d.transaction('kv','readwrite').objectStore('kv').put(v,k); }).catch(function(){}); }
+  function cv(v){ if(!v) return null;
+    if('stringValue' in v) return v.stringValue; if('integerValue' in v) return Number(v.integerValue); if('doubleValue' in v) return v.doubleValue;
+    if('booleanValue' in v) return v.booleanValue; if('nullValue' in v) return null; if('timestampValue' in v) return v.timestampValue;
+    if('arrayValue' in v) return (v.arrayValue.values||[]).map(cv);
+    if('mapValue' in v){ var o={}, f=v.mapValue.fields||{}; for(var k in f) o[k]=cv(f[k]); return o; }
+    if('referenceValue' in v) return v.referenceValue; if('geoPointValue' in v) return v.geoPointValue; return null; }
+  function net(){ var out=[];
+    function page(n,tok){ var u='https://firestore.googleapis.com/v1/projects/'+PID+'/databases/(default)/documents/products?pageSize=300&key='+KEY+(tok?'&pageToken='+encodeURIComponent(tok):'');
+      return fetch(u).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
+        (j.documents||[]).forEach(function(d){ var f=d.fields||{}, o={id:d.name.split('/').pop()}; for(var k in f) o[k]=cv(f[k]); out.push(o); });
+        return (j.nextPageToken&&n<20)?page(n+1,j.nextPageToken):out; }); }
+    return page(0,'').catch(function(){ return null; }); }
+  W.__PD={ cache:get('products'), net:net(), save:function(items){ try{ set('products',{t:Date.now(),items:JSON.parse(JSON.stringify(items))}); }catch(e){} } };
+})();
+</script>
 <title>BANA FASHION | প্রিমিয়াম মেনস ফ্যাশন</title>
 <meta name="description" content="BANA FASHION - Premium men's fashion brand from Shafipur Bazar, Kaliakoir, Gazipur. Shirts, T-shirts, Denim, Panjabi & more. Cash on Delivery all over Bangladesh.">
 
@@ -36,6 +65,10 @@ tailwind.config = {
 <style>
 html{scroll-padding-top:76px}
 html,body{overflow-x:clip;max-width:100%}
+html{background:#F3F4F6;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+#helpFab{bottom:calc(1.25rem + env(safe-area-inset-bottom,0px));right:calc(1rem + env(safe-area-inset-right,0px))}
+#toTop{bottom:calc(6rem + env(safe-area-inset-bottom,0px));right:calc(22px + env(safe-area-inset-right,0px))}
 img,video{max-width:100%}
 body{background:#F3F4F6;font-family:'Plus Jakarta Sans','Hind Siliguri',sans-serif}
 .gold-text{background:linear-gradient(90deg,#FBBF24,#D97706,#FDE68A,#D97706);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4s linear infinite}
@@ -1542,7 +1575,7 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, serverTimestamp, doc, getDoc, setDoc, increment, query, where, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { initializeAppCheck, ReCaptchaV3Provider, getToken as getAppCheckToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
+let initializeAppCheck, ReCaptchaV3Provider, getAppCheckToken;   /* loaded lazily below, only when APPCHECK_SITE_KEY is set */
 
 /* >>> Replace the YOUR_... values with the keys from Firebase Console > Project Settings > Your apps (Web) <<< */
 const firebaseConfig = {
@@ -1559,7 +1592,7 @@ const FIREBASE_READY = !String(firebaseConfig.apiKey).startsWith("YOUR_");
 let db = null, auth = null;
 if (FIREBASE_READY) {
   const app = initializeApp(firebaseConfig);
-  if (APPCHECK_SITE_KEY) { try { window.__appCheck = initializeAppCheck(app, { provider: new ReCaptchaV3Provider(APPCHECK_SITE_KEY), isTokenAutoRefreshEnabled: true }); window.__getAppCheckToken = getAppCheckToken; } catch (e) { console.warn('AppCheck:', e); } }
+  if (APPCHECK_SITE_KEY) { try { const _ac = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js"); initializeAppCheck=_ac.initializeAppCheck; ReCaptchaV3Provider=_ac.ReCaptchaV3Provider; getAppCheckToken=_ac.getToken; window.__appCheck = initializeAppCheck(app, { provider: new ReCaptchaV3Provider(APPCHECK_SITE_KEY), isTokenAutoRefreshEnabled: true }); window.__getAppCheckToken = getAppCheckToken; } catch (e) { console.warn('AppCheck:', e); } }
   db = getFirestore(app);
   auth = getAuth(app);
 }
@@ -1725,28 +1758,39 @@ function resetFilters(){ state.cat='all'; state.q=''; resetLimit(); $('searchInp
 
 async function loadFirestoreProducts(){
   try{ ['bana_products','bana_cache','bana_orders'].forEach(k=>{ if(FIREBASE_READY) localStorage.removeItem(k); }); }catch(e){}
+  const _mk=p=>normProduct({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p}),
+        _sig=l=>l.map(p=>[p.id,p.title,p.price,p.oldPrice,p.stock,p.home,p.category,p.badge,(p.images&&p.images.length)||0,String(p.image||'').length].join('~')).join('|');
+  let _cs=null, _same=false; const PD=window.__PD||{};
   if(FIREBASE_READY){
+    /* 1) cached list from the last visit -> products appear immediately */
+    try{ const c=await Promise.race([PD.cache||Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),700))]);
+      if(c&&c.items&&c.items.length){ state.products=c.items.map(_mk); state.loaded=true; _cs=_sig(state.products); renderProducts(); } }catch(e){}
+    /* 2) fresh list, already downloading since the first byte (see PRODUCT PREFETCH in <head>) */
+    try{ const it=PD.net?await PD.net:null; if(it){ state.products=it.map(_mk); state.fetchOk=true; if(PD.save) PD.save(it); } }catch(e){}
+    /* 3) fallback: Firebase SDK, up to 3 attempts */
     for(let tryN=0;tryN<3&&!state.fetchOk;tryN++){      /* up to 3 attempts so a flaky connection does not leave the shop empty */
       try{
         const snap=await getDocs(collection(db,'products'));
         const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()}));
-        state.products=items.map(p=>normProduct({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); state.fetchOk=true;
+        state.products=items.map(p=>normProduct({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); state.fetchOk=true; if(PD.save) PD.save(items);
       }catch(e){ console.warn('Firestore products not loaded (try '+(tryN+1)+'):',e.message); state.products=state.products||[]; if(tryN<2) await new Promise(r=>setTimeout(r,900*(tryN+1))); }
     }
   } else state.fetchOk=true;
+  if(_cs!==null&&state.fetchOk) _same=(_cs===_sig(state.products));   /* nothing changed since the cached paint -> no re-render, no flicker */
   state.loaded=true;
   /* drop cart / wishlist entries of deleted products and refresh price, title, image */
   if(state.fetchOk){ state.cart=state.cart.filter(i=>state.products.some(p=>p.id===i.id)).map(i=>{ const p=state.products.find(x=>x.id===i.id); return {...i,title:p.title,price:p.price,image:p.image||(p.images&&p.images[0])||i.image||''}; });
   state.wishlist=state.wishlist.filter(id=>state.products.some(p=>p.id===id)); save('bana_wish',state.wishlist); }
-  renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash();
+  if(!_same) renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash();
 }
 
 /* ===== ADMIN-LINKED: site settings, categories, payment ===== */
 async function loadSite(){
   if(!FIREBASE_READY) return;
-  try{ const s=await getDoc(doc(db,'settings','site')); if(s.exists()) state.site=s.data(); }catch(e){}
-  try{ const p=await getDoc(doc(db,'settings','payment')); if(p.exists()) state.payCfg=p.data(); }catch(e){}
-  try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
+  const [_rs,_rp,_rc]=await Promise.all([getDoc(doc(db,'settings','site')).catch(()=>null),getDoc(doc(db,'settings','payment')).catch(()=>null),getDocs(collection(db,'categories')).catch(()=>null)]);   /* 3 requests at once instead of one after another */
+  try{ if(_rs&&_rs.exists()) state.site=_rs.data(); }catch(e){}
+  try{ if(_rp&&_rp.exists()) state.payCfg=_rp.data(); }catch(e){}
+  try{ const c=_rc; if(!c) throw 0; const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
     if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; for(const k in _catKeys) delete _catKeys[k]; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:catLabel(x)}))); buildCatRow(); renderTabs(); } }catch(e){} _catsFinal=true; buildCatRow();
   renderMenu(); renderEid();
   const st=state.site||{}; { const w=String(st.whatsapp||'').replace(/\D/g,''); if(w&&$('fabWa')) $('fabWa').href='https://wa.me/'+w; const hp=String(st.helpline||'').replace(/[^\d+]/g,''); if(hp&&$('fabTel')) $('fabTel').href='tel:'+hp; }
