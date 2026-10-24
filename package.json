@@ -1,0 +1,15 @@
+{
+  "name": "bana-fashion-server",
+  "version": "2.0.0",
+  "private": true,
+  "description": "BANA FASHION - storefront + admin panel + Steadfast + WhatsApp notifications (Railway)",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "firebase-admin": "^12.7.0",
+    "helmet": "^7.2.0"
+  }
+}
