@@ -1,0 +1,4 @@
+rules_version = '2';
+// Firebase Storage ব্যবহার হচ্ছে না (ছবি Firestore-এ থাকে) — তাই সবকিছু বন্ধ।
+// Firebase Console > Storage > Rules এ পেস্ট করুন (Storage চালু না থাকলে দরকার নেই)।
+service firebase.storage { match /b/{bucket}/o { match /{allPaths=**} { allow read, write: if false; } } }
