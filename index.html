@@ -689,6 +689,33 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
 @media(min-width:640px){.fx-switch{top:12px;right:141px}}
 @media(min-width:1024px){.fx-switch{right:calc(6% + 138px)}}
 </style>
+
+<style id="fx-seq">
+/* ===== v12: person waves bye -> presses the switch -> lamp on -> stage spotlight sweeps the products -> off ===== */
+.fx-switch{right:auto;left:60px;top:19px}
+@media(min-width:640px){.fx-switch{right:auto;left:116px;top:43px}}
+@media(min-width:1024px){.fx-switch{right:auto;left:calc(6% + 112px);top:50px}}
+.fx-hint{display:none!important}
+/* long arm of the person that reaches the switch (drawn above the switch plate) */
+.fx-arm{position:absolute;z-index:4;left:42px;top:40px;height:6px;width:0;box-sizing:border-box;border-radius:6px;background:linear-gradient(#3a2e17,#1d160a);border:1px solid #d4af37;opacity:0;pointer-events:none;transition:width .26s ease-in,opacity .18s ease .12s}
+.fx-fist{position:absolute;right:-3.5px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:#e6bf98;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.shop-fx.press~.fx-arm{width:27px;opacity:1;transition:width .28s cubic-bezier(.3,1.5,.5,1),opacity .1s}
+@media(min-width:640px){.fx-arm{left:80px;top:63px;height:9px}.fx-fist{width:10px;height:10px;margin-top:-5px;right:-5px}.shop-fx.press~.fx-arm{width:45px}}
+@media(min-width:1024px){.fx-arm{left:calc(6% + 70px);top:68px;height:11px}.fx-fist{width:11px;height:11px;margin-top:-5.5px;right:-5.5px}.shop-fx.press~.fx-arm{width:51px}}
+.shop-fx.press .pf-wave{opacity:0;transition:opacity .08s}
+.pf-wave{transition:opacity .2s .15s}
+/* goodbye wave: bigger, faster swing */
+@keyframes pfBye{0%,100%{transform:rotate(-28deg)}50%{transform:rotate(24deg)}}
+.shop-fx.bye .pf-wave{animation:pfBye .5s ease-in-out infinite}
+/* lamp / glow fade out smoothly */
+@keyframes fxOut{from{opacity:1}to{opacity:0}}
+.shop-fx.fade .fx-glow,.shop-fx.fade .fx-lens,.shop-fx.fade .fx-cone{animation:fxOut .7s ease forwards}
+/* stage spotlight (fixed, above products, below header) */
+.fx-stage{position:fixed;inset:0;z-index:25;pointer-events:none;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+.fx-stage.on{opacity:1;visibility:visible;transition:opacity .45s ease}
+.fx-dim{position:absolute;inset:0;background:rgba(6,6,10,.5)}
+.fx-beam{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;clip-path:polygon(0 46%,100% 0,100% 100%,0 54%);background:linear-gradient(90deg,rgba(255,240,190,.6),rgba(255,226,140,.2) 55%,rgba(255,226,140,.06));mix-blend-mode:screen;filter:blur(2px)}
+</style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
 
@@ -974,6 +1001,7 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
       <ellipse cx="31" cy="46" rx="9" ry="4.5" transform="rotate(-38 31 46)" fill="#5a4a1c"/><ellipse class="fx-lens" cx="31" cy="46" rx="9" ry="4.5" transform="rotate(-38 31 46)" fill="#fff6c4"/></svg><span class="fx-cone"></span></div></div>
   </div>
   <button type="button" class="fx-switch" id="fxSwitch" aria-pressed="false" aria-label="লাইট জ্বালান"><span class="fx-plate"><i class="fx-lever"></i></span><span class="fx-hint">ক্লিক করুন</span></button>
+  <i class="fx-arm" aria-hidden="true"><b class="fx-fist"></b></i>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-5 reveal">
       <span class="text-gold-600 font-extrabold text-xs uppercase tracking-widest">আমাদের কালেকশন</span>
@@ -1287,6 +1315,7 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
 </div>
 
 <div id="toastContainer" class="fixed bottom-5 left-4 z-[80] space-y-2 pointer-events-none"></div>
+<div id="fxStage" class="fx-stage" aria-hidden="true"><div class="fx-dim"></div><div class="fx-beam"></div></div>
 
 <script>
 /* taps made before the main script finishes loading are queued and replayed (nothing is lost) */
@@ -1297,12 +1326,46 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
   function free(){ var p=document.getElementById('preloader'); if(p) p.style.pointerEvents='none'; }
   if((window.__splash||0)>=1) free(); else document.addEventListener('splash:exit',free,{once:true});
   /* product-section lighting: on while the section top is on screen, off when scrolled away, on again when back */
-  var fx=document.getElementById('shopFx'), sw=document.getElementById('fxSwitch');
+  var fx=document.getElementById('shopFx'), sw=document.getElementById('fxSwitch'), stg=document.getElementById('fxStage');
   if(fx){
-    if(sw) sw.addEventListener('click',function(){ var on=fx.classList.toggle('on'); sw.setAttribute('aria-pressed',on?'true':'false'); sw.setAttribute('aria-label',on?'লাইট নিভান':'লাইট জ্বালান'); });
-    var off=function(){ fx.classList.remove('show','on'); if(sw){ sw.setAttribute('aria-pressed','false'); sw.setAttribute('aria-label','লাইট জ্বালান'); } };
-    if(!('IntersectionObserver' in window)) fx.classList.add('show');
-    else new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting&&e.intersectionRatio>=.3) fx.classList.add('show'); else if(!e.isIntersecting) off(); }); },{threshold:[0,.3,.6]}).observe(fx);
+    /* timeline: person rises -> waves bye-bye -> presses the switch -> lamp on -> spotlight sweeps the products -> all off */
+    var SWEEP=2200, RISE=1700, BYE=1400, T=[], busy=false, raf=0;
+    var dim=stg&&stg.querySelector('.fx-dim'), beam=stg&&stg.querySelector('.fx-beam'), lens=fx.querySelector('.fx-lens');
+    var reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var later=function(f,ms){ T.push(setTimeout(f,ms)); };
+    var label=function(on){ if(sw){ sw.setAttribute('aria-pressed',on?'true':'false'); sw.setAttribute('aria-label',on?'লাইট নিভান':'লাইট জ্বালান'); } };
+    var stopAll=function(){ T.forEach(clearTimeout); T=[]; cancelAnimationFrame(raf); if(stg) stg.classList.remove('on'); busy=false; };
+    var sweep=function(){
+      if(!dim||!beam) return;
+      var t0=performance.now(), W=innerWidth, H=innerHeight, R=Math.max(150,Math.min(300,W*.34));
+      var P0=[W*.20,H*.28], P1=[W*.80,H*.47], P2=[W*.22,H*.74];            /* corner -> corner -> corner */
+      var C=[2*P1[0]-(P0[0]+P2[0])/2, 2*P1[1]-(P0[1]+P2[1])/2];
+      var frame=function(now){
+        var k=Math.min(1,(now-t0)/SWEEP), u=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, a=(1-u)*(1-u), b=2*(1-u)*u, c=u*u;
+        var x=a*P0[0]+b*C[0]+c*P2[0], y=a*P0[1]+b*C[1]+c*P2[1];
+        dim.style.background='radial-gradient(circle at '+x.toFixed(1)+'px '+y.toFixed(1)+'px,rgba(255,228,150,.30) 0,rgba(255,228,150,.11) '+(R*.6).toFixed(0)+'px,rgba(6,6,10,.56) '+(R*1.18).toFixed(0)+'px)';
+        var r=lens?lens.getBoundingClientRect():fx.getBoundingClientRect(), lx=r.left+r.width/2, ly=r.top+r.height/2;
+        var dx=x-lx, dy=y-ly, len=Math.sqrt(dx*dx+dy*dy), ang=Math.atan2(dy,dx)*180/Math.PI;
+        beam.style.width=len.toFixed(0)+'px'; beam.style.height=(R*1.5).toFixed(0)+'px';
+        beam.style.transform='translate('+lx.toFixed(1)+'px,'+ly.toFixed(1)+'px) rotate('+ang.toFixed(2)+'deg) translateY(-50%)';
+        if(k<1) raf=requestAnimationFrame(frame);
+      };
+      frame(t0);
+    };
+    var lightUp=function(t){
+      later(function(){ fx.classList.remove('bye'); fx.classList.add('press'); },t);                 /* hand reaches the switch */
+      later(function(){ fx.classList.add('on'); label(true); },t+380);                               /* switch flips, lamp turns on */
+      later(function(){ if(stg&&!reduce){ stg.classList.add('on'); sweep(); } },t+520);               /* spotlight sweeps products */
+      later(function(){ fx.classList.remove('press'); },t+950);                                      /* hand goes back */
+      later(function(){ if(stg) stg.classList.remove('on'); fx.classList.remove('on'); fx.classList.add('fade'); label(false); },t+520+SWEEP+100);
+      later(function(){ fx.classList.remove('fade'); cancelAnimationFrame(raf); busy=false; },t+520+SWEEP+900);
+    };
+    var begin=function(){ stopAll(); busy=true; later(function(){ fx.classList.add('bye'); },RISE); lightUp(RISE+BYE); };
+    var off=function(){ stopAll(); fx.classList.remove('show','on','bye','press','fade'); label(false); };
+    var start=function(){ if(fx.classList.contains('show')) return; fx.classList.add('show'); begin(); };
+    if(sw) sw.addEventListener('click',function(){ if(busy) return; fx.classList.add('show'); busy=true; lightUp(0); });
+    if(!('IntersectionObserver' in window)) start();
+    else new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting&&e.intersectionRatio>=.3) start(); else if(!e.isIntersecting) off(); }); },{threshold:[0,.3,.6]}).observe(fx);
   }
 })();
 </script>
