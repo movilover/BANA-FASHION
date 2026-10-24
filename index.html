@@ -1685,6 +1685,7 @@ async function loadSite(){
   try{ const s=await getDoc(doc(db,'settings','site')); if(s.exists()) state.site=s.data(); }catch(e){}
   try{ const p=await getDoc(doc(db,'settings','payment')); if(p.exists()) state.payCfg=p.data(); }catch(e){}
   try{ const tg=await getDoc(doc(db,'settings','telegram')); if(tg.exists()) state.tg=tg.data(); }catch(e){}
+  try{ const wa=await getDoc(doc(db,'settings','whatsapp')); if(wa.exists()) state.wa=wa.data(); }catch(e){}
   try{ const c=await getDocs(collection(db,'categories')); const a=[]; c.forEach(d=>a.push({id:d.id,...d.data()}));
     if(a.length){ a.sort((x,y)=>(x.order||0)-(y.order||0)); state.cats=a; for(const k in _catKeys) delete _catKeys[k]; CATEGORIES.splice(1,CATEGORIES.length-1,...a.map(x=>({id:x.id,label:catLabel(x)}))); buildCatRow(); renderTabs(); } }catch(e){} _catsFinal=true; buildCatRow();
   renderMenu(); renderEid();
@@ -2274,7 +2275,7 @@ async function placeOrder(e){
     const msg=['*NEW ORDER - BANA FASHION*','অর্ডার আইডি: '+orderId,'Name: '+order.customerName,'Phone: '+phone,'Address: '+order.address+', '+order.upazila+', '+order.district+(order.division?', '+order.division+' Division':''),order.geo?'Location: https://www.google.com/maps?q='+order.geo.lat+','+order.geo.lng:'','',...order.items.map(i=>'• '+i.title+' ('+i.size+') x'+i.qty+' = '+money(i.price*i.qty)),'','Delivery: '+(ship?money(ship):'ফ্রি'),...(disc?['Promo '+state.promo.code+': -'+money(disc)]:[]),'*মোট: '+money(order.total)+'*','Payment: '+order.payment+(pay?' | TrxID: '+pay.trxId:'')].filter(x=>x!==undefined).join('\n');
     const waUrl='https://wa.me/'+waNum+'?text='+encodeURIComponent(msg); $('successWa').href=waUrl;
     if(!(state.site&&state.site.waAuto===false)) setTimeout(()=>{ try{ window.open(waUrl,'_blank'); }catch(e){} },700);
-    $('successId').textContent=orderId; state.lastOrder=order; state.lastTg={items:checkoutItems().map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price,image:i.image||''})),stamp:tgStamp()}; tgNotify(order,state.lastTg);   /* Telegram alert (async, never blocks the order) */ try{trkSave(orderId);}catch(e){} try{myoSave(order);}catch(e){}
+    $('successId').textContent=orderId; state.lastOrder=order; state.lastTg={items:checkoutItems().map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price,image:i.image||''})),stamp:tgStamp()}; tgNotify(order,state.lastTg); waNotify(order,state.lastTg);   /* Telegram + WhatsApp alert (async, never blocks the order) */ try{trkSave(orderId);}catch(e){} try{myoSave(order);}catch(e){}
     $('successSummary').innerHTML=order.items.map(i=>`<div class="flex justify-between gap-2"><span class="truncate">${esc(i.title)} <span class="text-slate-400">(${esc(i.size)}) ×${i.qty}</span></span><b>${money(i.price*i.qty)}</b></div>`).join('')+`<div class="border-t border-white/10 pt-1.5 flex justify-between"><span class="text-silver-400">ডেলিভারি</span><b>${ship?money(ship):'ফ্রি'}</b></div>`+(disc?`<div class="flex justify-between"><span class="text-emerald-400">ডিসকাউন্ট</span><b>-${money(disc)}</b></div>`:'')+`<div class="flex justify-between text-sm font-extrabold"><span>মোট</span><span>${money(order.total)}</span></div><div class="border-t border-white/10 pt-1.5 text-silver-400 leading-relaxed"><b class="text-white">${esc(order.customerName)}</b> · ${esc(order.phone)}<br>${esc(order.address)}, ${esc(order.upazila)}, ${esc(DBN[order.district]||order.district)}${order.division?', '+esc(DVBN[order.division]||order.division)+' বিভাগ':''} <span class="text-gold-400 font-bold">(${order.area==='dhaka'?'ঢাকার ভিতরে':'ঢাকার বাইরে'})</span><br>পেমেন্ট: ${esc(order.payment)}</div>`;
     if(!state.buyNow) state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); onDist(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='GPS দিয়ে জেলা, এলাকা ও ঠিকানা নিজে থেকে পূরণ হবে'; showConfirm(orderId);
     }catch(uiErr){ console.error('post-order UI:',uiErr); try{ if(!state.buyNow) state.cart=[]; updateCart(); }catch(_){} try{ $('successId').textContent=orderId; }catch(_){} try{ showConfirm(orderId); }catch(_){} }
@@ -2388,6 +2389,52 @@ let _tgFlushing=false;
 async function tgFlush(){ if(_tgFlushing||!tgCfg()) return; const q=tgQueueGet(); if(!q.length||!navigator.onLine) return; _tgFlushing=true; const left=[];
   for(const j of q){ try{ await tgSend(j); }catch(e){ left.push(j); } } tgQueueSet(left); _tgFlushing=false; }
 window.addEventListener('online',tgFlush); setTimeout(tgFlush,7000);
+
+/* =====================================================================
+   WHATSAPP ORDER NOTIFICATIONS  (config comes from Admin > Settings > WhatsApp)
+   - mode "server": POST {orderId,text,image} to /api/wa-notify (token stays on the server)
+   - mode "direct": Whapi.Cloud / UltraMsg called straight from the browser
+   - reuses the invoice PNG (tgInvoiceBlob); failed sends are queued and retried
+   ===================================================================== */
+const WA_QUEUE='bana_wa_queue';
+function waCfg(){ const c=state.wa; return (c&&c.enabled)?c:null; }
+function waTarget(raw){ const s=String(raw||'').trim(); if(!s) return null; if(/@(g\.us|c\.us|s\.whatsapp\.net)$/.test(s)) return s;
+  if(/^\d{8,15}-\d+$/.test(s)||/^\d{16,}$/.test(s)) return s+'@g.us'; let d=s.replace(/\D/g,''); if(/^01\d{9}$/.test(d)) d='88'+d; return /^\d{10,15}$/.test(d)?d:null; }
+const waB=s=>String(s==null?'':s).replace(/[*_~`]/g,'');      /* WhatsApp markup characters inside customer text are removed */
+function waText(o,items,stamp){ const pay=o.pay, due=Math.max(0,o.total-(pay?o.delivery:0)), dist=(DBN[o.district]||o.district||''), ph=String(o.phone).replace(/\D/g,'');
+  const L=['🛍 *নতুন অর্ডার — BANA FASHION*','🕒 আজকের তারিখ ও সময়: *'+stamp+'*','🆔 অর্ডার আইডি: *'+o.orderId+'*','',
+    '👤 *'+waB(o.customerName)+'*','📞 '+ph,'📍 '+waB(o.address)+(o.upazila?', '+waB(o.upazila):''),'🏙 জেলা: *'+waB(dist)+'*'+(o.division?' ('+(DVBN[o.division]||o.division)+' বিভাগ)':''),
+    ...(o.note?['📝 নোট: '+waB(o.note)]:[]), ...(o.geo?['🗺 https://www.google.com/maps?q='+o.geo.lat+','+o.geo.lng]:[]),'',
+    ...items.map(i=>'• '+waB(i.title)+' ('+waB(i.size)+') — '+BT(i.price)+' × '+BNUM(i.qty)+' = *'+BT(i.price*i.qty)+'*'),'',
+    'সাবটোটাল: '+BT(o.subtotal)+(o.discount?'\nডিসকাউন্ট: -'+BT(o.discount):'')+'\nডেলিভারি: '+(o.delivery?BT(o.delivery):'ফ্রি'),'💰 *সর্বমোট: '+BT(o.total)+'*','',
+    pay?'✅ *ডেলিভারি চার্জ অনলাইনে পরিশোধিত* ('+tgPayLbl(o)+', '+BT(pay.amount)+')\n🔖 ট্রানজেকশন আইডি: *'+waB(pay.trxId)+'*\n📲 সেন্ডার নম্বর: '+waB(pay.sender)+'\n⚠️ ট্রানজেকশন যাচাই বাকি'
+        :(o.delivery?'❌ ডেলিভারি চার্জ অনলাইনে পরিশোধ হয়নি (ক্যাশ অন ডেলিভারি)':'🎁 ফ্রি ডেলিভারি'),
+    '💵 ক্যাশ অন ডেলিভারিতে নেবেন: *'+BT(due)+'*','','💬 কাস্টমারকে মেসেজ: https://wa.me/88'+ph];
+  return L.join('\n').replace(/\n{3,}/g,'\n\n'); }
+function waCompact(o,stamp){ return '🛍 *নতুন অর্ডার — BANA FASHION*\n🕒 '+stamp+'\n🆔 *'+o.orderId+'*\n👤 '+waB(o.customerName)+' · '+String(o.phone).replace(/\D/g,'')+'\n💰 সর্বমোট: *'+BT(o.total)+'*'; }
+const waDataURL=b=>new Promise(r=>{ const f=new FileReader(); f.onload=()=>r(f.result); f.onerror=()=>r(''); f.readAsDataURL(b); });
+async function waJson(r){ const j=await r.json().catch(()=>({})); if(!r.ok||j.error) throw new Error((j.error&&(j.error.message||j.error))||j.message||('HTTP '+r.status)); return j; }
+async function waDirect(c,to,text,img){
+  if(c.provider==='ultramsg'){ const b='https://api.ultramsg.com/'+encodeURIComponent(c.instance)+'/messages/', f=new URLSearchParams({token:c.token,to});
+    if(img){ f.set('image',img.split(',')[1]); f.set('caption',text); return waJson(await fetch(b+'image',{method:'POST',body:f})); }
+    f.set('body',text); return waJson(await fetch(b+'chat',{method:'POST',body:f})); }
+  const h={'Content-Type':'application/json',Authorization:'Bearer '+c.token};                 /* Whapi.Cloud */
+  if(img) return waJson(await fetch('https://gate.whapi.cloud/messages/image',{method:'POST',headers:h,body:JSON.stringify({to,media:img,caption:text})}));
+  return waJson(await fetch('https://gate.whapi.cloud/messages/text',{method:'POST',headers:h,body:JSON.stringify({to,body:text})})); }
+async function waSend(job){ const c=waCfg(); if(!c) return; const o=job.order, text=waText(o,job.items,job.stamp), short=text.length<=1000;
+  const blob=job.blob||await tgInvoiceBlob(o,job.items,job.stamp), img=blob?await waDataURL(blob):'';
+  if(c.mode!=='direct'){ await waJson(await fetch(c.endpoint||'/api/wa-notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:o.orderId,text,image:img})})); return; }
+  const to=waTarget(c.target); if(!to||!c.token) return;
+  if(img){ try{ await waDirect(c,to,short?text:waCompact(o,job.stamp),img); if(!short) await waDirect(c,to,text); return; }catch(e){ console.warn('WhatsApp image failed, sending text only:',e.message); } }
+  await waDirect(c,to,text); }
+function waQueueGet(){ try{ return JSON.parse(localStorage.getItem(WA_QUEUE)||'[]'); }catch(e){ return []; } }
+function waQueueSet(a){ try{ localStorage.setItem(WA_QUEUE,JSON.stringify(a.slice(-10))); }catch(e){} }
+async function waNotify(o,job){ if(!waCfg()) return; try{ await waSend({order:o,items:job.items,stamp:job.stamp}); }
+  catch(e){ console.warn('WhatsApp notify failed (queued for retry):',e.message); const q=waQueueGet(); q.push({order:o,items:job.items.map(i=>({...i,image:''})),stamp:job.stamp}); waQueueSet(q); } }
+let _waFlushing=false;
+async function waFlush(){ if(_waFlushing||!waCfg()) return; const q=waQueueGet(); if(!q.length||!navigator.onLine) return; _waFlushing=true; const left=[];
+  for(const j of q){ try{ await waSend(j); }catch(e){ left.push(j); } } waQueueSet(left); _waFlushing=false; }
+window.addEventListener('online',waFlush); setTimeout(waFlush,8000);
 /* ---- success-page button: download the invoice card as PNG ---- */
 async function tgDownloadInvoice(){ const L=state.lastTg, o=state.lastOrder, b=$('tgDlBtn'); if(!L||!o) return; const old=b.innerHTML; b.disabled=true; b.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>ইনভয়েস তৈরি হচ্ছে...';
   const blob=await tgInvoiceBlob(o,L.items,L.stamp); b.disabled=false; b.innerHTML=old; if(!blob){ toast('ইনভয়েস ইমেজ তৈরি করা যায়নি, আবার চেষ্টা করুন',false); return; }
