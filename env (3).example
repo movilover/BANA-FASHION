@@ -1,0 +1,20 @@
+# ===== Railway > Variables এ এগুলো দিন (এই ফাইলটি শুধু উদাহরণ — আসল মান গিটে রাখবেন না) =====
+
+# Firebase > Project settings > Service accounts > "Generate new private key" -> JSON ফাইলের base64:
+#   Windows PowerShell:  [Convert]::ToBase64String([IO.File]::ReadAllBytes("key.json"))
+#   Mac/Linux:           base64 -w0 key.json
+FIREBASE_SERVICE_ACCOUNT_B64=
+
+# অ্যাডমিন লগইন ইমেইল (Firestore rules-এ যেটা আছে সেটাই)
+ADMIN_EMAIL=banafashiongazipur@gmail.com
+
+# (ঐচ্ছিক) অ্যাডমিন প্যানেলের পাথ — ডিফল্ট /admin। গোপন কিছু দিলে ভালো, যেমন: panel-x7k2
+ADMIN_PATH=admin
+
+# (ঐচ্ছিক) App Check চালু করলে 1 দিন (নিচে README দেখুন)
+ENFORCE_APPCHECK=0
+
+# (ডিবাগ) কোনো কিছু ব্লক হলে 1 দিয়ে দেখুন — ব্লক না করে শুধু কনসোলে জানাবে
+CSP_REPORT_ONLY=0
+
+NODE_ENV=production
