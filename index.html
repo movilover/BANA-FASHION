@@ -41,13 +41,14 @@
     if('arrayValue' in v) return (v.arrayValue.values||[]).map(cv);
     if('mapValue' in v){ var o={}, f=v.mapValue.fields||{}; for(var k in f) o[k]=cv(f[k]); return o; }
     if('referenceValue' in v) return v.referenceValue; if('geoPointValue' in v) return v.geoPointValue; return null; }
-  function net(){ var out=[];
-    function page(n,tok){ var u='https://firestore.googleapis.com/v1/projects/'+PID+'/databases/(default)/documents/products?pageSize=300&key='+KEY+(tok?'&pageToken='+encodeURIComponent(tok):'');
+  var FAST=['title','category','categories','badge','price','oldPrice','image','description','sizes','colors','rating','reviews','stock','home','eid','order','createdAt','brand','material','color'];
+  function net(fast){ var out=[], mask=fast?FAST.map(function(f){ return '&mask.fieldPaths='+f; }).join(''):'';
+    function page(n,tok){ var u='https://firestore.googleapis.com/v1/projects/'+PID+'/databases/(default)/documents/products?pageSize=300&key='+KEY+mask+(tok?'&pageToken='+encodeURIComponent(tok):'');
       return fetch(u).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
         (j.documents||[]).forEach(function(d){ var f=d.fields||{}, o={id:d.name.split('/').pop()}; for(var k in f) o[k]=cv(f[k]); out.push(o); });
         return (j.nextPageToken&&n<20)?page(n+1,j.nextPageToken):out; }); }
     return page(0,'').catch(function(){ return null; }); }
-  W.__PD={ cache:get('products'), net:net(), save:function(items){ try{ set('products',{t:Date.now(),items:JSON.parse(JSON.stringify(items))}); }catch(e){} } };
+  W.__PD={ cache:get('products'), net:net(true), full:function(){ return net(false); }, save:function(items){ try{ set('products',{t:Date.now(),items:JSON.parse(JSON.stringify(items))}); }catch(e){} } };
 })();
 </script>
 <title>BANA FASHION | প্রিমিয়াম মেনস ফ্যাশন</title>
@@ -1044,6 +1045,24 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
 #checkoutModal .co-mbar .cow-go:disabled{opacity:.7}
 #checkoutModal .co-mbar .cow-go::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(251,191,36,.35) 50%,transparent 70%);transform:translateX(-120%);animation:coShine 2.8s infinite;pointer-events:none}
 </style>
+<style id="bf-fix">
+/* ===== bug-fix layer: overlays fit the real phone screen, background never scrolls, big close (X) button ===== */
+html.bf-lock{overflow:hidden!important}
+#myoWrap,#trkWrap,#invWrap{overscroll-behavior:contain}
+#myoWrap,#trkWrap{height:100vh;height:100dvh;padding-top:env(safe-area-inset-top,0px)}
+#myoWrap>div{height:min(92vh,calc(100vh - 10px))!important;height:min(92dvh,calc(100dvh - 10px))!important;max-height:calc(100dvh - 10px)!important}
+@media(min-width:640px){#myoWrap>div{height:auto!important;max-height:88dvh!important}}
+#trkWrap>div{max-height:calc(100vh - 10px)!important;max-height:calc(100dvh - 10px)!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#myoBody{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
+#myoQ,#trkIn{font-size:16px}
+.bf-x{flex:none;width:40px;height:40px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:18px;line-height:1;transition:background .15s,transform .1s}
+.bf-x:hover{background:rgba(255,255,255,.2)}.bf-x:active{transform:scale(.92)}
+.bf-invbar{position:sticky;top:0;z-index:5;padding:8px 0;margin-top:-4px;background:linear-gradient(rgba(0,0,0,.9),rgba(0,0,0,.55) 80%,transparent)}
+#invWrap{padding-top:calc(.75rem + env(safe-area-inset-top,0px))}
+@media print{body>*:not(#invWrap){display:none!important}body{position:static!important;top:auto!important}#invWrap{position:static!important;background:#fff!important;overflow:visible!important;padding:0!important}.no-print{display:none!important}}
+/* lower sections are painted only when they come near the screen -> faster first load */
+#about,#services,#helpline,footer{content-visibility:auto;contain-intrinsic-size:auto 700px}
+</style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
 
@@ -2012,6 +2031,8 @@ function renderTabs(){
   requestAnimationFrame(()=>pgPill(false)); setTimeout(()=>pgPill(true),80);
 }
 function pgSwap(fn){ const g=$('productGrid'); g.classList.add('pg-out'); setTimeout(()=>{ fn(); g.classList.remove('pg-out'); },210); }
+const _ordT=p=>{ const c=p&&p.createdAt; if(!c) return 0; if(c.toMillis) return c.toMillis(); if(c.seconds) return c.seconds*1000; const x=typeof c==='string'?Date.parse(c):+c; return x||0; };
+function _ordCmp(a,b){ const NOW=_ordCmp.n||(_ordCmp.n=Date.now()); const k=p=>(p.order!=null&&p.order!==''&&!isNaN(+p.order))?+p.order:-(_ordT(p)||NOW); return k(a)-k(b); }
 function _num(v){ const n=parseFloat(String(v==null?'':v).replace(/[^\d.\-]/g,'')); return isNaN(n)?0:n; }
 function _pageSize(){ const mx=(state.site&&+state.site.maxProducts)||0; return mx>0?mx:8; }
 function resetLimit(){ state.limit=_pageSize(); }
@@ -2034,6 +2055,7 @@ function renderProducts(){
   if(state.sort==='low') list.sort((a,b)=>_num(a.price)-_num(b.price));
   else if(state.sort==='high') list.sort((a,b)=>_num(b.price)-_num(a.price));
   else if(state.sort==='rating') list.sort((a,b)=>(_num(b.rating)-_num(a.rating))||(_num(b.reviews)-_num(a.reviews)));
+  else list.sort(_ordCmp);
   if(!state.limit) resetLimit();
   $('emptyState').classList.toggle('hidden',list.length>0); try{ const pc=$('pgCount'); if(pc) pc.innerHTML='<b>'+bnum(list.length)+'</b>টি পণ্য পাওয়া গেছে'; }catch(e){} setTimeout(()=>grid.querySelectorAll('.pcard').forEach(c=>pio.observe(c)),0);
   grid.classList.toggle('hidden',list.length===0);
@@ -2044,7 +2066,7 @@ function renderProducts(){
         ${p.badge?`<span class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/85 text-gold-400 font-extrabold text-[10px] uppercase tracking-wider">${esc(badgeBn(p.badge))}</span>`:''}
         ${off>0?`<span class="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-md btn-gold font-extrabold text-[10px]">-${off}%</span>`:''}
         <button onclick="event.stopPropagation();toggleWishlist('${p.id}')" class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-all ${wl?'text-rose-500':'text-slate-700'}"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
-        ${(()=>{ const im=(p.images&&p.images.length?p.images:[p.image]); const all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0" style="transition:transform .8s cubic-bezier(.65,0,.35,1)">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>${im.length>1?`<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">${im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}`; })()}
+        ${(()=>{ const im=(p.images&&p.images.length?p.images:[p.image]); const all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0" style="transition:transform .8s cubic-bezier(.65,0,.35,1)">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>${im.length>1?`<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">${im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}`; })()}
         <div class="hidden sm:flex absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity justify-center"><span class="w-full py-2.5 rounded-xl bg-white text-ink-900 text-center font-extrabold text-xs">দেখুন ও অর্ডার করুন <i class="fa-solid fa-arrow-right ml-1"></i></span></div>
       </div>
       <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between">
@@ -2065,7 +2087,7 @@ function renderProducts(){
 }
 
 /* ===== product card auto image slider ===== */
-setInterval(()=>{ if(document.hidden) return; document.querySelectorAll('.pslide').forEach((el,k)=>{ const n=+el.dataset.n; if(n<2||el.closest('.pcard:hover')) return; let i=+el.dataset.i+1; el.style.transition='transform .8s cubic-bezier(.65,0,.35,1)'; el.style.transform=`translateX(-${i*100}%)`; el.dataset.i=i;
+setInterval(()=>{ if(document.hidden) return; document.querySelectorAll('.pslide').forEach((el,k)=>{ const n=+el.dataset.n; if(n<2||el.closest('.pcard:hover')) return; const _r=el.getBoundingClientRect(); if(!_r.height||_r.bottom<0||_r.top>innerHeight) return; let i=+el.dataset.i+1; el.style.transition='transform .8s cubic-bezier(.65,0,.35,1)'; el.style.transform=`translateX(-${i*100}%)`; el.dataset.i=i;
   const dots=el.parentElement.querySelectorAll('.pdot'); dots.forEach((d,j)=>{ const on=j===(i%n); d.classList.toggle('bg-white',on); d.classList.toggle('bg-white/50',!on); });
   if(i>=n){ setTimeout(()=>{ el.style.transition='none'; el.style.transform='translateX(0)'; el.dataset.i=0; },850); } }); },2800);
 /* robust category match: product.category may hold the id, the Bengali/English label, or differ in case/spacing */
@@ -2081,6 +2103,26 @@ function handleSearch(v){ if(v&&document.body.classList.contains('pp-open')){ hi
 function setSort(v){ state.sort=v; resetLimit(); pgSwap(renderProducts); }
 function resetFilters(){ state.cat='all'; state.q=''; resetLimit(); $('searchInput').value=''; $('mobileSearchInput').value=''; renderTabs(); renderProducts(); }
 
+/* phase 2: the full list (all photos of every product) is fetched quietly AFTER the first paint, then cards are patched in place — no flicker, no hang */
+function bfHydrate(){
+  const PD=window.__PD||{}; if(!PD.full||state._hyd) return; state._hyd=1;
+  const go=async()=>{
+    try{
+      const it=await PD.full(); if(!it||!it.length) return;
+      if(PD.save) PD.save(it);
+      const m=new Map(it.map(x=>[x.id,normProduct({...x})])), ch=[];
+      state.products.forEach(p=>{ const f=m.get(p.id); if(!f||!f.images||!f.images.length) return; const a=p.images||[]; if(a.length===f.images.length&&a[0]===f.images[0]) return; p.images=f.images; ch.push(p.id); });
+      ch.forEach(id=>{ const p=state.products.find(x=>x.id===id); if(!p||!p.images||p.images.length<2) return; const im=p.images;
+        [...document.querySelectorAll('.pcard[data-pid]')].filter(c=>c.getAttribute('data-pid')===id).forEach(card=>{ const sl=card.querySelector('.pslide'); if(!sl) return;
+          sl.dataset.n=im.length; sl.dataset.i=0; sl.style.transition='none'; sl.style.transform='translateX(0)';
+          sl.innerHTML=[...im,im[0]].map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('');
+          if(!card.querySelector('.pdots')) sl.insertAdjacentHTML('afterend','<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">'+im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')+'</div>'); }); });
+      if(ch.length&&document.body.classList.contains('pp-open')&&state.pp&&ch.includes(state.pp.id)){ const a=document.activeElement; if(!(a&&/INPUT|TEXTAREA/.test(a.tagName))){ try{ renderPP(); }catch(e){} } }
+    }catch(e){}
+  };
+  const kick=()=>{ (window.requestIdleCallback||(f=>setTimeout(f,300)))(go,{timeout:4000}); };
+  if(document.readyState==='complete') setTimeout(kick,500); else addEventListener('load',()=>setTimeout(kick,500),{once:true});
+}
 async function loadFirestoreProducts(){
   try{ ['bana_products','bana_cache','bana_orders'].forEach(k=>{ if(FIREBASE_READY) localStorage.removeItem(k); }); }catch(e){}
   const _mk=p=>normProduct({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p}),
@@ -2091,13 +2133,13 @@ async function loadFirestoreProducts(){
     try{ const c=await Promise.race([PD.cache||Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),700))]);
       if(c&&c.items&&c.items.length){ state.products=c.items.map(_mk); state.loaded=true; _cs=_sig(state.products); renderProducts(); } }catch(e){}
     /* 2) fresh list, already downloading since the first byte (see PRODUCT PREFETCH in <head>) */
-    try{ const it=PD.net?await PD.net:null; if(it){ state.products=it.map(_mk); state.fetchOk=true; if(PD.save) PD.save(it); } }catch(e){}
+    try{ const it=PD.net?await PD.net:null; if(it){ const oldM=new Map((state.products||[]).map(x=>[x.id,x])); state.products=it.map(x=>{ const q=_mk(x), o=oldM.get(q.id); if(o&&o.images&&o.images.length&&!(q.images&&q.images.length)) q.images=o.images; return q; }); state.fetchOk=true; state._fast=true; } }catch(e){}
     /* 3) fallback: Firebase SDK, up to 3 attempts */
     for(let tryN=0;tryN<3&&!state.fetchOk;tryN++){      /* up to 3 attempts so a flaky connection does not leave the shop empty */
       try{
         const snap=await getDocs(collection(db,'products'));
         const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()}));
-        state.products=items.map(p=>normProduct({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); state.fetchOk=true; if(PD.save) PD.save(items);
+        state.products=items.map(p=>normProduct({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); state.fetchOk=true; state._fast=false; if(PD.save) PD.save(items);
       }catch(e){ console.warn('Firestore products not loaded (try '+(tryN+1)+'):',e.message); state.products=state.products||[]; if(tryN<2) await new Promise(r=>setTimeout(r,900*(tryN+1))); }
     }
   } else state.fetchOk=true;
@@ -2107,7 +2149,7 @@ async function loadFirestoreProducts(){
   /* drop cart / wishlist entries of deleted products and refresh price, title, image */
   if(state.fetchOk){ state.cart=state.cart.filter(i=>state.products.some(p=>p.id===i.id)).map(i=>{ const p=state.products.find(x=>x.id===i.id); return {...i,title:p.title,price:p.price,image:p.image||(p.images&&p.images[0])||i.image||''}; });
   state.wishlist=state.wishlist.filter(id=>state.products.some(p=>p.id===id)); save('bana_wish',state.wishlist); }
-  if(!_same) renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash();
+  if(!_same) renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash(); try{ if(state._fast) bfHydrate(); }catch(e){}
 }
 
 /* ===== ADMIN-LINKED: site settings, categories, payment ===== */
@@ -2212,8 +2254,8 @@ function invHTML(o){
   <div class="flex justify-between text-base font-bold border-t pt-2"><span>সর্বমোট:</span><span style="color:#D99B00">${BT(o.total)}</span></div><div class="flex justify-between font-bold"><span>ক্যাশ অন ডেলিভারিতে দেবেন:</span><span>${BT(due)}</span></div></div></div>
   <div class="pt-6 border-t flex justify-between items-end text-xs text-gray-500"><div class="text-center"><div class="w-32 border-b border-gray-400 mb-1"></div>গ্রাহকের স্বাক্ষর</div><div class="text-center"><div class="w-32 border-b mb-1" style="border-color:#D99B00"></div><b style="color:#D99B00">Bana Fashion Authorized</b></div></div>`;
 }
-function showInvoice(o){ const old=document.getElementById('invWrap'); if(old) old.remove(); const w=document.createElement('div'); w.id='invWrap'; w.className='fixed inset-0 z-[120] bg-black/85 overflow-y-auto p-3 sm:p-6';
-  w.innerHTML=`<div class="max-w-3xl mx-auto flex gap-2 justify-end mb-3 no-print"><button onclick="window.print()" class="font-bold px-5 py-2.5 rounded-xl text-sm" style="background:#FFB800;color:#000"><i class="fa-solid fa-print mr-2"></i>প্রিন্ট / ডাউনলোড</button><button onclick="document.getElementById('invWrap').remove()" class="bg-white/15 text-white font-bold px-4 py-2.5 rounded-xl text-sm">বন্ধ করুন</button></div><div id="invSheet" class="max-w-3xl mx-auto bg-white text-black rounded-2xl p-6 sm:p-10 space-y-6" style="font-family:'Hind Siliguri',sans-serif">${invHTML(o)}</div>`;
+function showInvoice(o){ const old=document.getElementById('invWrap'); if(old) old.remove(); const w=document.createElement('div'); w.id='invWrap'; w.className='fixed inset-0 z-[120] bg-black/85 overflow-y-auto p-3 sm:p-6'; w.onclick=e=>{ if(e.target===w) w.remove(); };
+  w.innerHTML=`<div class="max-w-3xl mx-auto flex gap-2 justify-end mb-3 no-print bf-invbar"><button onclick="window.print()" class="font-bold px-5 py-2.5 rounded-xl text-sm" style="background:#FFB800;color:#000"><i class="fa-solid fa-print mr-2"></i>প্রিন্ট / ডাউনলোড</button><button onclick="document.getElementById('invWrap').remove()" class="bg-white/15 text-white font-bold px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-xmark mr-1.5"></i>বন্ধ করুন</button></div><div id="invSheet" class="max-w-3xl mx-auto bg-white text-black rounded-2xl p-6 sm:p-10 space-y-6" style="font-family:'Hind Siliguri',sans-serif">${invHTML(o)}</div>`;
   document.body.appendChild(w); try{ new QRCode(document.getElementById('invQR'),{text:location.origin+location.pathname+'?verify='+encodeURIComponent(o.orderId),width:88,height:88,correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
 
 /* ===== ORDER TRACKING (live from admin / Steadfast sync) ===== */
@@ -2227,7 +2269,7 @@ function openTrack(id){
   const w=document.createElement('div'); w.id='trkWrap'; w.className='fixed inset-0 z-[135] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4'; w.onclick=e=>{ if(e.target===w) closeTrack(); };
   const rec=trkList();
   w.innerHTML=`<div class="pop w-full max-w-md rounded-t-3xl sm:rounded-3xl bg-ink-900 border border-gold-500/30 text-white p-5 max-h-[92vh] overflow-y-auto">
-    <div class="flex items-center justify-between mb-3"><div class="font-display font-extrabold tracking-wider"><i class="fa-solid fa-truck-fast text-gold-400 mr-2"></i>অর্ডার ট্র্যাক করুন</div><button type="button" onclick="closeTrack()" class="text-silver-400 text-xl" aria-label="বন্ধ করুন"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="flex items-center justify-between mb-3"><div class="font-display font-extrabold tracking-wider"><i class="fa-solid fa-truck-fast text-gold-400 mr-2"></i>অর্ডার ট্র্যাক করুন</div><button type="button" onclick="closeTrack()" class="bf-x" aria-label="বন্ধ করুন"><i class="fa-solid fa-xmark"></i></button></div>
     <form onsubmit="event.preventDefault();doTrack($('trkIn').value);" class="flex gap-2"><input id="trkIn" class="flex-1 min-w-0 px-3 py-3 rounded-xl bg-black/50 border border-white/15 text-sm uppercase tracking-wider outline-none focus:border-gold-500" placeholder="অর্ডার আইডি (যেমন BF-XXXX)" autocomplete="off"><button class="btn-gold px-4 rounded-xl font-extrabold text-sm">খুঁজুন</button></form>
     ${rec.length?`<div class="flex flex-wrap gap-1.5 mt-2">${rec.map(r=>`<button type="button" onclick="doTrack('${esc(r)}')" class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 border border-white/15 text-silver-300 font-bold">${esc(r)}</button>`).join('')}</div>`:''}
     <div id="trkOut" class="mt-4"></div></div>`;
@@ -2378,7 +2420,7 @@ function ppAdd(buy){
   addToCart(p.id,S.qty,variant,false);
 }
 function ppHeart(btn,id){ toggleWishlist(id); const on=state.wishlist.includes(id); btn.className=btn.className.replace(/text-rose-500|text-slate-700/,on?'text-rose-500':'text-slate-700'); btn.querySelector('i').className=(on?'fa-solid':'fa-regular')+' fa-heart'; }
-function ppSlide(p){ const im=ppImgs(p), all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>`; }
+function ppSlide(p){ const im=ppImgs(p), all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>`; }
 function ppRelCard(p,i){
   const wl=state.wishlist.includes(p.id);
   return `<div class="pcard group cursor-pointer" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
@@ -2912,7 +2954,7 @@ function myoPatch(id,p){ const a=myoList(), i=a.findIndex(x=>x.orderId===id); if
 const MYO_DONE=['delivered','cancelled','returned'], MYO_BAD=['cancelled','returned','rejected'];
 const myoIsBad=s=>MYO_BAD.includes(s);
 function myoBadge(){ const b=$('myoBadge'); if(!b) return; const n=myoList().filter(o=>!MYO_DONE.includes(o.status||'pending')).length; b.textContent=bnum(n); b.classList.toggle('opacity-0',!n); b.classList.toggle('scale-0',!n); }
-const myoNorm=v=>{ let d=String(v||'').replace(/\D/g,''); if(d.startsWith('88')&&d.length===13) d=d.slice(2); return d; };
+const myoNorm=v=>{ let d=String(v||'').replace(/[০-৯]/g,x=>'০১২৩৪৫৬৭৮৯'.indexOf(x)).replace(/\D/g,''); if(d.startsWith('88')&&d.length===13) d=d.slice(2); return d; };
 const myoPhoneOk=p=>/^01[3-9]\d{8}$/.test(p);
 const myoMask=p=>p?p.slice(0,3)+'••••'+p.slice(-2):'';
 let myoUnsubs=[];
@@ -2922,8 +2964,10 @@ function closeMyOrders(){ myoUnsubs.forEach(u=>{ try{u();}catch(e){} }); myoUnsu
 
 /* ---- server calls (same-origin /api — the Railway server that already handles WhatsApp / Steadfast) ---- */
 async function myoApi(path,body){
-  let r; try{ r=await fetch('/api'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); }
+  let r, ctl=('AbortController' in window)?new AbortController():null, tmo=ctl?setTimeout(()=>ctl.abort(),9000):0;
+  try{ r=await fetch('/api'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),...(ctl?{signal:ctl.signal}:{})}); }
   catch(e){ throw {code:'net',message:'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না। একটু পরে আবার চেষ্টা করুন।'}; }
+  finally{ clearTimeout(tmo); }
   const j=await r.json().catch(()=>null);
   if(!j) throw {code:'net',message:'সার্ভার এখন উত্তর দিচ্ছে না। একটু পরে আবার চেষ্টা করুন।'};
   if(!r.ok||j.error) throw {code:j.error||('http_'+r.status),message:j.message||'কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন।',data:j};
@@ -2986,7 +3030,7 @@ function myoDetailHTML(o){
     ${masked?'':`<button type="button" onclick="myoInv('${id}')" class="flex-1 py-2.5 rounded-xl bg-white/5 border border-gold-500/40 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-file-invoice mr-1.5"></i>ইনভয়েস</button>`}
     <button type="button" onclick="openTrack('${id}')" class="flex-1 py-2.5 rounded-xl btn-gold text-xs font-extrabold"><i class="fa-solid fa-truck-fast mr-1.5"></i>ট্র্যাক করুন</button>
   </div>`; }
-function myoRenderDetail(o){ const b=$('myoBody'); if(!b||!o) return; b.innerHTML='<div class="pop">'+myoDetailHTML(o)+'</div>'; b.scrollTop=0; }
+function myoRenderDetail(o){ const b=$('myoBody'); if(!b||!o) return; b.innerHTML='<div class="pop">'+(o.receiptOnly?myoReceiptHTML(o):myoDetailHTML(o))+'</div>'; b.scrollTop=0; }
 function myoOpen(id){ const o=myoSt.pool.get(id)||myoList().find(x=>x.orderId===id); if(!o) return; myoSt.openId=id; myoSt.openSrc=o.masked?'search':(myoList().some(x=>x.orderId===id)?'local':'search'); myoRenderDetail(o); }
 function myoBack(){ myoSt.openId=null; if(myoSt.last&&myoSt.last.kind==='results'){ const l=myoSt.last; myoShowResults(l.ph,l.list,l.verified); } else myoRender(); }
 function myoInv(id){ const o=myoSt.pool.get(id)||myoList().find(x=>x.orderId===id); if(o&&!o.masked) showInvoice(o); }
@@ -3005,21 +3049,37 @@ const myoMsg=(ic,t,s,btn)=>{ const b=$('myoBody'); if(b) b.innerHTML=`<div class
 /* ---- search (Order ID or mobile number) ---- */
 async function myoSearch(e){ if(e) e.preventDefault(); const raw=($('myoQ').value||'').trim(); if(!raw){ toast('অর্ডার আইডি বা মোবাইল নম্বর লিখুন',false); return; }
   const ph=myoNorm(raw); if(myoPhoneOk(ph)) return myoByPhone(ph);
-  const id=raw.toUpperCase().replace(/\s+/g,''); if(/^BF-[A-Z0-9]{4,}$/.test(id)) return myoById(id);
+  let id=raw.toUpperCase().replace(/\s+/g,''); if(/^BF[A-Z0-9]{4,}$/.test(id)) id='BF-'+id.slice(2); if(/^BF-[A-Z0-9]{4,}$/.test(id)) return myoById(id);
   toast('সঠিক মোবাইল নম্বর (01XXXXXXXXX) অথবা অর্ডার আইডি (BF-XXXX) দিন',false); }
 async function myoById(id){ const loc=myoList().find(x=>x.orderId===id); if(loc){ myoOpen(id); return; }
   myoLoad('অর্ডার খোঁজা হচ্ছে...');
   try{ const j=await myoApi('/orders/lookup',{orderId:id}); const o=(j.orders||[])[0]; if(!o) throw {code:'not_found'}; myoSt.last={kind:'home'}; myoSt.pool.set(o.orderId,o); myoSt.openId=o.orderId; myoSt.openSrc='search'; myoRenderDetail(o); }
-  catch(e){ if(e.code==='not_found'||e.code==='http_404') myoMsg('fa-circle-exclamation','এই আইডিতে কোনো অর্ডার পাওয়া যায়নি','আইডিটি আবার মিলিয়ে দেখুন (যেমন BF-XXXXXXXX)');
-    else { myoRender(); openTrack(id); } } }
+  catch(e){ const rc=await myoReceipt(id);
+    if(rc){ myoSt.last={kind:'home'}; myoSt.pool.set(rc.orderId,rc); myoSt.openId=rc.orderId; myoSt.openSrc='search'; myoRenderDetail(rc); }
+    else if(e.code==='not_found'||e.code==='http_404'||FIREBASE_READY) myoMsg('fa-circle-exclamation','এই আইডিতে কোনো অর্ডার পাওয়া যায়নি','আইডিটি আবার মিলিয়ে দেখুন (যেমন BF-XXXXXXXX)');
+    else myoMsg('fa-circle-exclamation','এখন খোঁজা যাচ্ছে না','ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন'); } }
+/* fallback when the server lookup is unavailable: the public order receipt (status / tracking) is read straight from the database */
+async function myoReceipt(id){ if(!FIREBASE_READY) return null; try{ const s=await getDoc(doc(db,'receipts',id)); if(!s.exists()) return null; const r=s.data();
+  return {orderId:r.orderId||id,status:r.status||'pending',total:r.total||0,customerName:r.name||'',createdAt:r.createdAt||null,tracking:r.tracking||'',courierName:typeof r.courier==='string'?r.courier:'',live:r.live||'',items:[],masked:true,receiptOnly:true}; }catch(e){ return null; } }
+function myoReceiptHTML(o){ const st=o.status||'pending', bad=myoIsBad(st), id=esc(o.orderId), tr=o.tracking||'', cn=o.courierName||'কুরিয়ার';
+  return `<button type="button" onclick="myoBack()" class="text-xs font-bold text-silver-300 hover:text-gold-400 mb-3"><i class="fa-solid fa-arrow-left mr-1.5"></i>ফিরে যান</button>
+  <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+    <div class="flex justify-between items-start gap-2"><div><div class="text-[10px] text-silver-400">অর্ডার আইডি</div><div class="font-extrabold tracking-wider text-gold-400">${id}</div>${myoDate(o)&&o.createdAt?`<div class="text-[10px] text-silver-400 mt-0.5">${myoDS(o,true)}</div>`:''}</div>${myoChip(st)}</div>
+    ${o.customerName?`<div class="text-xs text-silver-300 mt-2">${esc(o.customerName)}</div>`:''}
+    ${bad?`<div class="mt-3 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold">${st==='cancelled'?'এই অর্ডারটি বাতিল করা হয়েছে।':'এই অর্ডারটি রিটার্ন/রিজেক্ট হয়েছে।'}</div>`:`<div class="flex mt-4">${myoDots(st)}</div>`}
+    ${tr?`<div class="mt-3 p-2.5 rounded-xl bg-black/40 border border-gold-500/25 text-[11px]"><span class="text-silver-400">${esc(cn)} ট্র্যাকিং:</span> <span class="font-mono font-extrabold text-white break-all">${esc(tr)}</span>${o.live?`<div class="text-gold-400 font-bold mt-0.5"><i class="fa-solid fa-satellite-dish mr-1"></i>${esc(TRK_LIVE[o.live]||o.live)}</div>`:''}</div>`:''}
+    <div class="flex justify-between items-center mt-3 pt-3 border-t border-white/10 text-[11px]"><span class="text-silver-400">মোট</span><b class="text-gold-400 text-sm">${money(o.total)}</b></div>
+    <div class="mt-2.5 p-2 rounded-lg bg-gold-500/10 border border-gold-500/25 text-[10px] text-gold-400"><i class="fa-solid fa-shield-halved mr-1"></i>গোপনীয়তার জন্য শুধু অর্ডারের অবস্থা দেখানো হচ্ছে।</div>
+  </div>
+  <div class="flex gap-2 mt-3 pb-1"><button type="button" onclick="openTrack('${id}')" class="flex-1 py-2.5 rounded-xl btn-gold text-xs font-extrabold"><i class="fa-solid fa-truck-fast mr-1.5"></i>ট্র্যাক করুন</button></div>`; }
 async function myoByPhone(ph){
   if(myoSt.cfg.enabled){ if(myoSt.sess&&myoSt.sess.phone===ph&&myoSt.sess.exp>Date.now()) return myoShowResults(ph,myoSt.sess.orders,true); return myoOtpStart(ph); }
   myoLoad('এই নম্বরের অর্ডার খোঁজা হচ্ছে...');
   try{ const j=await myoApi('/orders/lookup',{phone:ph}); if(!Array.isArray(j.orders)) throw {code:'net'}; myoShowResults(ph,j.orders,false); }
   catch(e){ if(e.code==='otp_required'){ myoSt.cfg.enabled=true; return myoOtpStart(ph); }
     const mine=myoList().filter(o=>myoNorm(o.phone)===ph);
-    if(mine.length&&e.code==='net'){ myoShowResults(ph,mine,true,'সার্ভার সংযোগ নেই — শুধু এই ডিভাইসে সংরক্ষিত অর্ডার দেখানো হচ্ছে'); }
-    else myoMsg('fa-circle-exclamation',esc(e.message||'খুঁজে পাওয়া যায়নি'),''); } }
+    if(mine.length&&(e.code==='net'||/^http_(404|5\d\d)$/.test(e.code||''))){ myoShowResults(ph,mine,true,'সার্ভার সংযোগ নেই — শুধু এই ডিভাইসে সংরক্ষিত অর্ডার দেখানো হচ্ছে'); }
+    else myoMsg('fa-circle-exclamation',esc(e.message||'খুঁজে পাওয়া যায়নি'),(e.code==='net'||/^http_/.test(e.code||''))?'এখন অর্ডার আইডি (যেমন BF-XXXXXXXX) দিয়ে খুঁজলে সরাসরি দেখা যাবে':''); } }
 
 /* ---- results for a phone number: customer summary + orders ---- */
 function myoShowResults(ph,list,verified,note){ const box=$('myoBody'); if(!box) return; myoClearTimer();
@@ -3089,7 +3149,7 @@ const myoHintHTML=()=>myoSt.cfg.enabled?'<i class="fa-solid fa-shield-halved tex
 function openMyOrders(){ closeMyOrders(); myoSt.pool=new Map(); myoSt.last={kind:'home'};
   const w=document.createElement('div'); w.id='myoWrap'; w.className='fixed inset-0 z-[118] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4'; w.onclick=e=>{ if(e.target===w) closeMyOrders(); };
   w.innerHTML=`<div class="pop w-full max-w-md rounded-t-3xl sm:rounded-3xl bg-ink-900 border border-gold-500/30 text-white h-[92vh] sm:h-auto sm:max-h-[88vh] flex flex-col overflow-hidden">
-    <div class="flex items-center justify-between px-5 pt-5 pb-3"><div class="font-display font-extrabold tracking-wider"><i class="fa-solid fa-receipt text-gold-400 mr-2"></i>আপনার অর্ডার</div><button type="button" onclick="closeMyOrders()" class="text-silver-400 text-xl" aria-label="বন্ধ করুন"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="flex items-center justify-between px-5 pt-5 pb-3"><div class="font-display font-extrabold tracking-wider"><i class="fa-solid fa-receipt text-gold-400 mr-2"></i>আপনার অর্ডার</div><button type="button" onclick="closeMyOrders()" class="bf-x" aria-label="বন্ধ করুন"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="px-5 pb-3 border-b border-white/10"><form onsubmit="myoSearch(event)" class="flex gap-2"><div class="relative flex-1 min-w-0"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-silver-400 text-xs"></i><input id="myoQ" class="w-full pl-9 pr-3 py-3 rounded-xl bg-black/50 border border-white/15 text-sm outline-none focus:border-gold-500" placeholder="অর্ডার আইডি বা মোবাইল নম্বর" autocomplete="off" enterkeyhint="search"></div><button class="btn-gold px-4 rounded-xl font-extrabold text-sm" aria-label="খুঁজুন">খুঁজুন</button></form><div id="myoHint" class="text-[10px] text-silver-400 mt-2">${myoHintHTML()}</div></div>
     <div id="myoBody" class="flex-1 overflow-y-auto px-5 py-4"></div></div>`;
   document.body.appendChild(w); myoRender(); myoSync(); myoCfgWatch(); }
@@ -3639,6 +3699,21 @@ setTimeout(()=>{ (window.__q||[]).splice(0,5).forEach(c=>{ try{ window[c[0]].app
     if(window.openProduct) window.openProduct(s.id);
   },{passive:true});
   ['pointercancel','pointerleave'].forEach(function(ev){ g.addEventListener(ev,function(){ d=null; end(); },{passive:true}); });
+})();
+</script>
+<script id="bf-lock">
+/* page behind an open sheet/invoice is frozen (no scroll through, no jump); Esc closes the top-most sheet */
+(function(){
+  var IDS=['myoWrap','trkWrap','invWrap'], on=false, y=0;
+  function any(){ for(var i=0;i<IDS.length;i++){ if(document.getElementById(IDS[i])) return true; } return false; }
+  function lock(){ if(on) return; on=true; y=window.pageYOffset||document.documentElement.scrollTop||0; var s=document.body.style; s.position='fixed'; s.top=(-y)+'px'; s.left='0'; s.right='0'; s.width='100%'; document.documentElement.classList.add('bf-lock'); }
+  function unlock(){ if(!on) return; on=false; var s=document.body.style; s.position=''; s.top=''; s.left=''; s.right=''; s.width=''; document.documentElement.classList.remove('bf-lock'); try{ window.scrollTo({top:y,left:0,behavior:'instant'}); }catch(e){ window.scrollTo(0,y); } }
+  function sync(){ if(any()) lock(); else unlock(); }
+  new MutationObserver(sync).observe(document.body,{childList:true});
+  document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return;
+    var w=document.getElementById('invWrap'); if(w){ w.remove(); e.stopImmediatePropagation(); return; }
+    if(document.getElementById('trkWrap')&&window.closeTrack){ window.closeTrack(); e.stopImmediatePropagation(); return; }
+    if(document.getElementById('myoWrap')&&window.closeMyOrders){ window.closeMyOrders(); e.stopImmediatePropagation(); } });
 })();
 </script>
 </body>
