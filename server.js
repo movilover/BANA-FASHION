@@ -7,11 +7,18 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 
-require('./lib/firebase'); // credential না থাকলে এখানেই স্টার্টআপ ফেল (নিরাপদ ডিফল্ট)
+require('./firebase'); // credential না থাকলে এখানেই স্টার্টআপ ফেল (নিরাপদ ডিফল্ট)
 
 const app = express();
 const PROD = process.env.NODE_ENV === 'production';
-const PUBLIC = path.join(__dirname, 'public');
+const fs = require('fs');
+/* সব ফাইল একই ফোল্ডারে (গিটহাবের রুটে) — তাই সার্ভার নিজে index ও admin HTML খুঁজে নেয়।
+   শুধু এই দুটি ফাইলই বাইরে দেওয়া হয়; server.js, rules ইত্যাদি কখনো খোলা হয় না। */
+const FILES = fs.readdirSync(__dirname);
+const INDEX_FILE = FILES.includes('index.html') ? 'index.html' : FILES.find((f) => /\.html$/i.test(f) && !/^(admin|rul)/i.test(f));
+const ADMIN_FILE = FILES.find((f) => /^admin.*\.html$/i.test(f));
+if (!INDEX_FILE) console.warn('⚠️ index.html পাওয়া যায়নি — গিটহাবে আপলোড করেছেন তো?');
+if (!ADMIN_FILE) console.warn('⚠️ admin HTML ফাইল পাওয়া যায়নি (নাম admin দিয়ে শুরু হতে হবে)');
 const ADMIN_PATH = (process.env.ADMIN_PATH || '/admin').replace(/\/+$/, '') || '/admin';
 const EXTRA_ORIGINS = String(process.env.SITE_ORIGINS || '').split(',').map((s) => s.trim().replace(/\/+$/, '')).filter(Boolean);
 
@@ -74,24 +81,19 @@ app.use('/api', (req, res, next) => {
 
 /* ---------- API ---------- */
 app.get('/healthz', (req, res) => res.type('text').send('ok'));
-app.use('/api', require('./routes/products'));
-app.use('/api', require('./routes/wa'));
-app.use('/api', require('./routes/steadfast'));
+app.use('/api', require('./products'));
+app.use('/api', require('./wa'));
+app.use('/api', require('./steadfast'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 
-/* ---------- স্ট্যাটিক ফাইল ---------- */
-app.get([ADMIN_PATH, ADMIN_PATH + '.html', '/admin.html'], (req, res) => {
-  res.set({ 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' });
-  res.sendFile(path.join(PUBLIC, 'admin.html'));
-});
-app.use(express.static(PUBLIC, {
-  dotfiles: 'deny', index: 'index.html', extensions: ['html'],
-  setHeaders: (res, f) => {
-    if (/admin\.html$/.test(f)) return res.status(404); // সরাসরি /admin.html দিয়ে নয়, ADMIN_PATH দিয়েই
-    res.setHeader('Cache-Control', /\.html$/.test(f) ? 'no-cache' : 'public, max-age=86400');
-  },
-}));
-app.use((req, res) => res.status(404).sendFile(path.join(PUBLIC, 'index.html')));
+/* ---------- পেজ (শুধু দুটি ফাইল) ---------- */
+const page = (file, headers) => (req, res) => {
+  if (!file) return res.status(404).type('text').send('Not found');
+  res.set(headers); res.sendFile(path.join(__dirname, file));
+};
+app.get(['/', '/index.html'], page(INDEX_FILE, { 'Cache-Control': 'no-cache' }));
+app.get([ADMIN_PATH, ADMIN_PATH + '.html'], page(ADMIN_FILE, { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' }));
+app.use((req, res) => (req.method === 'GET' && !path.extname(req.path)) ? page(INDEX_FILE, { 'Cache-Control': 'no-cache' })(req, res) : res.status(404).type('text').send('Not found'));
 
 /* ---------- ত্রুটি হ্যান্ডলার (স্ট্যাক ট্রেস কখনো বাইরে যায় না) ---------- */
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
