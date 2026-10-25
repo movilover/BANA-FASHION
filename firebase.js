@@ -13,7 +13,10 @@ function loadCredential() {
   return json;
 }
 
-admin.initializeApp({ credential: admin.credential.cert(loadCredential()) });
+if (!admin.apps.length) {
+  admin.initializeApp({ credential: admin.credential.cert(loadCredential()) });
+}
+
 const db = admin.firestore();
 db.settings({ ignoreUndefinedProperties: true });
 
