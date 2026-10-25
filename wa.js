@@ -3,9 +3,9 @@
    POST /api/wa-notify    — কাস্টমার: নতুন অর্ডারের পর WhatsApp অ্যালার্ট (সার্ভার অর্ডার নিজে পড়ে মেসেজ বানায়)
    POST /api/wa           — অ্যাডমিন: test / groups */
 const router = require('express').Router();
-const { db } = require('../lib/firebase');
-const { requireUser, requireAdmin, appCheck } = require('../lib/auth');
-const wa = require('../lib/whatsapp');
+const { db } = require('./firebase');
+const { requireUser, requireAdmin, appCheck } = require('./auth');
+const wa = require('./whatsapp');
 
 const ORDER_ID = /^BF-[A-Z0-9]{4,20}$/;
 const money = (n) => '৳' + Math.round(Number(n) || 0).toLocaleString('en-US');
