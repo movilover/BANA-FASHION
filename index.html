@@ -1063,6 +1063,24 @@ html.bf-lock{overflow:hidden!important}
 /* lower sections are painted only when they come near the screen -> faster first load */
 #about,#services,#helpline,footer{content-visibility:auto;contain-intrinsic-size:auto 700px}
 </style>
+
+<style id="catFour">
+/* categories: always 4 per row; first 2 rows visible, rest behind the "আরো দেখুন" button */
+#catRow{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:18px 8px!important;max-width:680px;margin-left:auto;margin-right:auto}
+#catRow .cat-ic{width:min(100%,92px)!important}
+#catRow .cat-name{font-size:12px!important;line-height:1.25;text-align:center}
+@media(min-width:640px){#catRow{gap:26px 14px!important}#catRow .cat-ic{width:min(100%,108px)!important}#catRow .cat-name{font-size:14px!important}}
+@media(min-width:1024px){#catRow{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+#catRow.cat-collapsed .cat-card.cat-extra{display:none!important}
+#catRow .cat-card.cat-extra{animation:catExtraIn .45s ease both}
+@keyframes catExtraIn{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:none}}
+#catMoreWrap{display:flex;justify-content:center;margin-top:22px}
+.cat-more{display:inline-flex;align-items:center;gap:10px;padding:8px 20px 8px 9px;border-radius:9999px;background:linear-gradient(160deg,#17130a,#0b0b0b);border:1.5px solid rgba(212,175,55,.6);color:#FFD35A;font-weight:800;font-size:13px;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif;box-shadow:0 10px 26px -12px rgba(245,158,11,.55);transition:transform .25s,box-shadow .25s,border-color .25s}
+.cat-more:hover{transform:translateY(-2px);border-color:#FFB800;box-shadow:0 14px 30px -10px rgba(245,158,11,.7)}
+.cat-more:active{transform:scale(.96)}
+.cat-more-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFD35A,#F59E0B);color:#111;font-size:12px;transition:transform .35s}
+.cat-more.open .cat-more-ic{transform:rotate(180deg)}
+</style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
 
@@ -1849,7 +1867,7 @@ html.bf-lock{overflow:hidden!important}
 /* taps made before the main script finishes loading are queued and replayed (nothing is lost) */
 (function(){
   window.__q=[];
-  'loadMore,ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleForm,ppSubmitReview,showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,showLastInv,showMyInv,showInvoice,openTrack,closeTrack,doTrack,copyNum,chkTrx,updateCheckoutTotals,placeOrder,setArea,coQty,coRemove,closeConfirm,closeValPop,ppDescToggle,ppRvMore,openMyOrders,closeMyOrders,myoInv,myoFromConfirm'.split(',').forEach(function(n){ if(!window[n]) window[n]=function(){ window.__q.push([n,[].slice.call(arguments)]); }; });
+  'loadMore,ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleForm,ppSubmitReview,showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,showLastInv,showMyInv,showInvoice,openTrack,closeTrack,doTrack,copyNum,chkTrx,updateCheckoutTotals,placeOrder,setArea,coQty,coRemove,closeConfirm,closeValPop,ppDescToggle,ppRvMore,openMyOrders,closeMyOrders,myoInv,myoFromConfirm,railOpen,railClose,railPick,railSide,railSize,railQty,railBuy,railAdd'.split(',').forEach(function(n){ if(!window[n]) window[n]=function(){ window.__q.push([n,[].slice.call(arguments)]); }; });
   /* splash overlay must never swallow taps while it fades out */
   function free(){ var p=document.getElementById('preloader'); if(p) p.style.pointerEvents='none'; }
   if((window.__splash||0)>=1) free(); else document.addEventListener('splash:exit',free,{once:true});
@@ -2178,7 +2196,7 @@ let _catSig='', _catsFinal=false, _catWait=0, _catsPlayed=false;
 const CAT_CACHE='bana_cats_v1';
 /* placeholder circles keep the space reserved while the real list loads, so nothing below jumps */
 function catSkeleton(r){ if(r.dataset.sk) return; r.dataset.sk='1'; _catSig=''; r.innerHTML=Array.from({length:6},()=>'<div class="cat-card sk"><span class="cat-ic"></span><h3 class="cat-name"></h3></div>').join(''); }
-function buildCatRow(){ const r=$('catRow'); if(!r) return;
+function buildCatRowCore(){ const r=$('catRow'); if(!r) return;
   const hasCats=!!(state.cats&&state.cats.length);
   let list;
   if(hasCats) list=state.cats;
@@ -2198,6 +2216,18 @@ function buildCatRow(){ const r=$('catRow'); if(!r) return;
     const pr=state.products.find(p=>p.category===c.id); const im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
     return `<div onclick="goShop('${esc(c.id)}')" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(im)}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
   if(catsInView||_catsPlayed) playCats(); }
+/* ===== categories: 4 per row, 2 rows (8) first, then an "আরো দেখুন" button reveals the rest ===== */
+let _catExp=false;
+function buildCatRow(){ buildCatRowCore(); catMoreApply(); }
+function catMoreApply(){ const r=$('catRow'); if(!r) return;
+  const cards=[...r.querySelectorAll('.cat-card:not(.sk)')]; let w=$('catMoreWrap');
+  if(cards.length<=8){ cards.forEach(c=>c.classList.remove('cat-extra')); r.classList.remove('cat-collapsed'); if(w) w.remove(); return; }
+  cards.forEach((c,i)=>c.classList.toggle('cat-extra',i>=8));
+  r.classList.toggle('cat-collapsed',!_catExp);
+  if(!w){ w=document.createElement('div'); w.id='catMoreWrap'; r.after(w); }
+  w.innerHTML='<button type="button" class="cat-more'+(_catExp?' open':'')+'" onclick="catMoreToggle()" aria-expanded="'+(_catExp?'true':'false')+'"><span class="cat-more-ic"><i class="fa-solid fa-chevron-down"></i></span><span>'+(_catExp?'কম দেখুন':'আরো দেখুন')+'</span></button>'; }
+function catMoreToggle(){ _catExp=!_catExp; catMoreApply(); if(_catExp){ const r=$('catRow'); r.querySelectorAll('.cat-card').forEach(c=>{ c.classList.remove('lit'); c.classList.add('shown'); }); } }
+window.catMoreToggle=catMoreToggle;
 /* ===== pencil-writing text + Bengali spacing fix ===== */
 /* section headings are plain text now (the animated pencil icon was removed) */
 function pencilInit(){ document.querySelectorAll('.penned').forEach(el=>{ const s=el.querySelector('.pen'); if(s) el.innerHTML=s.innerHTML; el.classList.remove('penned'); }); }
@@ -3258,7 +3288,7 @@ async function railLoad(){
       if(snaps&&snaps.some(s=>s&&s.exists())) list=snaps.map((s,i)=>s&&s.exists()?railNorm(i+1,s.data()):null).filter(Boolean);
     }
   }catch(e){ console.warn('rail:',e); }
-  RAIL.items=list||railDemo(); RAIL.ready=true; railInject(); renderRail();
+  RAIL.items=list||[]; RAIL.ready=true; railInject(); renderRail();
 }
 function railInject(){
   if(!Array.isArray(state.products)) return;
