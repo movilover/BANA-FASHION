@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0a">
+<script>
+/* FRESH START: leaving the site and coming back always lands on the home page (never on the products section) */
+(function(){
+  try{ history.scrollRestoration='manual'; }catch(e){}
+  var nav=''; try{ var n=performance.getEntriesByType('navigation')[0]; nav=n&&n.type||''; }catch(e){}
+  var seen=false; try{ seen=sessionStorage.getItem('bf_seen')==='1'; sessionStorage.setItem('bf_seen','1'); }catch(e){}
+  var h=location.hash||'';
+  var keep=(!seen&&nav==='navigate'&&/^#product-/.test(h)); /* a shared product link in a brand-new visit still opens that product */
+  if(h&&!keep){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+  var moved=false; ['touchstart','wheel','mousedown','keydown'].forEach(function(ev){ addEventListener(ev,function(){ moved=true; },{passive:true,once:true}); });
+  function top(){ if(moved||keep) return; if((window.pageYOffset||0)>0) window.scrollTo({top:0,left:0,behavior:'instant'}); }
+  top(); addEventListener('DOMContentLoaded',top); addEventListener('load',top);
+  [300,900,1800,3200].forEach(function(ms){ setTimeout(top,ms); });
+  addEventListener('pageshow',function(e){ if(e.persisted) top(); });
+})();
+</script>
+
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
@@ -884,6 +901,149 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
 .fx-dim{position:absolute;inset:0;background:rgba(6,6,10,.5)}
 .fx-beam{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;clip-path:polygon(0 46%,100% 0,100% 100%,0 54%);background:linear-gradient(90deg,rgba(255,240,190,.6),rgba(255,226,140,.2) 55%,rgba(255,226,140,.06));mix-blend-mode:screen;filter:blur(2px)}
 </style>
+<style id="pg-style">
+/* ===== Premium category rail + animated product cards ===== */
+.pg-filterbar{margin:0 -4px 4px}
+.pg-railwrap{position:relative}
+.pg-railwrap:before,.pg-railwrap:after{content:"";position:absolute;top:0;bottom:0;width:22px;z-index:3;pointer-events:none}
+.pg-railwrap:before{left:0;background:linear-gradient(90deg,#F3F4F6,rgba(243,244,246,0))}
+.pg-railwrap:after{right:0;background:linear-gradient(-90deg,#F3F4F6,rgba(243,244,246,0))}
+#filterTabs.pg-rail{position:relative;display:flex;justify-content:flex-start;flex-wrap:nowrap;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:6px 18px 10px}
+#filterTabs.pg-rail::-webkit-scrollbar{display:none}
+@media(min-width:900px){#filterTabs.pg-rail{justify-content:center;flex-wrap:wrap;overflow:visible}}
+.pg-pill{position:absolute;z-index:1;left:0;top:0;border-radius:999px;background:linear-gradient(135deg,#1a1a1a,#0D0D0D);box-shadow:0 10px 24px -8px rgba(0,0,0,.55),0 0 0 1.5px rgba(245,158,11,.55),0 0 18px rgba(245,158,11,.25);transition:transform .55s cubic-bezier(.16,1,.3,1),width .55s cubic-bezier(.16,1,.3,1),height .55s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.pg-chip{position:relative;z-index:2;flex:0 0 auto;scroll-snap-align:center;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:#fff;border:1px solid #e5e7eb;font-weight:700;font-size:13px;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif;color:#475569;overflow:hidden;white-space:nowrap;transition:color .35s,background .35s,border-color .35s,transform .25s}
+.pg-chip.pg-enter{opacity:0;transform:translateY(14px) scale(.9);animation:pgChip .6s cubic-bezier(.16,1,.3,1) forwards;animation-delay:calc(var(--i)*.06s + .1s)}
+@keyframes pgChip{to{opacity:1;transform:none}}
+.pg-chip i{font-size:12px;color:#D97706;transition:color .3s,transform .5s cubic-bezier(.16,1,.3,1)}
+.pg-chip small{font-size:10px;font-weight:800;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;background:#f1f5f9;color:#64748b;transition:.3s}
+.pg-chip:hover{border-color:#F59E0B}
+.pg-chip:active{transform:scale(.94)}
+.pg-chip.on{background:transparent;border-color:transparent;color:#FBBF24}
+.pg-chip.on i{color:#FBBF24;transform:rotate(360deg) scale(1.15)}
+.pg-chip.on small{background:#F59E0B;color:#000}
+.pg-chip .pg-rp{position:absolute;border-radius:50%;background:rgba(245,158,11,.35);transform:scale(0);animation:pgRp .6s ease-out forwards;pointer-events:none}
+@keyframes pgRp{to{transform:scale(4);opacity:0}}
+.pg-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 4px 16px}
+.pg-count{font-family:'Hind Siliguri',sans-serif;font-size:13px;color:#64748b;font-weight:600}
+.pg-count b{color:#0D0D0D;font-size:15px}
+#sortSelect{display:none!important}
+.pg-sort{position:relative}
+.pg-sort>button{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e7eb;border-radius:999px;padding:9px 14px;font-weight:700;font-size:12px;font-family:'Hind Siliguri',sans-serif;transition:.25s}
+.pg-sort>button:hover{border-color:#F59E0B}
+.pg-sort>button .c{transition:transform .35s cubic-bezier(.16,1,.3,1);font-size:10px}
+.pg-sort.open>button .c{transform:rotate(180deg)}
+.pg-menu{position:absolute;right:0;top:calc(100% + 8px);width:210px;background:#0D0D0D;border:1px solid rgba(245,158,11,.35);border-radius:16px;padding:6px;box-shadow:0 20px 50px -10px rgba(0,0,0,.5);opacity:0;transform:translateY(-8px) scale(.96);transform-origin:top right;pointer-events:none;transition:.3s cubic-bezier(.16,1,.3,1);z-index:60}
+.pg-sort.open .pg-menu{opacity:1;transform:none;pointer-events:auto}
+.pg-menu div{padding:10px 12px;border-radius:11px;color:#d1d5db;font-size:13px;font-weight:600;font-family:'Hind Siliguri',sans-serif;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:.2s}
+.pg-menu div:hover{background:rgba(255,255,255,.07);color:#fff}
+.pg-menu div.on{color:#FBBF24}
+.pg-menu div.on:after{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;font-size:11px}
+/* grid swap + cards */
+#productGrid{transition:opacity .22s,filter .22s}
+#productGrid.pg-out{opacity:0;filter:blur(4px)}
+#productGrid .pcard{border-radius:20px;position:relative}
+#productGrid .pcard.in2{animation:pgIn .9s cubic-bezier(.16,1,.3,1) var(--pd,0s) backwards}
+@keyframes pgIn{from{opacity:0;transform:translateY(46px) scale(.94);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+#productGrid .pcard:not(.in2){transform:translateY(46px) scale(.94)}
+#productGrid .pcard:before{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);transform:translateX(-120%)}
+#productGrid .pcard.in2:before{animation:pgShine 1.3s calc(var(--pd,0s) + .5s) ease forwards}
+@keyframes pgShine{to{transform:translateX(120%)}}
+@media(hover:hover){#productGrid .pcard:hover{box-shadow:0 28px 50px -18px rgba(0,0,0,.28),0 0 0 1.5px rgba(245,158,11,.5)}}
+#productGrid .pcard .pslide img{transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
+#productGrid .pcard:hover .pslide img{transform:scale(1.08)}
+#productGrid .pdot{transition:width .4s cubic-bezier(.16,1,.3,1),background .4s}
+#productGrid .pdot.bg-white{width:18px}
+#productGrid .pcard .fa-heart.fa-solid{animation:pgPop .6s cubic-bezier(.16,1,.3,1)}
+@keyframes pgPop{0%{transform:scale(.3)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
+#productGrid .pcard .border-t{position:relative}
+#productGrid .pcard .border-t:before{content:"";position:absolute;top:-1px;left:0;height:1px;width:0;background:linear-gradient(90deg,#F59E0B,transparent);transition:width .7s cubic-bezier(.16,1,.3,1)}
+#productGrid .pcard:hover .border-t:before{width:100%}
+#productGrid .pcard button[onclick*="addToCart"]{transition:background .3s,color .3s,transform .25s,border-radius .4s}
+#productGrid .pcard button[onclick*="addToCart"]:hover{border-radius:50%}
+#productGrid .pcard button[onclick*="addToCart"].pg-done{background:#16a34a!important;color:#fff!important;border-radius:50%}
+.pg-fly{position:fixed;z-index:300;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#FBBF24,#D97706);box-shadow:0 0 16px 4px rgba(245,158,11,.7);pointer-events:none;transition:transform .85s cubic-bezier(.5,-.3,.7,.4),opacity .85s}
+.pg-bump{animation:pgBump .5s cubic-bezier(.16,1,.3,1)}
+@keyframes pgBump{0%{transform:scale(1)}30%{transform:scale(1.3) rotate(-8deg)}60%{transform:scale(.92)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.pg-pill,.pg-chip,#productGrid .pcard{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+<style id="co-b-style">
+/* ===== CHECKOUT – Design B: clean white, step by step. Money = clean sans-serif numerals ===== */
+#checkoutModal .co-panel{max-width:560px!important;background:#F3F4F6;color:#0D0D0D;border:1px solid #e5e7eb}
+@media(min-width:1024px){#checkoutModal .co-panel{margin-top:24px;margin-bottom:24px;border-radius:26px}}
+#checkoutModal .co-head{background:rgba(255,255,255,.94);border-bottom:1px solid #e5e7eb;row-gap:10px}
+#checkoutModal .text-white{color:#0D0D0D!important}
+#checkoutModal .text-silver-400,#checkoutModal .text-silver-300{color:#64748b!important}
+#checkoutModal .text-gold-400{color:#D97706!important}
+#checkoutModal .text-emerald-400{color:#16a34a!important}
+#checkoutModal .text-red-400{color:#ef4444!important}
+#checkoutModal .border-white\/10{border-color:#e5e7eb!important}
+#checkoutModal .bg-white\/10{background:#f1f5f9!important;color:#475569!important}
+#checkoutModal .bg-ink-900.text-gold-400,#checkoutModal .bg-ink-900 .text-gold-400{background:#0D0D0D;color:#FBBF24!important}
+#checkoutModal .co-secure{background:#fff8e6;border-color:#fde68a;color:#92400e}
+#checkoutForm{display:block!important}
+#checkoutForm>div{padding:14px 14px 4px!important}
+.co-step{display:none}.co-step.cur{display:block}
+#checkoutModal .co-box{background:#fff;border:1px solid #e5e7eb;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+#checkoutModal .co-box::before{display:none}
+#checkoutModal .co-bt{color:#0D0D0D}
+#checkoutModal .co-box>.co-bt{border-bottom:1px solid #eef0f4}
+#checkoutModal .co-box>.co-bt::after{background:#fff8e6;color:#D97706}
+#checkoutModal .co-box[data-cs="1"]>.co-bt::after{content:"ধাপ ১"}
+#checkoutModal .co-box[data-cs="2"]>.co-bt::after{content:"ধাপ ২"}
+#checkoutModal .co-box[data-cs="3"]>.co-bt::after{content:"ধাপ ৩"}
+#checkoutModal .co-lbl{color:#0D0D0D}
+#checkoutModal .co-field>.fi{color:#D97706}
+#checkoutModal .co-in{background:#f8fafc;border:1.5px solid #dbe0e8;color:#0D0D0D}
+#checkoutModal .co-in::placeholder{color:#94a3b8}
+#checkoutModal .co-in:hover{border-color:#cbd5e1}
+#checkoutModal .co-in:focus{background:#fff;border-color:#F59E0B;box-shadow:0 0 0 4px rgba(245,158,11,.18)}
+#checkoutModal .co-in option{background:#fff;color:#0D0D0D}
+#checkoutModal .co-in:-webkit-autofill{-webkit-text-fill-color:#0D0D0D;caret-color:#0D0D0D;box-shadow:0 0 0 100px #f8fafc inset}
+#checkoutModal .co-in.bad{animation:cowShake .45s}
+@keyframes cowShake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+#checkoutModal .co-div{background:#f8fafc;border:1px dashed #cbd5e1;color:#64748b}
+#checkoutModal .co-div.ok{background:#ecfdf5;border:1px solid #6ee7b7;color:#0D0D0D}
+#checkoutModal .co-tag,#checkoutModal .co-payinfo,#checkoutModal .co-delchk{background:#fff8e6;border:1px solid #fde68a;color:#475569}
+#checkoutModal .co-tag b,#checkoutModal .co-payinfo b{color:#0D0D0D}
+#checkoutModal .co-delchk span{color:#0D0D0D!important}#checkoutModal .co-delchk small{color:#64748b!important}
+#checkoutModal .co-area,#checkoutModal .co-pay{background:#f8fafc;border:1.5px solid #dbe0e8;color:#0D0D0D}
+#checkoutModal .co-area b,#checkoutModal .co-pay{color:#0D0D0D}
+#checkoutModal .co-area small,#checkoutModal .co-pay.on small{color:#D97706}
+#checkoutModal .co-pay small{color:#64748b}
+#checkoutModal .co-area:hover,#checkoutModal .co-pay:hover:not(.dis){border-color:#F59E0B}
+#checkoutModal .co-area.on,#checkoutModal .co-pay.on{background:#fff8e6;border-color:#F59E0B;box-shadow:0 10px 26px -12px rgba(245,158,11,.7)}
+#checkoutModal .co-area .co-radio{border-color:#cbd5e1}
+#checkoutModal .co-pay .co-chk{color:#F59E0B}
+#checkoutModal .from-ink-900{background:#fff8e6!important;background-image:none!important;border-color:#fde68a!important;box-shadow:none!important}
+#checkoutModal .co-aside{background:#fff;border:1px solid #e5e7eb!important;border-radius:20px;margin:0 14px 14px!important;position:static!important;padding:16px!important;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+#checkoutModal .co-item{background:#f8fafc;border:1px solid #e5e7eb}
+#checkoutModal .co-qty{background:#fff;border-color:#F59E0B}
+#checkoutModal .co-qty button{color:#D97706}#checkoutModal .co-qty span{color:#0D0D0D}
+#checkoutModal .co-aside .co-row.text-base{border-top:1px dashed #cbd5e1}
+#checkoutModal .co-trust{color:#64748b;border-top:1px dashed #e5e7eb}#checkoutModal .co-trust i{color:#D97706}
+#coSubmit,#coSubmit+p{display:none!important}
+/* clean money numerals – no decorative font */
+#coTotal,#coMTotal,#coSub,#coShip,#coDisc,#noteIn,#noteOut,#coAreaInP,#coAreaOutP,#checkoutModal .co-item .font-display,#checkoutModal .co-item .text-silver-400,#checkoutModal .co-row b,#checkoutModal .co-payinfo b,#checkoutModal .co-tag b,#checkoutModal .co-area small,#checkoutModal #coCnt{font-family:'Plus Jakarta Sans','Hind Siliguri',system-ui,sans-serif!important;font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;letter-spacing:0!important}
+#coTotal{font-size:1.65rem!important;font-weight:800!important;color:#0D0D0D!important}
+#coMTotal{font:800 1.35rem/1.2 'Plus Jakarta Sans','Hind Siliguri',system-ui,sans-serif!important;color:#0D0D0D!important;font-variant-numeric:lining-nums tabular-nums}
+#checkoutModal .co-item .font-display{font-weight:800;font-size:14px}
+/* stepper */
+.cow-stp{width:100%;display:flex;align-items:center;padding:2px 8px 0}
+.cow-st{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#64748b;flex:0 0 auto;cursor:pointer;transition:color .3s;font-family:'Hind Siliguri',sans-serif}
+.cow-st i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#f1f5f9;border:1.5px solid #dbe0e8;font-style:normal;font-size:12px;transition:.4s cubic-bezier(.16,1,.3,1)}
+.cow-st.on{color:#D97706}.cow-st.on i{background:linear-gradient(135deg,#FBBF24,#D97706);color:#000;border-color:transparent;transform:scale(1.15);box-shadow:0 0 0 5px rgba(245,158,11,.18)}
+.cow-st.done i{background:#16a34a;color:#fff;border-color:transparent}
+.cow-ln{flex:1;height:3px;background:#dbe0e8;margin:0 6px 16px;border-radius:2px;overflow:hidden}.cow-ln i{display:block;height:100%;width:0;background:linear-gradient(90deg,#F59E0B,#FBBF24);transition:width .6s cubic-bezier(.16,1,.3,1)}
+/* bottom bar (all screen sizes) */
+#checkoutModal .co-mbar{display:flex!important;align-items:center;gap:12px;position:sticky;bottom:0;z-index:12;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -10px 30px -16px rgba(15,23,42,.25)}
+#checkoutModal .co-mbar .t small{display:block;font-size:11px;color:#64748b;line-height:1}
+#checkoutModal .co-mbar .cow-bk{flex:0 0 52px;height:52px;border-radius:15px;background:#f8fafc;border:1.5px solid #dbe0e8;color:#0D0D0D;min-height:0}
+#checkoutModal .co-mbar .cow-go{position:relative;overflow:hidden;flex:1;min-height:52px;border-radius:15px;background:#0D0D0D!important;color:#FBBF24!important;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 30px -14px rgba(0,0,0,.7);transition:transform .25s}
+#checkoutModal .co-mbar .cow-go:active{transform:scale(.97)}
+#checkoutModal .co-mbar .cow-go:disabled{opacity:.7}
+#checkoutModal .co-mbar .cow-go::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(251,191,36,.35) 50%,transparent 70%);transform:translateX(-120%);animation:coShine 2.8s infinite;pointer-events:none}
+</style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
 
@@ -1341,11 +1501,14 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
       <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-ink-900 mt-1">নির্বাচিত পণ্য</h2>
       <p class="text-slate-500 text-sm mt-2">যেকোনো পণ্যে ক্লিক করে বিস্তারিত দেখুন, সাইজ বেছে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
     </div>
-    <div class="flex flex-col md:flex-row items-center justify-between gap-3 mb-5">
-      <div id="filterTabs" class="flex items-center justify-center gap-2 flex-wrap"></div>
-      <select id="sortSelect" onchange="setSort(this.value)" class="bg-white border border-slate-200 rounded-full text-xs font-bold px-4 py-2.5">
-        <option value="default">সাজান: ফিচার্ড</option><option value="low">দাম: কম থেকে বেশি</option><option value="high">দাম: বেশি থেকে কম</option><option value="rating">সর্বোচ্চ রেটিং</option>
-      </select>
+    <div class="pg-filterbar"><div class="pg-railwrap"><div id="filterTabs" class="pg-rail"></div></div></div>
+    <div class="pg-toolbar">
+      <div id="pgCount" class="pg-count"></div>
+      <div class="pg-sort" id="pgSort">
+        <button type="button" id="pgSortBtn"><i class="fa-solid fa-arrow-down-wide-short" style="color:#D97706"></i><span id="pgSortLbl">ফিচার্ড</span><i class="fa-solid fa-chevron-down c"></i></button>
+        <div class="pg-menu" id="pgMenu"><div data-s="default" class="on">সাজান: ফিচার্ড</div><div data-s="low">দাম: কম থেকে বেশি</div><div data-s="high">দাম: বেশি থেকে কম</div><div data-s="rating">সর্বোচ্চ রেটিং</div></div>
+      </div>
+      <select id="sortSelect" onchange="setSort(this.value)"><option value="default">সাজান: ফিচার্ড</option><option value="low">দাম: কম থেকে বেশি</option><option value="high">দাম: বেশি থেকে কম</option><option value="rating">সর্বোচ্চ রেটিং</option></select>
     </div>
     <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
     <div id="loadMoreWrap" class="hidden mt-8 sm:mt-10 flex flex-col items-center gap-2.5">
@@ -1553,9 +1716,14 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
   <div onclick="closeCheckout()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
   <div class="relative min-h-screen">
     <div class="co-panel w-full max-w-5xl mx-auto min-h-screen shadow-2xl">
-      <div class="co-head sticky top-0 z-10 px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div class="co-head sticky top-0 z-10 px-4 sm:px-6 py-3.5 flex items-center justify-between flex-wrap">
         <div class="flex items-center gap-3"><span class="co-hic"><i class="fa-solid fa-bag-shopping"></i></span><div><h3 class="font-display font-extrabold text-lg text-white leading-tight">অর্ডার কনফার্ম করুন</h3><p class="text-[11px] text-silver-400">তথ্য দিন, পেমেন্ট বেছে কনফার্ম করুন</p></div></div>
         <span class="co-secure"><i class="fa-solid fa-lock"></i>নিরাপদ চেকআউট</span><button type="button" onclick="closeCheckout()" aria-label="বন্ধ করুন" class="w-9 h-9 rounded-full bg-white/10 hover:bg-gold-500 hover:text-black text-silver-300 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <div class="cow-stp" id="cowStp">
+          <div class="cow-st on" data-i="1"><i>১</i>আপনার তথ্য</div><div class="cow-ln"><i></i></div>
+          <div class="cow-st" data-i="2"><i>২</i>ঠিকানা</div><div class="cow-ln"><i></i></div>
+          <div class="cow-st" data-i="3"><i>৩</i>পেমেন্ট</div>
+        </div>
       </div>
       <form id="checkoutForm" novalidate onsubmit="placeOrder(event)" class="grid md:grid-cols-5 gap-0">
         <div class="md:col-span-3 p-4 sm:p-6 space-y-4">
@@ -1615,7 +1783,7 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
           <div class="co-trust"><span><i class="fa-solid fa-truck-fast"></i>দ্রুত ডেলিভারি</span><span><i class="fa-solid fa-hand-holding-dollar"></i>ক্যাশ অন ডেলিভারি</span><span><i class="fa-solid fa-rotate-left"></i>সহজ এক্সচেঞ্জ</span></div>
         </div>
       </form>
-      <div class="co-mbar"><div class="t"><small>মোট</small><b id="coMTotal"></b></div><button type="button" class="btn-gold" onclick="document.getElementById('coSubmit').click()"><i class="fa-solid fa-lock mr-2"></i>অর্ডার কনফার্ম</button></div>
+      <div class="co-mbar"><button type="button" id="cowBack" class="cow-bk" aria-label="পেছনে" style="display:none"><i class="fa-solid fa-arrow-left"></i></button><div class="t"><small>মোট</small><b id="coMTotal"></b></div><button type="button" id="cowNext" class="cow-go"><span class="cow-lb"><i class="fa-solid fa-arrow-right mr-2"></i>পরবর্তী ধাপ</span></button></div>
       <script>(function(){var t=document.getElementById('coTotal'),m=document.getElementById('coMTotal');if(!t||!m)return;function f(){m.textContent=t.textContent}f();new MutationObserver(f).observe(t,{childList:true,characterData:true,subtree:true});})();</script>
     </div>
   </div>
@@ -1826,9 +1994,24 @@ function showHero(i){
 const nextHeroSlide=()=>showHero(state.hero+1), prevHeroSlide=()=>showHero(state.hero-1), goToHeroSlide=i=>showHero(i);
 
 /* ================= PRODUCTS ================= */
+const PG_ICON={all:'fa-border-all',shoes:'fa-shoe-prints',shirts:'fa-shirt',tshirts:'fa-shirt',jeans:'fa-user-tie',pants:'fa-user-tie',shorts:'fa-person-walking',jackets:'fa-vest',threepiece:'fa-vest',watches:'fa-clock'};
+let _pgSig='',_pgFirst=true;
+function pgCount(id){ try{ const b=state.products.filter(p=>!p._rail); return id==='all'?b.length:b.filter(p=>inCategory(p,id)).length; }catch(e){ return 0; } }
+function pgPill(instant){ const rail=$('filterTabs'); if(!rail) return; const a=rail.querySelector('.pg-chip.on'), pill=rail.querySelector('.pg-pill'); if(!a||!pill||!a.offsetWidth) return;
+  if(instant) pill.style.transition='none';
+  pill.style.width=a.offsetWidth+'px'; pill.style.height=a.offsetHeight+'px'; pill.style.transform='translate('+a.offsetLeft+'px,'+a.offsetTop+'px)';
+  if(instant){ pill.offsetWidth; pill.style.transition=''; }
+  if(rail.scrollWidth>rail.clientWidth+4){ const x=a.offsetLeft-(rail.clientWidth-a.offsetWidth)/2; rail.scrollTo({left:Math.max(0,x),behavior:instant?'auto':'smooth'}); } }
 function renderTabs(){
-  $('filterTabs').innerHTML = CATEGORIES.map(c=>`<button type="button" data-c="${esc(c.id)}" onclick="filterCategory(this.dataset.c)" class="px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all ${state.cat===c.id?'bg-ink-900 text-gold-400 shadow-md':'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'}">${c.label}</button>`).join('');
+  const rail=$('filterTabs'); if(!rail) return;
+  const sig=CATEGORIES.map(c=>c.id+'|'+c.label+'|'+pgCount(c.id)).join(',');
+  if(sig!==_pgSig){ _pgSig=sig; const enter=_pgFirst; _pgFirst=false;
+    rail.innerHTML='<span class="pg-pill"></span>'+CATEGORIES.map((c,i)=>`<button type="button" data-c="${esc(c.id)}" style="--i:${i}" class="pg-chip${enter?' pg-enter':''}"><i class="fa-solid ${PG_ICON[c.id]||'fa-tag'}"></i>${esc(c.label)}<small>${bnum(pgCount(c.id))}</small></button>`).join('');
+  }
+  rail.querySelectorAll('.pg-chip').forEach(b=>b.classList.toggle('on',b.dataset.c===state.cat));
+  requestAnimationFrame(()=>pgPill(false)); setTimeout(()=>pgPill(true),80);
 }
+function pgSwap(fn){ const g=$('productGrid'); g.classList.add('pg-out'); setTimeout(()=>{ fn(); g.classList.remove('pg-out'); },210); }
 function _num(v){ const n=parseFloat(String(v==null?'':v).replace(/[^\d.\-]/g,'')); return isNaN(n)?0:n; }
 function _pageSize(){ const mx=(state.site&&+state.site.maxProducts)||0; return mx>0?mx:8; }
 function resetLimit(){ state.limit=_pageSize(); }
@@ -1850,7 +2033,7 @@ function renderProducts(){
   else if(state.sort==='high') list.sort((a,b)=>_num(b.price)-_num(a.price));
   else if(state.sort==='rating') list.sort((a,b)=>(_num(b.rating)-_num(a.rating))||(_num(b.reviews)-_num(a.reviews)));
   if(!state.limit) resetLimit();
-  $('emptyState').classList.toggle('hidden',list.length>0); setTimeout(()=>grid.querySelectorAll('.pcard').forEach(c=>pio.observe(c)),0);
+  $('emptyState').classList.toggle('hidden',list.length>0); try{ const pc=$('pgCount'); if(pc) pc.innerHTML='<b>'+bnum(list.length)+'</b>টি পণ্য পাওয়া গেছে'; }catch(e){} setTimeout(()=>grid.querySelectorAll('.pcard').forEach(c=>pio.observe(c)),0);
   grid.classList.toggle('hidden',list.length===0);
   const cardHTML=(p,i)=>{
     const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0, wl=state.wishlist.includes(p.id);
@@ -1890,10 +2073,10 @@ function catKeys(cid){ if(_catKeys[cid]) return _catKeys[cid]; const ks=new Set(
   if(CATBN[cid]) ks.add(_nk(CATBN[cid])); const raw=(state.cats||[]).find(x=>x.id===cid);
   if(raw) ['name','nameBn','name_bn','bn','label','title','slug'].forEach(k=>{ if(raw[k]) ks.add(_nk(raw[k])); }); ks.delete(''); return (_catKeys[cid]=ks); }
 function inCategory(p,cid){ if(cid==='all') return true; const ks=catKeys(cid); if(ks.has(_nk(p.category))) return true; return Array.isArray(p.categories)&&p.categories.some(x=>ks.has(_nk(x))); }
-function filterCategory(c){ hidePP(); state.cat=c; resetLimit(); if(state.q){ state.q=''; ['searchInput','mobileSearchInput'].forEach(id=>{ const e=$(id); if(e) e.value=''; }); } renderTabs(); renderProducts(); }
+function filterCategory(c){ hidePP(); state.cat=c; resetLimit(); if(state.q){ state.q=''; ['searchInput','mobileSearchInput'].forEach(id=>{ const e=$(id); if(e) e.value=''; }); } renderTabs(); pgSwap(renderProducts); }
 function goShop(c){ filterCategory(c); $('shop').scrollIntoView({behavior:'smooth'}); }
 function handleSearch(v){ if(v&&document.body.classList.contains('pp-open')){ hidePP(); setTimeout(()=>$('shop').scrollIntoView(),30); } state.q=v; resetLimit(); $('searchInput').value=v; $('mobileSearchInput').value=v; renderProducts(); }
-function setSort(v){ state.sort=v; resetLimit(); renderProducts(); }
+function setSort(v){ state.sort=v; resetLimit(); pgSwap(renderProducts); }
 function resetFilters(){ state.cat='all'; state.q=''; resetLimit(); $('searchInput').value=''; $('mobileSearchInput').value=''; renderTabs(); renderProducts(); }
 
 async function loadFirestoreProducts(){
@@ -2773,6 +2956,51 @@ async function myoBoot(){ myoBadge(); if(!FIREBASE_READY) return; try{ await Pro
   for(const o of act){ try{ const s=await getDoc(doc(db,'receipts',o.orderId)); if(s.exists()){ const r=s.data(); myoPatch(o.orderId,{status:r.status||'pending',tracking:r.tracking||'',courierName:typeof r.courier==='string'?r.courier:'',live:r.live||''}); } }catch(e){} } }catch(e){} }
 
 /* expose handlers to inline onclick */
+/* ===== checkout wizard (step by step): only changes how the form is shown, every field/function stays as is ===== */
+(function(){
+  const modal=$('checkoutModal'), form=$('checkoutForm'); if(!modal||!form||!form.children[0]) return;
+  const left=form.children[0], bx=[...left.children]; if(bx.length<4) return;
+  bx[0].dataset.cs='1'; bx[1].dataset.cs='2'; bx[2].dataset.cs='3'; bx[3].dataset.cs='3'; form.children[1].dataset.cs='3';
+  form.querySelectorAll('[data-cs]').forEach(e=>e.classList.add('co-step'));
+  const sts=[...modal.querySelectorAll('.cow-st')], lns=[...modal.querySelectorAll('.cow-ln i')], back=$('cowBack'), next=$('cowNext');
+  const BNn=['১','২','৩'], FINAL='<span class="cow-lb"><i class="fa-solid fa-lock mr-2"></i>অর্ডার কনফার্ম করুন</span>', NEXT='<span class="cow-lb"><i class="fa-solid fa-arrow-right mr-2"></i>পরবর্তী ধাপ</span>';
+  let step=1;
+  function go(n){
+    step=n;
+    form.querySelectorAll('.co-step').forEach(e=>{ const on=+e.dataset.cs===n; e.classList.toggle('cur',on); if(on){ e.style.animation='none'; e.offsetWidth; e.style.animation=''; } });
+    sts.forEach((el,k)=>{ const i=k+1; el.classList.toggle('on',i===n); el.classList.toggle('done',i<n); el.firstChild.innerHTML=i<n?'<span style="font-size:11px">✓</span>':BNn[k]; });
+    lns.forEach((l,k)=>l.style.width=(n>k+1?'100%':'0'));
+    back.style.display=n>1?'flex':'none'; next.innerHTML=n<3?NEXT:FINAL;
+    try{ modal.scrollTo({top:0,behavior:'smooth'}); }catch(e){ modal.scrollTop=0; }
+  }
+  function chk(n){
+    const errs=[], bad=(id,m)=>{ errs.push({id,m}); const e=$(id); if(e) e.classList.add('bad'); };
+    if(n===1){ ['coName','coPhone'].forEach(id=>$(id).classList.remove('bad'));
+      if($('coName').value.trim().length<2) bad('coName','আপনার পূর্ণ নাম লিখুন');
+      const ph=BN2EN($('coPhone').value).replace(/[\s-]/g,'').replace(/^\+?88/,'');
+      if(!ph) bad('coPhone','মোবাইল নম্বর দিন'); else if(!/^01[3-9]\d{8}$/.test(ph)) bad('coPhone','মোবাইল নম্বর অবশ্যই ১১ ডিজিটের সঠিক নম্বর হতে হবে (যেমন 01XXXXXXXXX)'); }
+    if(n===2){ ['coDist','coAddress'].forEach(id=>$(id).classList.remove('bad'));
+      if(!$('coDist').value) bad('coDist','আপনার জেলা নির্বাচন করুন');
+      const ad=$('coAddress').value.trim();
+      if(!ad) bad('coAddress','ডেলিভারির পূর্ণাঙ্গ ঠিকানা লিখুন'); else if(ad.length<10||!/[^\d\s,.\-/]/.test(ad)) bad('coAddress','ঠিকানা অসম্পূর্ণ — বাড়ি/রোড/এলাকা/থানাসহ পূর্ণাঙ্গ ঠিকানা লিখুন'); }
+    if(errs.length){ showValPop(errs.map(x=>x.m),errs[0].id); return false; } return true;
+  }
+  function goTo(n){ for(let k=1;k<n&&k<3;k++){ if(!chk(k)){ go(k); return; } } go(n); }
+  next.addEventListener('click',()=>{
+    if(step<3){ if(chk(step)) go(step+1); return; }
+    if(!chk(1)){ go(1); return; } if(!chk(2)){ go(2); return; }
+    $('coSubmit').click();
+  });
+  back.addEventListener('click',()=>go(Math.max(1,step-1)));
+  sts.forEach(el=>el.addEventListener('click',()=>{ const n=+el.dataset.i; if(n<=step) go(n); else goTo(n); }));
+  /* Enter key inside a field = next step (not a half-filled submit) */
+  document.addEventListener('submit',e=>{ if(e.target&&e.target.id==='checkoutForm'&&step<3){ e.preventDefault(); e.stopImmediatePropagation(); if(chk(step)) go(step+1); } },true);
+  /* mirror the "ordering…" state of the real submit button onto the bottom button */
+  const sub=$('coSubmit'); if(sub) new MutationObserver(()=>{ next.disabled=sub.disabled; if(step===3) next.innerHTML=sub.disabled?'<span class="cow-lb"><i class="fa-solid fa-spinner fa-spin mr-2"></i>অর্ডার হচ্ছে...</span>':FINAL; }).observe(sub,{attributes:true,attributeFilter:['disabled']});
+  /* every time the checkout opens, start at step 1 */
+  let was=false; new MutationObserver(()=>{ const open=!modal.classList.contains('hidden'); if(open&&!was) go(1); was=open; }).observe(modal,{attributes:true,attributeFilter:['class']});
+  go(1);
+})();
 Object.assign(window,{loadMore,ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleForm,ppSubmitReview,showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,showLastInv,showMyInv,showInvoice,openTrack,closeTrack,doTrack,copyNum,chkTrx,updateCheckoutTotals,placeOrder,setArea,coQty,coRemove,closeConfirm,closeValPop,ppDescToggle,ppRvMore,openMyOrders,closeMyOrders,myoInv,myoFromConfirm,onDelChk,tgDownloadInvoice});
 
 /* ================= HANGER RAIL (settings/rail_1 … rail_6 — অ্যাডমিন > হ্যাঙ্গার) ================= */
@@ -3208,5 +3436,44 @@ setTimeout(()=>{ (window.__q||[]).splice(0,5).forEach(c=>{ try{ window[c[0]].app
 })();
 </script>
 
+<script>
+/* premium filter bar + cart fly animation */
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var rail=$('filterTabs');
+  if(rail) rail.addEventListener('click',function(e){
+    var b=e.target.closest('.pg-chip'); if(!b) return;
+    var r=b.getBoundingClientRect(),sp=document.createElement('span'),z=Math.max(r.width,r.height)/2;
+    sp.className='pg-rp'; sp.style.cssText='width:'+z+'px;height:'+z+'px;left:'+(e.clientX-r.left-z/2)+'px;top:'+(e.clientY-r.top-z/2)+'px';
+    b.appendChild(sp); setTimeout(function(){sp.remove()},600);
+    if(typeof window.filterCategory==='function') window.filterCategory(b.dataset.c);
+  });
+  addEventListener('resize',function(){ var a=rail&&rail.querySelector('.pg-chip.on'); if(a){ var p=rail.querySelector('.pg-pill'); if(p){ p.style.transition='none'; p.style.width=a.offsetWidth+'px'; p.style.height=a.offsetHeight+'px'; p.style.transform='translate('+a.offsetLeft+'px,'+a.offsetTop+'px)'; p.offsetWidth; p.style.transition=''; } } });
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ var a=rail&&rail.querySelector('.pg-chip.on'),p=rail&&rail.querySelector('.pg-pill'); if(a&&p){ p.style.transition='none'; p.style.width=a.offsetWidth+'px'; p.style.height=a.offsetHeight+'px'; p.style.transform='translate('+a.offsetLeft+'px,'+a.offsetTop+'px)'; p.offsetWidth; p.style.transition=''; } });
+  /* sort menu */
+  var sort=$('pgSort'),btn=$('pgSortBtn'),menu=$('pgMenu'),sel=$('sortSelect');
+  if(btn&&menu){
+    btn.addEventListener('click',function(e){ e.stopPropagation(); sort.classList.toggle('open'); });
+    document.addEventListener('click',function(){ sort.classList.remove('open'); });
+    var names={'default':'ফিচার্ড',low:'কম → বেশি',high:'বেশি → কম',rating:'রেটিং'};
+    menu.querySelectorAll('div').forEach(function(d){ d.addEventListener('click',function(){
+      menu.querySelectorAll('div').forEach(function(x){ x.classList.toggle('on',x===d); });
+      $('pgSortLbl').textContent=names[d.dataset.s]; if(sel) sel.value=d.dataset.s;
+      if(typeof window.setSort==='function') window.setSort(d.dataset.s);
+    }); });
+  }
+  /* add-to-cart: tick + flying gold ball into the bag */
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('#productGrid .pcard button[onclick*="addToCart"]'); if(!a||a.classList.contains('pg-done')) return;
+    var old=a.innerHTML; a.classList.add('pg-done'); a.innerHTML='<i class="fa-solid fa-check text-xs"></i>';
+    setTimeout(function(){ a.classList.remove('pg-done'); a.innerHTML=old; },1600);
+    var tgt=($('cartBadge')&&$('cartBadge').parentElement)||null; if(!tgt) return;
+    var f=a.getBoundingClientRect(),t=tgt.getBoundingClientRect(),d=document.createElement('div'); d.className='pg-fly';
+    d.style.left=(f.left+f.width/2-8)+'px'; d.style.top=(f.top+f.height/2-8)+'px'; document.body.appendChild(d);
+    requestAnimationFrame(function(){ d.style.transform='translate('+(t.left+t.width/2-f.left-f.width/2)+'px,'+(t.top+t.height/2-f.top-f.height/2)+'px) scale(.35)'; d.style.opacity='.4'; });
+    setTimeout(function(){ d.remove(); tgt.classList.remove('pg-bump'); tgt.offsetWidth; tgt.classList.add('pg-bump'); },850);
+  },true);
+})();
+</script>
 </body>
 </html>
