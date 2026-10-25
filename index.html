@@ -2022,7 +2022,9 @@ function updateLoadMore(){ const w=$('loadMoreWrap'); if(!w) return; const total
 function loadMore(){ const grid=$('productGrid'), list=state._list||[], from=grid.children.length; if(from>=list.length) return;
   const next=list.slice(from,from+_pageSize()); grid.insertAdjacentHTML('beforeend',next.map((p,k)=>state._card(p,k)).join(''));
   state.limit=from+next.length; [...grid.children].slice(from).forEach(c=>pio.observe(c)); updateLoadMore(); }
+window.renderProducts=renderProducts;
 function renderProducts(){
+  if(window.__pgDown&&Date.now()-window.__pgDown<1500){ window.__pgPend=1; return; }   /* a press is in progress: redraw right after release, so the tap is never lost */
   const grid=$('productGrid'); renderEid();
   if(FIREBASE_READY&&!state.loaded){ $('emptyState').classList.add('hidden'); grid.classList.remove('hidden'); grid.innerHTML=Array.from({length:8},()=>'<div class="rounded-2xl overflow-hidden bg-white border border-slate-200"><div class="aspect-[4/5] bg-slate-200 animate-pulse"></div><div class="p-4 space-y-2"><div class="h-3 w-2/3 bg-slate-200 rounded animate-pulse"></div><div class="h-3 w-1/3 bg-slate-200 rounded animate-pulse"></div></div></div>').join(''); return; }
   /* admin "Show on Homepage": the default view (all categories, no search) lists only the selected products; if none is selected yet, everything shows */
@@ -2037,7 +2039,7 @@ function renderProducts(){
   grid.classList.toggle('hidden',list.length===0);
   const cardHTML=(p,i)=>{
     const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0, wl=state.wishlist.includes(p.id);
-    return `<div class="pcard reveal in group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
+    return `<div class="pcard reveal in group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer" data-pid="${esc(p.id)}" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
       <div class="relative overflow-hidden bg-ink-800 aspect-[4/5]">
         ${p.badge?`<span class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md bg-black/85 text-gold-400 font-extrabold text-[10px] uppercase tracking-wider">${esc(badgeBn(p.badge))}</span>`:''}
         ${off>0?`<span class="absolute bottom-3 left-3 z-10 px-2 py-1 rounded-md btn-gold font-extrabold text-[10px]">-${off}%</span>`:''}
@@ -2336,6 +2338,7 @@ const ppImgs=p=>(p.images&&p.images.length)?p.images:[p.image];
 const CSSCOL={Black:'#111827',White:'#ffffff',Navy:'#1e2a4a',Red:'#c62828',Green:'#1f7a4d',Blue:'#2b4fa3','Sky Blue':'#7ec8f0',Grey:'#9ca3af',Olive:'#708238',Beige:'#d6c3a1',Brown:'#6b4423',Khaki:'#bda77b',Charcoal:'#36454f',Indigo:'#2c3e75',Silver:'#c0c0c0','Red/Black':'#c62828','Green/Black':'#1f7a4d','Grey/Blue':'#6b7fa3'};
 function stockOf(p){ return (p.stock===undefined||p.stock===null||p.stock==='')?null:+p.stock; }
 function openProduct(id,push=true){
+  if(push&&state.pp&&state.pp.id===id&&document.body.classList.contains('pp-open')) return;
   const p=state.products.find(x=>x.id===id); if(!p) return;
   state.pp={id,img:0,qty:1,size:(p.sizes&&p.sizes[0])||'M',color:(p.colors&&p.colors[0])||''};
   renderPP();
@@ -2898,40 +2901,175 @@ function buildPromos(){
 buildPromos();
 document.querySelectorAll('.tk-col[data-dup]').forEach(c=>{ c.innerHTML+=c.innerHTML; });
 
-/* ===== YOUR ORDERS — no login: every confirmed order is remembered on this device and shown automatically ===== */
+/* ===== YOUR ORDERS v2 — no login. Device orders show automatically; anyone can also search by Order ID or mobile number.
+   Admin switch (settings/sms): OFF = phone search shows a privacy-masked view | ON = SMS code (OTP) is required for full details ===== */
 const MYO_KEY='bana_myorders';
 const myoList=()=>{ const a=load(MYO_KEY,[]); return Array.isArray(a)?a:[]; };
 function myoStore(a){ save(MYO_KEY,a.slice(0,40)); myoBadge(); }
 function myoSave(o){ const rec={orderId:o.orderId,uid:o.uid,createdAt:new Date().toISOString(),customerName:o.customerName,phone:o.phone,area:o.area,district:o.district,division:o.division,upazila:o.upazila,address:o.address,items:o.items,subtotal:o.subtotal,discount:o.discount,promo:o.promo||null,delivery:o.delivery,total:o.total,payment:o.payment,pay:o.pay||null,deliveryPaid:!!o.deliveryPaid,courier:null,status:'pending',currency:'BDT'};
   myoStore([rec,...myoList().filter(x=>x.orderId!==rec.orderId)]); }
 function myoPatch(id,p){ const a=myoList(), i=a.findIndex(x=>x.orderId===id); if(i<0) return; a[i]={...a[i],...p}; save(MYO_KEY,a); myoBadge(); }
-function myoBadge(){ const b=$('myoBadge'); if(!b) return; const n=myoList().filter(o=>!['delivered','cancelled','returned'].includes(o.status||'pending')).length; b.textContent=bnum(n); b.classList.toggle('opacity-0',!n); b.classList.toggle('scale-0',!n); }
+const MYO_DONE=['delivered','cancelled','returned'], MYO_BAD=['cancelled','returned','rejected'];
+const myoIsBad=s=>MYO_BAD.includes(s);
+function myoBadge(){ const b=$('myoBadge'); if(!b) return; const n=myoList().filter(o=>!MYO_DONE.includes(o.status||'pending')).length; b.textContent=bnum(n); b.classList.toggle('opacity-0',!n); b.classList.toggle('scale-0',!n); }
+const myoNorm=v=>{ let d=String(v||'').replace(/\D/g,''); if(d.startsWith('88')&&d.length===13) d=d.slice(2); return d; };
+const myoPhoneOk=p=>/^01[3-9]\d{8}$/.test(p);
+const myoMask=p=>p?p.slice(0,3)+'••••'+p.slice(-2):'';
 let myoUnsubs=[];
-function closeMyOrders(){ myoUnsubs.forEach(u=>{ try{u();}catch(e){} }); myoUnsubs=[]; const w=$('myoWrap'); if(w) w.remove(); }
+const myoSt={cfg:{enabled:false},openId:null,openSrc:'',pool:new Map(),sess:null,otp:null,timer:null};
+function myoClearTimer(){ if(myoSt.timer){ clearInterval(myoSt.timer); myoSt.timer=null; } }
+function closeMyOrders(){ myoUnsubs.forEach(u=>{ try{u();}catch(e){} }); myoUnsubs=[]; myoClearTimer(); myoSt.openId=null; myoSt.sess=null; myoSt.otp=null; const w=$('myoWrap'); if(w) w.remove(); }
+
+/* ---- server calls (same-origin /api — the Railway server that already handles WhatsApp / Steadfast) ---- */
+async function myoApi(path,body){
+  let r; try{ r=await fetch('/api'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); }
+  catch(e){ throw {code:'net',message:'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না। একটু পরে আবার চেষ্টা করুন।'}; }
+  const j=await r.json().catch(()=>null);
+  if(!j) throw {code:'net',message:'সার্ভার এখন উত্তর দিচ্ছে না। একটু পরে আবার চেষ্টা করুন।'};
+  if(!r.ok||j.error) throw {code:j.error||('http_'+r.status),message:j.message||'কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন।',data:j};
+  return j; }
+
+/* ---- small pieces ---- */
+const myoDate=o=>{ const d=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate():new Date(o.createdAt||Date.now()); return isNaN(d)?null:d; };
+const myoDS=(o,t)=>{ const d=myoDate(o); if(!d) return ''; return d.toLocaleDateString('bn-BD',{day:'numeric',month:'short',year:'numeric'})+(t?' · '+d.toLocaleTimeString('bn-BD',{hour:'numeric',minute:'2-digit'}):''); };
+function myoImg(it,cls){ const p=(state.products||[]).find(x=>x.id===it.id), im=it.image||(p&&(p.image||(p.images&&p.images[0])));
+  return im?`<img src="${esc(im)}" alt="" class="${cls} object-cover border border-white/15 bg-black/30" onerror="this.style.visibility='hidden'">`:`<span class="${cls} bg-white/5 border border-white/10 flex items-center justify-center text-gold-400"><i class="fa-solid fa-shirt"></i></span>`; }
+function myoChip(st){ const bad=myoIsBad(st); return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border whitespace-nowrap ${bad?'bg-red-500/15 text-red-300 border-red-500/30':(st==='delivered'?'bg-emerald-500/15 text-emerald-300 border-emerald-500/30':'bg-gold-500/15 text-gold-400 border-gold-500/30')}">${bad?(st==='cancelled'?'বাতিল':'রিটার্ন/রিজেক্ট'):(TRK_L[st]||esc(st))}</span>`; }
+function myoDots(st){ const bad=myoIsBad(st), idx=Math.max(0,TRK_ST.indexOf(st));
+  return TRK_ST.map((k,i)=>{ const on=!bad&&i<=idx; return `<div class="flex-1 flex flex-col items-center gap-1 relative"><span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] z-10 ${on?'btn-gold':'bg-ink-900 text-silver-400 border border-white/15'}"><i class="fa-solid ${TRK_I[k]}"></i></span><span class="text-[9px] leading-tight text-center ${on?'text-white font-bold':'text-silver-400'}">${TRK_L[k]}</span>${i?`<span class="absolute top-3 right-1/2 w-full h-[2px] ${on?'bg-gold-500':'bg-white/10'}"></span>`:''}</div>`; }).join(''); }
+
+/* ---- compact order card (small) ---- */
 function myoCard(o){
-  const st=o.status||'pending', bad=st==='cancelled'||st==='returned', idx=Math.max(0,TRK_ST.indexOf(st));
-  const d=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate():new Date(o.createdAt||Date.now());
-  const ds=isNaN(d)?'':d.toLocaleDateString('bn-BD',{day:'numeric',month:'long',year:'numeric'})+' · '+d.toLocaleTimeString('bn-BD',{hour:'numeric',minute:'2-digit'});
-  const items=o.items||[];
-  const thumbs=items.slice(0,4).map(i=>{ const p=(state.products||[]).find(x=>x.id===i.id), im=p&&(p.image||(p.images&&p.images[0]));
-    return im?`<img src="${esc(im)}" alt="" class="w-11 h-11 rounded-lg object-cover border border-white/15" onerror="this.style.visibility='hidden'">`:`<span class="w-11 h-11 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gold-400"><i class="fa-solid fa-shirt"></i></span>`; }).join('')+(items.length>4?`<span class="w-11 h-11 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xs font-extrabold text-silver-300">+${bnum(items.length-4)}</span>`:'');
-  const dots=TRK_ST.map((k,i)=>{ const on=i<=idx; return `<div class="flex-1 flex flex-col items-center gap-1 relative"><span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] z-10 ${on?'btn-gold':'bg-ink-900 text-silver-400 border border-white/15'}"><i class="fa-solid ${TRK_I[k]}"></i></span><span class="text-[9px] leading-tight text-center ${on?'text-white font-bold':'text-silver-400'}">${TRK_L[k]}</span>${i?`<span class="absolute top-3 right-1/2 w-full h-[2px] ${on?'bg-gold-500':'bg-white/10'}"></span>`:''}</div>`; }).join('');
+  const st=o.status||'pending', items=o.items||[], id=esc(o.orderId), n=items.reduce((a,i)=>a+(+i.qty||0),0)||items.length;
+  myoSt.pool.set(o.orderId,o);
+  return `<div class="myo-card rounded-2xl bg-white/5 border border-white/10 p-3 transition-colors hover:border-gold-500/40" data-id="${id}">
+    <div class="flex items-center gap-3">
+      <div class="flex -space-x-3 flex-none">${items.slice(0,3).map(i=>myoImg(i,'w-11 h-11 rounded-xl ring-2 ring-ink-900')).join('')||myoImg({},'w-11 h-11 rounded-xl')}</div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between gap-2"><span class="font-extrabold tracking-wider text-gold-400 text-[12px] truncate">${id}</span>${myoChip(st)}</div>
+        <div class="text-[10px] text-silver-400 mt-0.5">${myoDS(o)} · ${bnum(n)}টি পণ্য</div>
+      </div></div>
+    <div class="flex items-center justify-between mt-2.5 pt-2.5 border-t border-white/10">
+      <div class="text-[11px] text-silver-400">মোট <b class="text-white text-sm ml-1">${money(o.total)}</b></div>
+      <button type="button" onclick="myoOpen('${id}')" class="px-3 py-1.5 rounded-lg btn-gold text-[11px] font-extrabold">বিস্তারিত দেখুন <i class="fa-solid fa-arrow-right ml-1 text-[9px]"></i></button>
+    </div></div>`; }
+
+/* ---- full details of one order ---- */
+function myoDetailHTML(o){
+  const st=o.status||'pending', bad=myoIsBad(st), items=o.items||[], masked=!!o.masked;
   const tr=o.tracking||(o.courier&&o.courier.tracking)||'', cn=o.courierName||(typeof o.courier==='string'?o.courier:(o.courier&&o.courier.name))||'কুরিয়ার';
-  const id=esc(o.orderId);
-  return `<div class="myo-card rounded-2xl bg-white/5 border border-white/10 p-3.5" data-id="${id}">
-    <div class="flex justify-between items-start gap-2"><div><div class="text-[10px] text-silver-400">অর্ডার আইডি</div><div class="font-extrabold tracking-wider text-gold-400 text-sm">${id}</div><div class="text-[10px] text-silver-400 mt-0.5">${ds}</div></div>
-      <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${bad?'bg-red-500/15 text-red-300 border-red-500/30':'bg-gold-500/15 text-gold-400 border-gold-500/30'}">${bad?(st==='cancelled'?'বাতিল':'রিটার্ন'):(TRK_L[st]||esc(st))}</span></div>
-    <div class="flex gap-1.5 mt-3">${thumbs}</div>
-    <div class="mt-2 text-[11px] text-silver-300 space-y-0.5">${items.slice(0,3).map(i=>`<div class="truncate">${esc(i.title)} <span class="text-silver-400">(${esc(i.size)}) ×${bnum(i.qty)}</span></div>`).join('')}${items.length>3?`<div class="text-silver-400">আরও ${bnum(items.length-3)}টি পণ্য…</div>`:''}</div>
-    ${bad?`<div class="mt-3 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold">${st==='cancelled'?'এই অর্ডারটি বাতিল করা হয়েছে।':'এই অর্ডারটি রিটার্ন/রিজেক্ট হয়েছে।'}</div>`:`<div class="flex mt-3.5">${dots}</div>`}
+  const id=esc(o.orderId), place=[o.upazila,DBN[o.district]||o.district].filter(Boolean).map(esc).join(', ');
+  return `<button type="button" onclick="myoBack()" class="text-xs font-bold text-silver-300 hover:text-gold-400 mb-3"><i class="fa-solid fa-arrow-left mr-1.5"></i>ফিরে যান</button>
+  <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+    <div class="flex justify-between items-start gap-2"><div><div class="text-[10px] text-silver-400">অর্ডার আইডি</div><div class="font-extrabold tracking-wider text-gold-400">${id}</div><div class="text-[10px] text-silver-400 mt-0.5">${myoDS(o,true)}</div></div>${myoChip(st)}</div>
+    ${bad?`<div class="mt-3 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold">${st==='cancelled'?'এই অর্ডারটি বাতিল করা হয়েছে।':'এই অর্ডারটি রিটার্ন/রিজেক্ট হয়েছে।'}</div>`:`<div class="flex mt-4">${myoDots(st)}</div>`}
     ${tr?`<div class="mt-3 p-2.5 rounded-xl bg-black/40 border border-gold-500/25 text-[11px]"><span class="text-silver-400">${esc(cn)} ট্র্যাকিং:</span> <span class="font-mono font-extrabold text-white break-all">${esc(tr)}</span>${o.live?`<div class="text-gold-400 font-bold mt-0.5"><i class="fa-solid fa-satellite-dish mr-1"></i>${esc(TRK_LIVE[o.live]||o.live)}</div>`:''}</div>`:''}
-    <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2"><div><div class="text-[10px] text-silver-400">মোট</div><div class="font-extrabold">${money(o.total)}</div></div>
-      <div class="flex gap-2"><button type="button" onclick="myoInv('${id}')" class="px-3 py-2 rounded-xl bg-white/5 border border-gold-500/40 text-gold-400 text-[11px] font-extrabold"><i class="fa-solid fa-file-invoice mr-1"></i>ইনভয়েস</button><button type="button" onclick="openTrack('${id}')" class="px-3 py-2 rounded-xl btn-gold text-[11px] font-extrabold"><i class="fa-solid fa-truck-fast mr-1"></i>ট্র্যাক</button></div></div></div>`;
-}
-function myoRender(){ const box=$('myoList'); if(!box) return; const a=myoList();
-  box.innerHTML=a.length?a.map(myoCard).join('')+`<div class="text-[10px] text-silver-400 text-center pt-1"><i class="fa-solid fa-mobile-screen mr-1"></i>আপনার অর্ডার এই ডিভাইসে সংরক্ষিত থাকে • স্ট্যাটাস নিজে থেকেই আপডেট হয়</div>`
-  :`<div class="text-center py-10"><div class="w-16 h-16 rounded-full bg-gold-500/10 text-gold-400 flex items-center justify-center mx-auto text-2xl mb-3"><i class="fa-solid fa-receipt"></i></div><div class="font-extrabold">এখনো কোনো অর্ডার নেই</div><div class="text-xs text-silver-400 mt-1">অর্ডার কনফার্ম করলেই এখানে অটোমেটিক দেখা যাবে</div><button type="button" onclick="closeMyOrders();filterCategory('all');$('shop').scrollIntoView({behavior:'smooth'})" class="mt-4 px-6 py-2.5 rounded-xl btn-gold font-extrabold text-xs">শপিং শুরু করুন</button></div>`; }
-function myoRefresh(id){ const box=$('myoList'), o=myoList().find(x=>x.orderId===id); if(!box||!o) return; const el=box.querySelector('[data-id="'+id+'"]'); if(!el) return; const t=document.createElement('div'); t.innerHTML=myoCard(o); el.replaceWith(t.firstElementChild); }
+  </div>
+  <div class="rounded-2xl bg-white/5 border border-white/10 p-4 mt-3">
+    <div class="text-[11px] font-extrabold text-silver-300 mb-2.5"><i class="fa-solid fa-bag-shopping text-gold-400 mr-1.5"></i>অর্ডার করা পণ্য</div>
+    <div class="space-y-2.5">${items.map(i=>`<div class="flex items-center gap-3">${myoImg(i,'w-12 h-12 rounded-xl flex-none')}<div class="flex-1 min-w-0"><div class="text-xs font-bold truncate">${esc(i.title)}</div><div class="text-[10px] text-silver-400">${i.size?'সাইজ: '+esc(i.size)+' · ':''}পরিমাণ: ${bnum(i.qty||1)}</div></div><div class="text-xs font-extrabold">${money((+i.price||0)*(+i.qty||1))}</div></div>`).join('')}</div>
+    <div class="mt-3 pt-3 border-t border-white/10 space-y-1 text-[11px]">
+      <div class="flex justify-between text-silver-400"><span>সাবটোটাল</span><span class="text-white">${money(o.subtotal)}</span></div>
+      ${+o.discount?`<div class="flex justify-between text-emerald-400"><span>ডিসকাউন্ট${o.promo&&o.promo.code?' ('+esc(o.promo.code)+')':''}</span><span>-${money(o.discount)}</span></div>`:''}
+      <div class="flex justify-between text-silver-400"><span>ডেলিভারি</span><span class="text-white">${+o.delivery?money(o.delivery):'ফ্রি'}</span></div>
+      <div class="flex justify-between text-sm font-extrabold pt-1.5 border-t border-white/10"><span>মোট</span><span class="text-gold-400">${money(o.total)}</span></div>
+    </div></div>
+  <div class="rounded-2xl bg-white/5 border border-white/10 p-4 mt-3 text-[11px] leading-relaxed">
+    <div class="text-[11px] font-extrabold text-silver-300 mb-2"><i class="fa-solid fa-location-dot text-gold-400 mr-1.5"></i>ডেলিভারি ও পেমেন্ট</div>
+    ${o.customerName?`<div><b class="text-white">${esc(o.customerName)}</b>${o.phone?` · <span class="text-silver-300">${esc(o.phone)}</span>`:''}</div>`:''}
+    ${masked?`<div class="text-silver-300">${place||'—'}</div>`:`<div class="text-silver-300">${esc(o.address||'')}${place?', '+place:''}${o.division?', '+esc(DVBN[o.division]||o.division)+' বিভাগ':''}</div>`}
+    ${o.area?`<div class="text-gold-400 font-bold mt-1">${o.area==='dhaka'?'ঢাকার ভিতরে':'ঢাকার বাইরে'}</div>`:''}
+    <div class="text-silver-400 mt-1">পেমেন্ট: <span class="text-white">${esc(o.payment||'Cash on Delivery')}</span></div>
+    ${masked?`<div class="mt-2.5 p-2 rounded-lg bg-gold-500/10 border border-gold-500/25 text-[10px] text-gold-400"><i class="fa-solid fa-shield-halved mr-1"></i>গোপনীয়তার জন্য নাম, নম্বর ও পূর্ণ ঠিকানা আংশিক লুকানো আছে।</div>`:''}
+  </div>
+  <div class="flex gap-2 mt-3 pb-1">
+    ${masked?'':`<button type="button" onclick="myoInv('${id}')" class="flex-1 py-2.5 rounded-xl bg-white/5 border border-gold-500/40 text-gold-400 text-xs font-extrabold"><i class="fa-solid fa-file-invoice mr-1.5"></i>ইনভয়েস</button>`}
+    <button type="button" onclick="openTrack('${id}')" class="flex-1 py-2.5 rounded-xl btn-gold text-xs font-extrabold"><i class="fa-solid fa-truck-fast mr-1.5"></i>ট্র্যাক করুন</button>
+  </div>`; }
+function myoRenderDetail(o){ const b=$('myoBody'); if(!b||!o) return; b.innerHTML='<div class="pop">'+myoDetailHTML(o)+'</div>'; b.scrollTop=0; }
+function myoOpen(id){ const o=myoSt.pool.get(id)||myoList().find(x=>x.orderId===id); if(!o) return; myoSt.openId=id; myoSt.openSrc=o.masked?'search':(myoList().some(x=>x.orderId===id)?'local':'search'); myoRenderDetail(o); }
+function myoBack(){ myoSt.openId=null; if(myoSt.last&&myoSt.last.kind==='results'){ const l=myoSt.last; myoShowResults(l.ph,l.list,l.verified); } else myoRender(); }
+function myoInv(id){ const o=myoSt.pool.get(id)||myoList().find(x=>x.orderId===id); if(o&&!o.masked) showInvoice(o); }
+
+/* ---- home view: this device's orders ---- */
+function myoRender(){ const box=$('myoBody'); if(!box) return; myoSt.last={kind:'home'}; myoSt.openId=null; myoClearTimer(); const a=myoList();
+  box.innerHTML=a.length?`<div class="flex items-center justify-between mb-2.5"><div class="text-[11px] font-extrabold text-silver-300"><i class="fa-solid fa-mobile-screen text-gold-400 mr-1.5"></i>এই ডিভাইসের অর্ডার</div><div class="text-[10px] text-silver-400">${bnum(a.length)}টি</div></div><div class="space-y-2.5">${a.map(myoCard).join('')}</div><div class="text-[10px] text-silver-400 text-center pt-3"><i class="fa-solid fa-rotate mr-1"></i>স্ট্যাটাস নিজে থেকেই আপডেট হয়</div>`
+  :`<div class="text-center py-8"><div class="w-16 h-16 rounded-full bg-gold-500/10 text-gold-400 flex items-center justify-center mx-auto text-2xl mb-3"><i class="fa-solid fa-receipt"></i></div><div class="font-extrabold">এখনো কোনো অর্ডার নেই</div><div class="text-xs text-silver-400 mt-1">অর্ডার কনফার্ম করলেই এখানে অটোমেটিক দেখা যাবে</div><div class="text-[11px] text-silver-400 mt-1">অন্য ফোনের অর্ডার দেখতে উপরে নম্বর বা আইডি দিয়ে খুঁজুন</div><button type="button" onclick="closeMyOrders();filterCategory('all');$('shop').scrollIntoView({behavior:'smooth'})" class="mt-4 px-6 py-2.5 rounded-xl btn-gold font-extrabold text-xs">শপিং শুরু করুন</button></div>`; }
+function myoRefresh(id){ const box=$('myoBody'); if(!box) return; if(myoSt.openId===id&&myoSt.openSrc==='local'){ const o=myoList().find(x=>x.orderId===id); if(o) myoRenderDetail(o); return; }
+  const o=myoList().find(x=>x.orderId===id); if(!o||myoSt.last&&myoSt.last.kind!=='home') return; const el=box.querySelector('[data-id="'+id+'"]'); if(!el) return; const t=document.createElement('div'); t.innerHTML=myoCard(o); el.replaceWith(t.firstElementChild); }
+
+/* ---- loading / error helpers ---- */
+const myoLoad=t=>{ const b=$('myoBody'); if(b) b.innerHTML=`<div class="text-center py-12 text-sm text-silver-400"><i class="fa-solid fa-spinner fa-spin text-gold-400 text-xl mb-3 block"></i>${t||'খোঁজা হচ্ছে...'}</div>`; };
+const myoMsg=(ic,t,s,btn)=>{ const b=$('myoBody'); if(b) b.innerHTML=`<div class="text-center py-10 pop"><div class="w-14 h-14 rounded-full bg-red-500/10 text-red-300 flex items-center justify-center mx-auto text-xl mb-3"><i class="fa-solid ${ic}"></i></div><div class="font-extrabold text-sm">${t}</div><div class="text-xs text-silver-400 mt-1 leading-relaxed">${s||''}</div>${btn||''}<div><button type="button" onclick="myoRender()" class="mt-4 text-xs font-bold text-gold-400 underline">আমার অর্ডারে ফিরে যান</button></div></div>`; };
+
+/* ---- search (Order ID or mobile number) ---- */
+async function myoSearch(e){ if(e) e.preventDefault(); const raw=($('myoQ').value||'').trim(); if(!raw){ toast('অর্ডার আইডি বা মোবাইল নম্বর লিখুন',false); return; }
+  const ph=myoNorm(raw); if(myoPhoneOk(ph)) return myoByPhone(ph);
+  const id=raw.toUpperCase().replace(/\s+/g,''); if(/^BF-[A-Z0-9]{4,}$/.test(id)) return myoById(id);
+  toast('সঠিক মোবাইল নম্বর (01XXXXXXXXX) অথবা অর্ডার আইডি (BF-XXXX) দিন',false); }
+async function myoById(id){ const loc=myoList().find(x=>x.orderId===id); if(loc){ myoOpen(id); return; }
+  myoLoad('অর্ডার খোঁজা হচ্ছে...');
+  try{ const j=await myoApi('/orders/lookup',{orderId:id}); const o=(j.orders||[])[0]; if(!o) throw {code:'not_found'}; myoSt.last={kind:'home'}; myoSt.pool.set(o.orderId,o); myoSt.openId=o.orderId; myoSt.openSrc='search'; myoRenderDetail(o); }
+  catch(e){ if(e.code==='not_found'||e.code==='http_404') myoMsg('fa-circle-exclamation','এই আইডিতে কোনো অর্ডার পাওয়া যায়নি','আইডিটি আবার মিলিয়ে দেখুন (যেমন BF-XXXXXXXX)');
+    else { myoRender(); openTrack(id); } } }
+async function myoByPhone(ph){
+  if(myoSt.cfg.enabled){ if(myoSt.sess&&myoSt.sess.phone===ph&&myoSt.sess.exp>Date.now()) return myoShowResults(ph,myoSt.sess.orders,true); return myoOtpStart(ph); }
+  myoLoad('এই নম্বরের অর্ডার খোঁজা হচ্ছে...');
+  try{ const j=await myoApi('/orders/lookup',{phone:ph}); if(!Array.isArray(j.orders)) throw {code:'net'}; myoShowResults(ph,j.orders,false); }
+  catch(e){ if(e.code==='otp_required'){ myoSt.cfg.enabled=true; return myoOtpStart(ph); }
+    const mine=myoList().filter(o=>myoNorm(o.phone)===ph);
+    if(mine.length&&e.code==='net'){ myoShowResults(ph,mine,true,'সার্ভার সংযোগ নেই — শুধু এই ডিভাইসে সংরক্ষিত অর্ডার দেখানো হচ্ছে'); }
+    else myoMsg('fa-circle-exclamation',esc(e.message||'খুঁজে পাওয়া যায়নি'),''); } }
+
+/* ---- results for a phone number: customer summary + orders ---- */
+function myoShowResults(ph,list,verified,note){ const box=$('myoBody'); if(!box) return; myoClearTimer();
+  list=[...list].sort((a,b)=>(myoDate(b)||0)-(myoDate(a)||0)); myoSt.last={kind:'results',ph,list,verified}; myoSt.openId=null;
+  const t=list.length, dl=list.filter(o=>(o.status||'pending')==='delivered').length, bd=list.filter(o=>myoIsBad(o.status)).length, act=t-dl-bd;
+  const val=list.filter(o=>!myoIsBad(o.status)).reduce((a,o)=>a+(+o.total||0),0), ds=list.map(myoDate).filter(Boolean).sort((a,b)=>a-b);
+  const fd=d=>d.toLocaleDateString('bn-BD',{day:'numeric',month:'short',year:'numeric'});
+  const tile=(ic,l,v,c)=>`<div class="rounded-xl bg-black/30 border border-white/10 p-2.5 text-center"><div class="text-[15px] ${c||'text-gold-400'}"><i class="fa-solid ${ic}"></i></div><div class="font-extrabold text-sm mt-0.5">${v}</div><div class="text-[9px] text-silver-400 leading-tight">${l}</div></div>`;
+  box.innerHTML=`<button type="button" onclick="myoRender()" class="text-xs font-bold text-silver-300 hover:text-gold-400 mb-3"><i class="fa-solid fa-arrow-left mr-1.5"></i>ফিরে যান</button>
+  <div class="pop rounded-2xl bg-gradient-to-br from-gold-500/15 to-white/5 border border-gold-500/30 p-4">
+    <div class="flex items-center justify-between gap-2"><div><div class="text-[10px] text-silver-400">কাস্টমার নম্বর</div><div class="font-extrabold tracking-wider">${verified?esc(ph):esc(myoMask(ph))}</div></div>
+      <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${verified?'bg-emerald-500/15 text-emerald-300 border-emerald-500/30':'bg-white/5 text-silver-300 border-white/15'}"><i class="fa-solid ${verified?'fa-shield-halved':'fa-eye-slash'} mr-1"></i>${verified?'ভেরিফাইড':'সংক্ষিপ্ত ভিউ'}</span></div>
+    ${t?`<div class="grid grid-cols-3 gap-2 mt-3">${tile('fa-bag-shopping','মোট অর্ডার',bnum(t))}${tile('fa-box-open','ডেলিভারড',bnum(dl),'text-emerald-400')}${tile('fa-ban','বাতিল/রিজেক্ট',bnum(bd),'text-red-400')}${tile('fa-truck-fast','চলমান',bnum(act),'text-sky-400')}${tile('fa-coins','মোট অর্ডারের মূল্য',money(val))}${tile('fa-calendar-days','প্রথম অর্ডার',ds.length?fd(ds[0]):'—')}</div>
+    ${ds.length?`<div class="text-[10px] text-silver-400 mt-2.5 text-center">সর্বশেষ অর্ডার: <b class="text-white">${fd(ds[ds.length-1])}</b></div>`:''}`:''}
+  </div>
+  ${note?`<div class="mt-3 p-2.5 rounded-xl bg-gold-500/10 border border-gold-500/25 text-[11px] text-gold-400"><i class="fa-solid fa-circle-info mr-1"></i>${esc(note)}</div>`:''}
+  ${!verified?`<div class="mt-3 p-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] text-silver-300 leading-relaxed"><i class="fa-solid fa-shield-halved text-gold-400 mr-1"></i>গোপনীয়তার জন্য নাম ও ঠিকানা আংশিক লুকানো আছে।</div>`:''}
+  ${t?`<div class="text-[11px] font-extrabold text-silver-300 mt-4 mb-2.5"><i class="fa-solid fa-list text-gold-400 mr-1.5"></i>অর্ডার তালিকা</div><div class="space-y-2.5">${list.map(myoCard).join('')}</div>`
+    :`<div class="text-center py-9"><div class="w-14 h-14 rounded-full bg-gold-500/10 text-gold-400 flex items-center justify-center mx-auto text-xl mb-3"><i class="fa-solid fa-magnifying-glass"></i></div><div class="font-extrabold text-sm">এই নম্বরে কোনো অর্ডার পাওয়া যায়নি</div><div class="text-xs text-silver-400 mt-1">নম্বরটি আবার মিলিয়ে দেখুন</div></div>`}`;
+  box.scrollTop=0; }
+
+/* ---- SMS code (OTP) flow — only used while the admin switch is ON ---- */
+function myoOtpView(ph,state,msg){ const b=$('myoBody'); if(!b) return; const len=(myoSt.otp&&myoSt.otp.len)||6;
+  b.innerHTML=`<button type="button" onclick="myoRender()" class="text-xs font-bold text-silver-300 hover:text-gold-400 mb-3"><i class="fa-solid fa-arrow-left mr-1.5"></i>ফিরে যান</button>
+  <div class="pop rounded-2xl bg-white/5 border border-gold-500/25 p-5 text-center">
+    <div class="w-14 h-14 rounded-full bg-gold-500/10 text-gold-400 flex items-center justify-center mx-auto text-2xl"><i class="fa-solid ${state==='sending'?'fa-spinner fa-spin':'fa-comment-dots'}"></i></div>
+    <div class="font-extrabold mt-3">নম্বর ভেরিফাই করুন</div>
+    ${state==='error'?`<div class="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">${esc(msg||'কোড পাঠানো যায়নি')}</div><button type="button" onclick="myoOtpStart('${ph}')" class="mt-3 px-5 py-2.5 rounded-xl btn-gold text-xs font-extrabold">আবার চেষ্টা করুন</button>`
+    :state==='sending'?`<div class="text-xs text-silver-400 mt-1">${esc(myoMask(ph))} নম্বরে কোড পাঠানো হচ্ছে...</div>`
+    :`<div class="text-xs text-silver-400 mt-1 leading-relaxed"><b class="text-white">${esc(myoMask(ph))}</b> নম্বরে ${bnum(len)} সংখ্যার একটি কোড পাঠানো হয়েছে</div>
+    <form onsubmit="myoOtpVerify(event)" class="mt-4"><input id="myoCode" inputmode="numeric" autocomplete="one-time-code" maxlength="${len}" placeholder="${'•'.repeat(len)}" class="w-full px-3 py-3.5 rounded-xl bg-black/50 border border-white/15 text-center text-2xl font-extrabold tracking-[.5em] outline-none focus:border-gold-500" oninput="this.value=this.value.replace(/\\D/g,'');$('myoCodeErr').textContent=''">
+      <div id="myoCodeErr" class="text-[11px] text-red-300 mt-2 min-h-[16px]"></div>
+      <button id="myoVerBtn" class="mt-2 w-full py-3 rounded-xl btn-gold font-extrabold text-sm"><i class="fa-solid fa-lock-open mr-2"></i>ভেরিফাই করে দেখুন</button></form>
+    <div class="flex items-center justify-between mt-3 text-[11px]"><button type="button" onclick="myoRender()" class="text-silver-400 underline">নম্বর বদলান</button><button type="button" id="myoResend" onclick="myoResend()" class="font-bold text-gold-400 disabled:text-silver-400 disabled:no-underline" disabled></button></div>`}
+  </div>`;
+  if(state==='sent'){ setTimeout(()=>{ const c=$('myoCode'); if(c) c.focus(); },120); myoTick(); } }
+function myoTick(){ myoClearTimer(); const f=()=>{ const b=$('myoResend'); if(!b||!myoSt.otp){ myoClearTimer(); return; } const s=Math.max(0,Math.ceil((myoSt.otp.next-Date.now())/1000)); b.disabled=s>0; b.textContent=s>0?'আবার পাঠান ('+bnum(s)+' সেকেন্ড)':'কোড আবার পাঠান'; if(!s) myoClearTimer(); }; f(); myoSt.timer=setInterval(f,1000); }
+async function myoOtpStart(ph){ myoSt.otp={phone:ph,len:6,next:0}; myoOtpView(ph,'sending');
+  try{ const j=await myoApi('/otp/send',{phone:ph}); myoSt.otp={phone:ph,len:j.len||6,next:Date.now()+(j.resend||60)*1000}; myoOtpView(ph,'sent'); }
+  catch(e){ if(e.code==='sms_off'){ myoSt.cfg.enabled=false; return myoByPhone(ph); } myoOtpView(ph,'error',e.message); } }
+function myoResend(){ if(myoSt.otp) myoOtpStart(myoSt.otp.phone); }
+async function myoOtpVerify(e){ e.preventDefault(); if(!myoSt.otp) return; const code=($('myoCode').value||'').replace(/\D/g,''), er=$('myoCodeErr'), btn=$('myoVerBtn');
+  if(code.length<myoSt.otp.len){ er.textContent=bnum(myoSt.otp.len)+' সংখ্যার কোডটি পুরোটা লিখুন'; return; }
+  btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i>যাচাই হচ্ছে...';
+  try{ const ph=myoSt.otp.phone, j=await myoApi('/otp/verify',{phone:ph,code}); if(!Array.isArray(j.orders)) throw {code:'net',message:'সার্ভার উত্তর দেয়নি'};
+    myoSt.sess={phone:ph,orders:j.orders,exp:Date.now()+10*60*1000}; myoShowResults(ph,j.orders,true); }
+  catch(x){ if(!$('myoCodeErr')) return; $('myoCodeErr').textContent=x.message||'কোড মেলেনি'; const b=$('myoVerBtn'); if(b){ b.disabled=false; b.innerHTML='<i class="fa-solid fa-lock-open mr-2"></i>ভেরিফাই করে দেখুন'; }
+    if(x.code==='too_many'||x.code==='expired'){ if(myoSt.otp) myoSt.otp.next=0; myoTick(); } } }
+
+/* ---- live status of this device's orders + restore after cleared browser data ---- */
 function myoWatch(id){ if(!FIREBASE_READY||!$('myoWrap')) return;
   try{ myoUnsubs.push(onSnapshot(doc(db,'receipts',id),s=>{ if(!s.exists()) return; const r=s.data(); myoPatch(id,{status:r.status||'pending',tracking:r.tracking||'',courierName:typeof r.courier==='string'?r.courier:'',live:r.live||''}); myoRefresh(id); },()=>{})); }catch(e){} }
 async function myoSync(){ if(!FIREBASE_READY) return;
@@ -2943,17 +3081,23 @@ async function myoSync(){ if(!FIREBASE_READY) return;
       if(have.has(x.orderId)) myoPatch(x.orderId,{deliveryPaid:!!x.deliveryPaid,courier:x.courier||null,status:x.status||have.get(x.orderId).status});
       else add.push({...x,createdAt:ca}); });
     if(add.length){ myoStore([...myoList(),...add].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt))); add.forEach(o=>myoWatch(o.orderId)); }
-    if($('myoWrap')) myoRender();
+    if($('myoWrap')&&myoSt.last&&myoSt.last.kind==='home'&&!myoSt.openId) myoRender();
   }catch(e){} }
-function openMyOrders(){ closeMyOrders();
+/* admin switch: settings/sms { enabled } — read live while the sheet is open */
+function myoCfgWatch(){ if(!FIREBASE_READY) return; try{ myoUnsubs.push(onSnapshot(doc(db,'settings','sms'),s=>{ const d=s.exists()?s.data():{}; myoSt.cfg={enabled:!!d.enabled}; const h=$('myoHint'); if(h) h.innerHTML=myoHintHTML(); },()=>{})); }catch(e){} }
+const myoHintHTML=()=>myoSt.cfg.enabled?'<i class="fa-solid fa-shield-halved text-gold-400 mr-1"></i>নম্বর দিয়ে খুঁজলে SMS-এ কোড যাবে — কোড দিলে পূর্ণ বিবরণ দেখাবে':'<i class="fa-solid fa-circle-info text-gold-400 mr-1"></i>অন্য ফোন থেকে দেখতে অর্ডার আইডি বা মোবাইল নম্বর দিয়ে খুঁজুন';
+function openMyOrders(){ closeMyOrders(); myoSt.pool=new Map(); myoSt.last={kind:'home'};
   const w=document.createElement('div'); w.id='myoWrap'; w.className='fixed inset-0 z-[118] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4'; w.onclick=e=>{ if(e.target===w) closeMyOrders(); };
-  w.innerHTML=`<div class="pop w-full max-w-md rounded-t-3xl sm:rounded-3xl bg-ink-900 border border-gold-500/30 text-white max-h-[92vh] flex flex-col"><div class="flex items-center justify-between p-5 pb-3"><div class="font-display font-extrabold tracking-wider"><i class="fa-solid fa-receipt text-gold-400 mr-2"></i>আপনার অর্ডার</div><button type="button" onclick="closeMyOrders()" class="text-silver-400 text-xl" aria-label="বন্ধ করুন"><i class="fa-solid fa-xmark"></i></button></div><div id="myoList" class="px-5 pb-5 space-y-3 overflow-y-auto"></div></div>`;
-  document.body.appendChild(w); myoRender(); myoSync(); }
-function myoInv(id){ const o=myoList().find(x=>x.orderId===id); if(o) showInvoice(o); }
+  w.innerHTML=`<div class="pop w-full max-w-md rounded-t-3xl sm:rounded-3xl bg-ink-900 border border-gold-500/30 text-white h-[92vh] sm:h-auto sm:max-h-[88vh] flex flex-col overflow-hidden">
+    <div class="flex items-center justify-between px-5 pt-5 pb-3"><div class="font-display font-extrabold tracking-wider"><i class="fa-solid fa-receipt text-gold-400 mr-2"></i>আপনার অর্ডার</div><button type="button" onclick="closeMyOrders()" class="text-silver-400 text-xl" aria-label="বন্ধ করুন"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="px-5 pb-3 border-b border-white/10"><form onsubmit="myoSearch(event)" class="flex gap-2"><div class="relative flex-1 min-w-0"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-silver-400 text-xs"></i><input id="myoQ" class="w-full pl-9 pr-3 py-3 rounded-xl bg-black/50 border border-white/15 text-sm outline-none focus:border-gold-500" placeholder="অর্ডার আইডি বা মোবাইল নম্বর" autocomplete="off" enterkeyhint="search"></div><button class="btn-gold px-4 rounded-xl font-extrabold text-sm" aria-label="খুঁজুন">খুঁজুন</button></form><div id="myoHint" class="text-[10px] text-silver-400 mt-2">${myoHintHTML()}</div></div>
+    <div id="myoBody" class="flex-1 overflow-y-auto px-5 py-4"></div></div>`;
+  document.body.appendChild(w); myoRender(); myoSync(); myoCfgWatch(); }
 function myoFromConfirm(){ try{ hideConfirm(); }catch(e){} openMyOrders(); }
 async function myoBoot(){ myoBadge(); if(!FIREBASE_READY) return; try{ await Promise.race([authReady,new Promise(r=>setTimeout(r,3000))]);
-  const act=myoList().filter(o=>!['delivered','cancelled','returned'].includes(o.status||'pending')).slice(0,5);
+  const act=myoList().filter(o=>!MYO_DONE.includes(o.status||'pending')).slice(0,5);
   for(const o of act){ try{ const s=await getDoc(doc(db,'receipts',o.orderId)); if(s.exists()){ const r=s.data(); myoPatch(o.orderId,{status:r.status||'pending',tracking:r.tracking||'',courierName:typeof r.courier==='string'?r.courier:'',live:r.live||''}); } }catch(e){} } }catch(e){} }
+Object.assign(window,{myoOpen,myoBack,myoInv,myoSearch,myoOtpStart,myoOtpVerify,myoResend,myoRender,openMyOrders,closeMyOrders,myoFromConfirm});
 
 /* expose handlers to inline onclick */
 /* ===== checkout wizard (step by step): only changes how the form is shown, every field/function stays as is ===== */
@@ -3473,6 +3617,28 @@ setTimeout(()=>{ (window.__q||[]).splice(0,5).forEach(c=>{ try{ window[c[0]].app
     requestAnimationFrame(function(){ d.style.transform='translate('+(t.left+t.width/2-f.left-f.width/2)+'px,'+(t.top+t.height/2-f.top-f.height/2)+'px) scale(.35)'; d.style.opacity='.4'; });
     setTimeout(function(){ d.remove(); tgt.classList.remove('pg-bump'); tgt.offsetWidth; tgt.classList.add('pg-bump'); },850);
   },true);
+})();
+</script>
+<style>#productGrid .pcard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}#productGrid .pcard img{-webkit-user-drag:none;pointer-events:none}#productGrid .pcard:active{transform:scale(.985)!important;transition:transform .1s}</style>
+<script>
+/* products: tap/click ANYWHERE on a card opens its order (product) page instantly — works even while the list is being redrawn */
+(function(){
+  var g=document.getElementById('productGrid'); if(!g) return; var d=null;
+  function end(){ window.__pgDown=0; if(window.__pgPend){ window.__pgPend=0; setTimeout(function(){ if(window.renderProducts) window.renderProducts(); },0); } }
+  function inner(t){ return t&&t.closest&&t.closest('button,a,input,select,textarea'); }
+  g.addEventListener('pointerdown',function(e){
+    if(e.pointerType==='mouse'&&e.button!==0){ d=null; return; }
+    var c=e.target.closest&&e.target.closest('.pcard[data-pid]');
+    if(!c||inner(e.target)){ d=null; return; }
+    d={id:c.getAttribute('data-pid'),x:e.clientX,y:e.clientY}; window.__pgDown=Date.now();
+  },{passive:true});
+  g.addEventListener('pointerup',function(e){
+    var s=d; d=null; end(); if(!s) return;
+    if(Math.abs(e.clientX-s.x)>10||Math.abs(e.clientY-s.y)>10) return;      /* it was a scroll/swipe, not a tap */
+    if(inner(e.target)) return;
+    if(window.openProduct) window.openProduct(s.id);
+  },{passive:true});
+  ['pointercancel','pointerleave'].forEach(function(ev){ g.addEventListener(ev,function(){ d=null; end(); },{passive:true}); });
 })();
 </script>
 </body>
