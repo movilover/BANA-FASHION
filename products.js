@@ -2,7 +2,7 @@
 /* GET /api/products — ক্যাটালগ সার্ভারে ক্যাশ (৬০ সেকেন্ড) + ETag/304।
    হাজার হাজার ভিজিটর এলেও Firestore রিড মাত্র মিনিটে ১ বার। */
 const router = require('express').Router();
-const { db, Timestamp } = require('../lib/firebase');
+const { db, Timestamp } = require('./firebase');
 
 const TTL = 60_000;
 let cache = { t: 0, body: null, pending: null };
