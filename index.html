@@ -1081,6 +1081,33 @@ html.bf-lock{overflow:hidden!important}
 .cat-more-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFD35A,#F59E0B);color:#111;font-size:12px;transition:transform .35s}
 .cat-more.open .cat-more-ic{transform:rotate(180deg)}
 </style>
+
+<style id="railForward">
+/* hanger rail sits under the category chips: all 6 products on ONE rope, no sideways scroll */
+#shop .rail-sec{background:none;border:0;padding:6px 0 0;overflow:visible;margin:4px 0 8px}
+#shop .rail-sec::before{display:none}
+#shop .rail-head,#shop .rail-cta{display:none}
+#shop .rail-wrap{max-width:1000px;margin:0 auto}
+#shop .rail-scroll{overflow:visible!important;padding:0 6px 150px!important;scroll-snap-type:none}
+#shop .rail-track{display:flex;justify-content:center;gap:0!important;width:100%;margin:0}
+#shop .rail-item{flex:0 0 20%!important;width:20%!important;margin-left:-4%;min-width:0;transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .5s ease;transform-origin:50% 0;position:relative}
+#shop .rail-item.act{transform:translateX(var(--tx,0px)) scale(var(--s,2.2));z-index:9}
+#shop .rail-track.has-act .rail-item:not(.act){opacity:.55}
+#shop .rail-item .rail-sh{transform:none!important}
+#shop .rail-meta{display:none}
+#shop .rail-item.act .rail-meta{display:block}
+#shop .rail-name{font-size:8px}#shop .rail-price{font-size:8px}#shop .rail-price s{font-size:7px}
+#shop .rail-dots i{width:7px;height:7px}
+#shop .rail-rope{top:10px}
+#shop .rail-item:first-child{margin-left:0}
+#shop .rail-item:nth-child(1){--r0:-16deg}#shop .rail-item:nth-child(2){--r0:12deg}#shop .rail-item:nth-child(3){--r0:-10deg}#shop .rail-item:nth-child(4){--r0:15deg}#shop .rail-item:nth-child(5){--r0:-14deg}#shop .rail-item:nth-child(6){--r0:11deg}
+#shop .rail-spin{transform:rotateY(var(--r0,0deg))}
+#shop .rail-rope{height:3px!important;top:11px!important;background:linear-gradient(180deg,#d7dade,#8b9097 55%,#c3c7cc)!important;box-shadow:0 3px 5px rgba(0,0,0,.22)!important}
+#shop .rail-rope::before,#shop .rail-rope::after{width:10px!important;height:10px!important;top:-3px!important;background:radial-gradient(circle at 35% 30%,#fff,#aeb3b9 60%,#6f757c)!important}
+#shop .rail-sh{filter:drop-shadow(0 14px 10px rgba(0,0,0,.2))}
+@media(min-width:640px){#shop .rail-wrap{max-width:900px}#shop .rail-scroll{padding-bottom:190px!important}#shop .rail-meta{display:block}#shop .rail-name,#shop .rail-price{font-size:12px}#shop .rail-item.act{--s:1.6}}
+@media(prefers-reduced-motion:reduce){#shop .rail-item,#shop .rail-item.act{transition:none}}
+</style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
 
@@ -1386,6 +1413,8 @@ html.bf-lock{overflow:hidden!important}
   </div>
 </section>
 
+
+
 <!-- ===== BANA FASHION GLOBAL SHIPPING BANNER (injected below Category Grid) ===== -->
 <section id="globalShipping" class="gs-sec" aria-label="Bana Fashion Global Shipping">
   <div class="gs-card" id="gsCard">
@@ -1485,20 +1514,7 @@ html.bf-lock{overflow:hidden!important}
 .rm-btn.s{background:#0d0d0d;color:#fff}
 </style>
 
-<!-- ===== HANGER RAIL (admin: হ্যাঙ্গার ট্যাব) ===== -->
-<section id="railSec" class="rail-sec" aria-label="হ্যাঙ্গার কালেকশন">
-  <div class="rail-head">
-    <span class="text-gold-600 font-extrabold text-xs uppercase tracking-widest">নতুন কালেকশন</span>
-    <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-ink-900 mt-1">হ্যাঙ্গার কালেকশন</h2>
-    <p class="text-slate-500 text-sm mt-2">যেকোনো পোশাকে ক্লিক করে সবগুলো কালার দেখুন ও সরাসরি অর্ডার করুন।</p>
-  </div>
-  <div class="rail-wrap">
-    <div class="rail-rope" aria-hidden="true"></div>
-    <div class="rail-scroll" id="railScroll"><div class="rail-track" id="railTrack"></div></div>
-  </div>
-  <button type="button" class="rail-cta" id="railCta" onclick="railOpen()">সব কালার দেখুন →</button>
-</section>
-<!-- ===== /HANGER RAIL ===== -->
+
 
 <!-- PRODUCTS (4 per row on desktop) -->
 <section id="eid" class="hidden py-14 relative overflow-hidden" style="background:linear-gradient(135deg,#032b27,#0b3d36 45%,#14532d)">
@@ -1539,6 +1555,20 @@ html.bf-lock{overflow:hidden!important}
       <p class="text-slate-500 text-sm mt-2">যেকোনো পণ্যে ক্লিক করে বিস্তারিত দেখুন, সাইজ বেছে ক্যাশ অন ডেলিভারিতে অর্ডার করুন।</p>
     </div>
     <div class="pg-filterbar"><div class="pg-railwrap"><div id="filterTabs" class="pg-rail"></div></div></div>
+<!-- ===== HANGER RAIL (admin: হ্যাঙ্গার ট্যাব) ===== -->
+<section id="railSec" class="rail-sec" aria-label="হ্যাঙ্গার কালেকশন">
+  <div class="rail-head">
+    <span class="text-gold-600 font-extrabold text-xs uppercase tracking-widest">নতুন কালেকশন</span>
+    <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-ink-900 mt-1">হ্যাঙ্গার কালেকশন</h2>
+    <p class="text-slate-500 text-sm mt-2">যেকোনো পোশাকে ক্লিক করে সবগুলো কালার দেখুন ও সরাসরি অর্ডার করুন।</p>
+  </div>
+  <div class="rail-wrap">
+    <div class="rail-rope" aria-hidden="true"></div>
+    <div class="rail-scroll" id="railScroll"><div class="rail-track" id="railTrack"></div></div>
+  </div>
+  <button type="button" class="rail-cta" id="railCta" onclick="railOpen()">সব কালার দেখুন →</button>
+</section>
+<!-- ===== /HANGER RAIL ===== -->
     <div class="pg-toolbar">
       <div id="pgCount" class="pg-count"></div>
       <div class="pg-sort" id="pgSort">
@@ -3288,7 +3318,7 @@ async function railLoad(){
       if(snaps&&snaps.some(s=>s&&s.exists())) list=snaps.map((s,i)=>s&&s.exists()?railNorm(i+1,s.data()):null).filter(Boolean);
     }
   }catch(e){ console.warn('rail:',e); }
-  RAIL.items=list||[]; RAIL.ready=true; railInject(); renderRail();
+  RAIL.items=list||railDemo(); RAIL.ready=true; railInject(); renderRail();
 }
 function railInject(){
   if(!Array.isArray(state.products)) return;
@@ -3326,14 +3356,18 @@ function renderRail(){
 function railTurn(it,toBack){
   const sp=it.querySelector('.rail-spin'); if(!sp||it._busy) return; const hasB=it.dataset.back==='1';
   if(!hasB) return;
-  sp.style.transform=toBack?'rotateY(180deg)':'rotateY(0deg)';
+  sp.style.transform=toBack?'rotateY(180deg)':'rotateY(var(--r0,0deg))';
 }
 function railAuto(it,done){
-  const sp=it.querySelector('.rail-spin'), hasB=it.dataset.back==='1'; it._busy=true; it.classList.add('act');
-  const reset=()=>{ sp.style.transition='none'; sp.style.transform='rotateY(0deg)'; void sp.offsetWidth; sp.style.transition=''; };
-  const end=()=>{ it._busy=false; it.classList.remove('act'); done&&done(); };
-  if(hasB){ sp.style.transform='rotateY(180deg)'; setTimeout(()=>{ sp.style.transform='rotateY(360deg)'; setTimeout(()=>{ reset(); end(); },1250); },2300); }
-  else { sp.style.transform='rotateY(360deg)'; setTimeout(()=>{ reset(); end(); },1300); }
+  const sp=it.querySelector('.rail-spin'), hasB=it.dataset.back==='1', tr=$('railTrack'); it._busy=true; it.classList.add('act'); if(tr) tr.classList.add('has-act');
+  const reset=()=>{ sp.style.transition='none'; sp.style.transform='rotateY(var(--r0,0deg))'; void sp.offsetWidth; sp.style.transition=''; };
+  const end=()=>{ it.classList.remove('act'); if(tr&&!tr.querySelector('.rail-item.act')) tr.classList.remove('has-act'); setTimeout(()=>{ it._busy=false; done&&done(); },550); };
+  const rot=d=>{ sp.style.transform='rotateY('+d+'deg)'; };
+  try{ const box=$('railScroll').getBoundingClientRect(), r=it.getBoundingClientRect(), big=matchMedia('(min-width:640px)').matches, k=big?1.6:2.2, cx=r.left+r.width/2, half=r.width*k/2, lo=box.left+4, hi=box.right-4, tx=Math.max(lo-(cx-half),Math.min(0,hi-(cx+half))); it.style.setProperty('--s',k); it.style.setProperty('--tx',tx+'px'); }catch(e){}
+  setTimeout(()=>{   /* 1) comes forward (zoom), 2) turns: side -> back -> side -> front */
+    if(hasB){ rot(90); setTimeout(()=>{ rot(180); setTimeout(()=>{ rot(270); setTimeout(()=>{ rot(360); setTimeout(()=>{ reset(); end(); },1300); },900); },1500); },900); }
+    else { rot(360); setTimeout(()=>{ reset(); end(); },1400); }
+  },650);
 }
 function railLoop(){
   clearTimeout(RAIL.timer);
