@@ -2,8 +2,8 @@
 /* POST /api/sf          — অ্যাডমিন: Steadfast প্রক্সি (Key/Secret সার্ভারে Firestore থেকে; শুধু allowlist পাথ)
    POST /api/sf-webhook  — Steadfast থেকে আসে; Bearer টোকেন মিললে তবেই অর্ডারের স্ট্যাটাস আপডেট */
 const router = require('express').Router();
-const { db } = require('../lib/firebase');
-const { requireAdmin, safeEqual } = require('../lib/auth');
+const { db } = require('./firebase');
+const { requireAdmin, safeEqual } = require('./auth');
 
 const BASE = 'https://portal.packzy.com/api/v1/';
 const PATHS = /^(get_balance|create_order|status_by_cid\/\d{1,15}|status_by_invoice\/[A-Za-z0-9_-]{1,40}|status_by_trackingcode\/[A-Za-z0-9_-]{1,40})$/;
