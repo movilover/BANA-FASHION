@@ -7,7 +7,7 @@
   "scripts": { "start": "node server.js" },
   "engines": { "node": ">=20" },
   "dependencies": {
-    "compression": "^1.7.4",
+    "compression": "^1.8.0",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
     "firebase-admin": "^12.6.0",
