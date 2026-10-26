@@ -1,6 +1,6 @@
 'use strict';
 /* BANA FASHION — Railway সার্ভার
-   স্ট্যাটিক সাইট (public/) + API (/api/*) একই ডোমেইনে, তাই CORS লাগে না। */
+   সাইট (index/admin HTML, একই ফোল্ডারে) + API (/api/*) একই ডোমেইনে, তাই CORS লাগে না। */
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
@@ -15,10 +15,19 @@ const fs = require('fs');
 /* সব ফাইল একই ফোল্ডারে (গিটহাবের রুটে) — তাই সার্ভার নিজে index ও admin HTML খুঁজে নেয়।
    শুধু এই দুটি ফাইলই বাইরে দেওয়া হয়; server.js, rules ইত্যাদি কখনো খোলা হয় না। */
 const FILES = fs.readdirSync(__dirname);
-const INDEX_FILE = FILES.includes('index.html') ? 'index.html' : FILES.find((f) => /\.html$/i.test(f) && !/^(admin|rul)/i.test(f));
-const ADMIN_FILE = FILES.find((f) => /^admin.*\.html$/i.test(f));
-if (!INDEX_FILE) console.warn('⚠️ index.html পাওয়া যায়নি — গিটহাবে আপলোড করেছেন তো?');
+/* একাধিক কপি থাকলে (যেমন index.html আর index__1_.html) যার নম্বর সবচেয়ে বড় সেটাই নতুন ধরে নেওয়া হয়; ভেরিয়েবল দিয়ে জোর করে ঠিক করাও যায় */
+const ver = (f) => { const m = /__(\d+)_|\((\d+)\)/.exec(f); return m ? Number(m[1] || m[2]) : 0; };
+const best = (env, list, plain) => (env && list.includes(env)) ? env
+  : [...list].sort((x, y) => ver(y) - ver(x) || (x === plain ? -1 : y === plain ? 1 : x.localeCompare(y)))[0];
+const idxAll = FILES.filter((f) => /\.html$/i.test(f) && !/^(adm|rul)/i.test(f));
+const admAll = FILES.filter((f) => /^adm.*\.html$/i.test(f));
+const INDEX_FILE = best(process.env.INDEX_FILE, idxAll, 'index.html');
+const ADMIN_FILE = best(process.env.ADMIN_FILE, admAll, 'admin.html');
+if (!INDEX_FILE) console.warn('⚠️ index HTML পাওয়া যায়নি — গিটহাবে আপলোড করেছেন তো?');
 if (!ADMIN_FILE) console.warn('⚠️ admin HTML ফাইল পাওয়া যায়নি (নাম admin দিয়ে শুরু হতে হবে)');
+if (idxAll.length > 1) console.warn('⚠️ একাধিক index ফাইল আছে:', idxAll.join(', '), '→ ব্যবহার হচ্ছে:', INDEX_FILE, '(বদলাতে INDEX_FILE ভেরিয়েবল দিন বা পুরোনোটা গিটহাব থেকে মুছুন)');
+if (admAll.length > 1) console.warn('⚠️ একাধিক admin ফাইল আছে:', admAll.join(', '), '→ ব্যবহার হচ্ছে:', ADMIN_FILE, '(বদলাতে ADMIN_FILE ভেরিয়েবল দিন বা পুরোনোটা গিটহাব থেকে মুছুন)');
+console.log('Serving index:', INDEX_FILE, '| admin:', ADMIN_FILE);
 const ADMIN_PATH = (process.env.ADMIN_PATH || '/admin').replace(/\/+$/, '') || '/admin';
 const EXTRA_ORIGINS = String(process.env.SITE_ORIGINS || '').split(',').map((s) => s.trim().replace(/\/+$/, '')).filter(Boolean);
 
@@ -59,13 +68,19 @@ app.use((req, res, next) => {
 app.use(compression());
 
 /* ---------- Rate limit ---------- */
-const mk = (windowMs, max, msg) => rateLimit({ windowMs, max, standardHeaders: true, legacyHeaders: false, message: { error: msg || 'অনেক বেশি রিকোয়েস্ট, একটু পরে চেষ্টা করুন' } });
+const mk = (windowMs, max, msg) => rateLimit({ windowMs, max, standardHeaders: true, legacyHeaders: false, message: { error: 'too_many', message: msg || 'অনেক বেশি অনুরোধ, একটু পরে চেষ্টা করুন' } });
 app.use(mk(60_000, 300));                                  // সব রিকোয়েস্ট: IP প্রতি মিনিটে ৩০০
 app.use('/api/wa-notify', mk(10 * 60_000, 15));            // অর্ডার নোটিফাই: ১০ মিনিটে ১৫
 app.use('/api/sf-webhook', mk(60_000, 120));
-app.use(['/api/sf', '/api/wa'], mk(60_000, 60));
+app.use(['/api/sf', '/api/wa'], mk(60_000, 120));
+app.use('/api/upload', mk(60_000, 90));                    // অ্যাডমিন ছবি আপলোড (পুরনো ছবি মাইগ্রেশনেও চলবে)
+app.use('/api/sms/test', mk(10 * 60_000, 10));
+app.use('/api/orders/lookup', mk(10 * 60_000, 40, 'অনেকবার খোঁজা হয়েছে, কয়েক মিনিট পরে চেষ্টা করুন'));
+app.use('/api/otp/send', mk(60 * 60_000, 8, 'অনেকবার কোড চাওয়া হয়েছে, ১ ঘণ্টা পরে চেষ্টা করুন'));
+app.use('/api/otp/verify', mk(10 * 60_000, 30, 'অনেকবার চেষ্টা হয়েছে, কয়েক মিনিট পরে আবার দেখুন'));
 
 /* ---------- Body parser (সীমিত সাইজ) ---------- */
+app.use('/api/upload', express.json({ limit: '14mb' }));   // প্রোডাক্ট ছবি (base64)
 app.use('/api/wa-notify', express.json({ limit: '3mb' })); // ইনভয়েস ছবি থাকে
 app.use('/api', express.json({ limit: '50kb' }));
 
@@ -84,6 +99,8 @@ app.get('/healthz', (req, res) => res.type('text').send('ok'));
 app.use('/api', require('./products'));
 app.use('/api', require('./wa'));
 app.use('/api', require('./steadfast'));
+app.use('/api', require('./orders'));
+app.use('/api', require('./upload'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 
 /* ---------- পেজ (শুধু দুটি ফাইল) ---------- */
@@ -91,9 +108,11 @@ const page = (file, headers) => (req, res) => {
   if (!file) return res.status(404).type('text').send('Not found');
   res.set(headers); res.sendFile(path.join(__dirname, file));
 };
-app.get(['/', '/index.html'], page(INDEX_FILE, { 'Cache-Control': 'no-cache' }));
-app.get([ADMIN_PATH, ADMIN_PATH + '.html'], page(ADMIN_FILE, { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' }));
-app.use((req, res) => (req.method === 'GET' && !path.extname(req.path)) ? page(INDEX_FILE, { 'Cache-Control': 'no-cache' })(req, res) : res.status(404).type('text').send('Not found'));
+/* সাইট HTML: ১ মিনিট ক্যাশ + পুরোনোটা দেখিয়ে ব্যাকগ্রাউন্ডে নতুন আনে → রিপিট ভিজিটে সাইট প্রায় তাৎক্ষণিক খোলে */
+const SITE_CC = 'public, max-age=60, stale-while-revalidate=600';
+app.get(['/', '/index.html'], page(INDEX_FILE, { 'Cache-Control': SITE_CC }));
+app.get([ADMIN_PATH, ADMIN_PATH + '.html', '/admin.html'], page(ADMIN_FILE, { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' }));
+app.use((req, res) => (req.method === 'GET' && !path.extname(req.path)) ? page(INDEX_FILE, { 'Cache-Control': SITE_CC })(req, res) : res.status(404).type('text').send('Not found'));
 
 /* ---------- ত্রুটি হ্যান্ডলার (স্ট্যাক ট্রেস কখনো বাইরে যায় না) ---------- */
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
