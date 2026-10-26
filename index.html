@@ -1125,6 +1125,25 @@ body{overflow-x:hidden;touch-action:manipulation}
 /* Pause infinite decorative animations while tab is hidden / off-screen sections are paused by JS */
 body.perf-hidden *,body.perf-hidden *:before,body.perf-hidden *:after{animation-play-state:paused!important}
 </style>
+<style id="hrCss">
+#hangerRail{padding:34px 0 26px;text-align:center}
+#hangerRail .hr-lab{color:#d4af37;font-weight:800;font-size:14px;letter-spacing:.04em}
+#hangerRail h2{margin:4px 0 6px;font-size:clamp(26px,5vw,40px);font-weight:900;color:#111}
+#hangerRail .hr-sub{margin:0 auto 22px;max-width:520px;color:#64748b;font-size:14px;padding:0 16px}
+.hr-wrap{container-type:inline-size;position:relative;max-width:1100px;margin:0 auto;-webkit-user-select:none;user-select:none}
+.hr-wrap:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:#111;border-radius:2px;box-shadow:0 3px 6px -2px rgba(0,0,0,.35);z-index:50}
+.hr-stage{--w:min(46cqw,250px);position:relative;height:calc(var(--w)*1.34 + 104px);overflow:hidden;padding-top:0}
+.hr-item{position:absolute;top:0;width:var(--w);left:calc(var(--i)*(100cqw - var(--w))/var(--k));cursor:pointer;transform-origin:50% 0;transform:rotate(var(--r));transition:transform .45s cubic-bezier(.2,.8,.2,1);-webkit-tap-highlight-color:transparent;touch-action:pan-y}
+.hr-item.on{z-index:30!important;transform:rotate(0) translateY(2px)}
+.hr-hanger{display:block;width:62%;height:38px;margin:0 auto -2px;position:relative;z-index:2}
+.hr-frame{border:3px solid #fff;border-radius:14px;overflow:hidden;background:#e5e7eb;box-shadow:0 10px 22px -8px rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.06);aspect-ratio:3/4}
+.hr-frame img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none;pointer-events:none}
+.hr-tag{margin-top:10px;opacity:0;transform:translateY(-4px);transition:.3s;pointer-events:none}
+.hr-item.on .hr-tag{opacity:1;transform:none}
+.hr-tag b{display:block;font-size:14px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hr-tag span{display:block;margin-top:2px;font-weight:800;color:#e11d0c;font-size:15px}
+@media(prefers-reduced-motion:reduce){.hr-item{transition:none}}
+</style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden selection:bg-gold-500 selection:text-black">
 
@@ -1543,6 +1562,7 @@ body.perf-hidden *,body.perf-hidden *:before,body.perf-hidden *:after{animation-
   </div>
 </section>
 
+<section id="hangerRail" class="hidden"><div class="hr-lab">আমাদের কালেকশন</div><h2>নির্বাচিত পণ্য</h2><p class="hr-sub">যেকোনো পণ্যে ট্যাপ করুন, আবার ট্যাপ করলে বিস্তারিত দেখাযাবে</p><div class="hr-wrap"><div class="hr-stage" id="hrStage"></div></div></section>
 <section id="shop" class="py-8 sm:py-12 bg-silver-100">
   <div class="shop-fx" id="shopFx" aria-hidden="true">
     <div class="fx-glow fx-glow-l"></div><div class="fx-glow fx-glow-r"></div>
@@ -2110,6 +2130,21 @@ function loadMore(){ const grid=$('productGrid'), list=state._list||[], from=gri
   const next=list.slice(from,from+_pageSize()); grid.insertAdjacentHTML('beforeend',next.map((p,k)=>state._card(p,k)).join(''));
   state.limit=from+next.length; [...grid.children].slice(from).forEach(c=>pio.observe(c)); updateLoadMore(); }
 window.renderProducts=renderProducts;
+function renderHangerRail(base){
+  const sec=document.getElementById('hangerRail'), st=document.getElementById('hrStage'); if(!sec||!st) return;
+  const home=state.cat==='all'&&!String(state.q||'').trim();
+  const items=home?base.slice().sort(_ordCmp).slice(0,6):[];
+  if(!items.length){ sec.classList.add('hidden'); return; }
+  const rot=[-2.4,1.8,-1.6,2.2,-2,1.5], n=items.length, k=Math.max(n-1,1);
+  const hook='<svg class="hr-hanger" viewBox="0 0 100 38" aria-hidden="true"><path d="M50 17V7.5a4.2 4.2 0 1 1 4.2 4.2" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"/><path d="M50 17L8 33.5Q5 35.5 8.5 36.5L91.5 36.5Q95 35.5 92 33.5Z" fill="none" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/></svg>';
+  st.style.setProperty('--k',k);
+  st.innerHTML=items.map((p,i)=>{ const im=(p.images&&p.images.length?p.images[0]:p.image)||''; return '<div class="hr-item'+(i===0?' on':'')+'" data-pid="'+esc(p.id)+'" style="--i:'+i+';--r:'+rot[i%6]+'deg;z-index:'+(n-i)+'" onclick="hrTap(this)" onmouseenter="hrHover(this)">'+hook+'<div class="hr-frame"><img src="'+esc(im)+'" alt="'+esc(p.title)+'" decoding="async"'+(i>1?' loading="lazy"':'')+' draggable="false"></div><div class="hr-tag"><b>'+esc(p.title)+'</b><span>'+money(p.price)+'</span></div></div>'; }).join('');
+  sec.classList.remove('hidden');
+}
+function hrOn(el){ el.parentNode.querySelectorAll('.hr-item.on').forEach(x=>x.classList.remove('on')); el.classList.add('on'); }
+function hrHover(el){ if(window.matchMedia&&matchMedia('(hover:hover)').matches) hrOn(el); }
+function hrTap(el){ if(el.classList.contains('on')) openProduct(el.getAttribute('data-pid')); else hrOn(el); }
+window.hrTap=hrTap; window.hrHover=hrHover; window.hrOn=hrOn;
 function renderProducts(){
   if(window.__pgDown&&Date.now()-window.__pgDown<1500){ window.__pgPend=1; return; }   /* a press is in progress: redraw right after release, so the tap is never lost */
   const grid=$('productGrid'); renderEid();
@@ -2149,7 +2184,7 @@ function renderProducts(){
   };
   state._list=list; state._card=cardHTML;
   grid.innerHTML=list.slice(0,state.limit).map(cardHTML).join('');
-  updateLoadMore();
+  updateLoadMore(); try{ renderHangerRail(base); }catch(e){}
 }
 
 /* ===== product card auto image slider ===== */
