@@ -21,6 +21,7 @@ router.get('/wa-enabled', async (req, res) => {
 /* দাম মিলিয়ে দেখে — rules শুধু যোগফল মেলায়, প্রোডাক্টের আসল দাম নয়। অমিল পেলে অ্যাডমিনকে সতর্ক করে */
 async function priceWarnings(items) {
   try {
+    items = items.filter((i) => i && typeof i === 'object' && i.id);
     const refs = [...new Set(items.map((i) => i.id))].slice(0, 50).map((id) => db.collection('products').doc(String(id)));
     const snaps = await db.getAll(...refs);
     const price = {}; snaps.forEach((s) => { if (s.exists) price[s.id] = Number(s.data().price); });
@@ -30,6 +31,7 @@ async function priceWarnings(items) {
 }
 
 async function buildMessage(o) {
+  o = { ...o, items: (Array.isArray(o.items) ? o.items : []).filter((i) => i && typeof i === 'object') };
   const addr = [o.address, o.upazila, o.district, o.division].filter(Boolean).join(', ');
   const cod = (o.pay && o.deliveryPaid) ? o.subtotal - (o.discount || 0) : o.total;
   const warn = await priceWarnings(o.items || []);
