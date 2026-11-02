@@ -3,11 +3,17 @@
 const admin = require('firebase-admin');
 
 function loadCred() {
-  const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_B64;
-  const raw = b64 ? Buffer.from(b64, 'base64').toString('utf8') : process.env.FIREBASE_SERVICE_ACCOUNT;
+  /* দুটো ভ্যারিয়েবলের যেকোনোটায়, যেকোনো ভাবে বসানো চলবে: পুরো JSON অথবা base64 — সার্ভার নিজেই চিনে নেয় */
+  let raw = process.env.FIREBASE_SERVICE_ACCOUNT_B64 || process.env.FIREBASE_SERVICE_ACCOUNT || '';
+  raw = String(raw).trim();
   if (!raw) throw new Error('Railway Variables-এ FIREBASE_SERVICE_ACCOUNT_B64 (বা FIREBASE_SERVICE_ACCOUNT) নেই');
-  const j = JSON.parse(raw);
-  if (j.private_key) j.private_key = String(j.private_key).replace(/\\n/g, '\n');
+  if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) raw = raw.slice(1, -1).trim();
+  if (!raw.startsWith('{')) raw = Buffer.from(raw, 'base64').toString('utf8').trim();
+  let j;
+  try { j = JSON.parse(raw); }
+  catch (e) { throw new Error('সার্ভিস অ্যাকাউন্ট ভ্যারিয়েবলটি ঠিক নয় — Firebase থেকে ডাউনলোড করা JSON ফাইলের পুরো লেখা ({ থেকে } পর্যন্ত) বসান'); }
+  if (!j.private_key || !j.client_email) throw new Error('সার্ভিস অ্যাকাউন্টে private_key/client_email নেই — ভুল ফাইল');
+  j.private_key = String(j.private_key).replace(/\\n/g, '\n');
   return j;
 }
 
