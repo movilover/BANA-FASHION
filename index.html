@@ -943,7 +943,10 @@ button,a,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:
 @keyframes pgShine{to{transform:translateX(120%)}}
 @media(hover:hover){#productGrid .pcard:hover{box-shadow:0 28px 50px -18px rgba(0,0,0,.28),0 0 0 1.5px rgba(245,158,11,.5)}}
 #productGrid .pcard .pslide img{transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
-#productGrid .pcard:hover .pslide img{transform:scale(1.08)}
+@media (hover:hover){#productGrid .pcard:hover .pslide img{transform:scale(1.04)}}
+/* card photos: each picture waits, then glides right-to-left; the box clips everything else so neighbours never show */
+#productGrid .pcard>div:first-child{contain:paint;isolation:isolate}
+#productGrid .pcard .pslide{will-change:transform;backface-visibility:hidden}
 #productGrid .pdot{transition:width .4s cubic-bezier(.16,1,.3,1),background .4s}
 #productGrid .pdot.bg-white{width:18px}
 #productGrid .pcard .fa-heart.fa-solid{animation:pgPop .6s cubic-bezier(.16,1,.3,1)}
@@ -2102,9 +2105,10 @@ function pgSwap(fn){ const g=$('productGrid'); g.classList.add('pg-out'); setTim
 const _ordT=p=>{ const c=p&&p.createdAt; if(!c) return 0; if(c.toMillis) return c.toMillis(); if(c.seconds) return c.seconds*1000; const x=typeof c==='string'?Date.parse(c):+c; return x||0; };
 function _ordCmp(a,b){ const NOW=_ordCmp.n||(_ordCmp.n=Date.now()); const k=p=>(p.order!=null&&p.order!==''&&!isNaN(+p.order))?+p.order:-(_ordT(p)||NOW); return k(a)-k(b); }
 function _num(v){ const n=parseFloat(String(v==null?'':v).replace(/[^\d.\-]/g,'')); return isNaN(n)?0:n; }
-function _pageSize(){ const mx=(state.site&&+state.site.maxProducts)||0; return mx>0?mx:8; }
-function resetLimit(){ state.limit=_pageSize(); }
-function updateLoadMore(){ try{ const es=$('emptyState'); if(es) es.classList.toggle('hidden',(state._list||[]).length>0); }catch(e){} const w=$('loadMoreWrap'); if(!w) return; const total=(state._list||[]).length, shown=$('productGrid').children.length, left=total-shown;
+function _pageSize(){ return 10; }   /* home shows 10 products in a row, no 'load more' */
+function resetLimit(){ const home=state.cat==='all'&&!String(state.q||'').trim(); state.limit=home?_pageSize():100000; }   /* only the home view is capped at 10 */
+function updateLoadMore(){ try{ const es=$('emptyState'); if(es) es.classList.toggle('hidden',(state._list||[]).length>0); }catch(e){} const w=$('loadMoreWrap'); if(!w) return; w.classList.add('hidden'); return;
+  const total=(state._list||[]).length, shown=$('productGrid').children.length, left=total-shown;
   w.classList.toggle('hidden',left<=0); if(left<=0) return;
   $('loadMoreInfo').textContent=bnum(total)+' টির মধ্যে '+bnum(shown)+' টি দেখানো হচ্ছে'; $('loadMoreBar').style.width=(shown/total*100)+'%';
   $('loadMoreBtn').innerHTML='আরও দেখুন ('+bnum(Math.min(left,_pageSize()))+' টি) <i class="fa-solid fa-chevron-down"></i>'; }
@@ -2172,14 +2176,14 @@ function renderProducts(){
 /* ===== product card auto image slider ===== */
 setInterval(()=>{ if(document.hidden) return; let q=0; document.querySelectorAll('.pslide').forEach(el=>{ const n=+el.dataset.n; if(n<2||el._sl||el.closest('.pcard:hover')) return; const _r=el.getBoundingClientRect(); if(!_r.height||_r.bottom<0||_r.top>innerHeight) return;
   const nx=el.children[(+el.dataset.i)+1];
-  const slide=()=>{ if(!el.isConnected){ el._sl=0; return; } const i=+el.dataset.i+1; el.style.willChange='transform'; el.style.transition='transform .75s cubic-bezier(.45,0,.2,1)'; el.style.transform=`translateX(-${i*100}%)`; el.dataset.i=i;
+  const slide=()=>{ if(!el.isConnected){ el._sl=0; return; } const i=+el.dataset.i+1; el.style.willChange='transform'; el.style.transition='transform .8s cubic-bezier(.65,0,.35,1)'; el.style.transform=`translateX(-${i*100}%)`; el.dataset.i=i;
     const dots=el.parentElement.querySelectorAll('.pdot'); dots.forEach((d,j)=>{ const on=j===(i%n); d.classList.toggle('bg-white',on); d.classList.toggle('bg-white/50',!on); });
-    setTimeout(()=>{ if(!el.isConnected){ el._sl=0; return; } if(i>=n){ el.style.transition='none'; el.style.transform='translateX(0)'; el.dataset.i=0; } el.style.willChange=''; el._sl=0; },820); };
-  el._sl=1; const d=(q++%4)*150;
+    setTimeout(()=>{ if(!el.isConnected){ el._sl=0; return; } if(i>=n){ el.style.transition='none'; el.style.transform='translateX(0)'; el.dataset.i=0; } el.style.willChange=''; el._sl=0; },880); };
+  el._sl=1; const d=(el._d!=null)?el._d:(el._d=(q++%4)*140);   /* fixed offset per card: every card holds each photo exactly 1 second */
   /* never slide to a picture that is not loaded AND decoded yet (that was the "bump") */
   const go=()=>setTimeout(slide,d);
   if(nx&&nx.tagName==='IMG'){ nx.loading='eager'; if(nx.decode){ Promise.race([nx.decode(),new Promise((_,rj)=>setTimeout(rj,2500))]).then(go,()=>{ el._sl=0; }); } else go(); } else go();
- }); },2400);
+ }); },1800);   /* 0.8s glide + 1s hold */
 /* robust category match: product.category may hold the id, the Bengali/English label, or differ in case/spacing */
 const _nk=v=>String(v==null?'':(typeof v==='object'?_s(v):v)).trim().toLowerCase().replace(/\s+/g,' ');
 const _catKeys={};
