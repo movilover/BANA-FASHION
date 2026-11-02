@@ -1,8 +1,43 @@
-/* Bengali district / division names + number formatting (same data as the storefront) */
 'use strict';
-const DBN={Dhaka:'ঢাকা',Gazipur:'গাজীপুর',Narayanganj:'নারায়ণগঞ্জ',Narsingdi:'নরসিংদী',Manikganj:'মানিকগঞ্জ',Munshiganj:'মুন্সিগঞ্জ',Faridpur:'ফরিদপুর',Gopalganj:'গোপালগঞ্জ',Madaripur:'মাদারীপুর',Rajbari:'রাজবাড়ী',Shariatpur:'শরীয়তপুর',Tangail:'টাঙ্গাইল',Kishoreganj:'কিশোরগঞ্জ',Chattogram:'চট্টগ্রাম',"Cox's Bazar":'কক্সবাজার',Cumilla:'কুমিল্লা',Feni:'ফেনী',Brahmanbaria:'ব্রাহ্মণবাড়িয়া',Noakhali:'নোয়াখালী',Lakshmipur:'লক্ষ্মীপুর',Chandpur:'চাঁদপুর',Khagrachhari:'খাগড়াছড়ি',Rangamati:'রাঙ্গামাটি',Bandarban:'বান্দরবান',Rajshahi:'রাজশাহী',Chapainawabganj:'চাঁপাইনবাবগঞ্জ',Naogaon:'নওগাঁ',Natore:'নাটোর',Pabna:'পাবনা',Sirajganj:'সিরাজগঞ্জ',Bogura:'বগুড়া',Joypurhat:'জয়পুরহাট',Khulna:'খুলনা',Bagerhat:'বাগেরহাট',Satkhira:'সাতক্ষীরা',Jashore:'যশোর',Jhenaidah:'ঝিনাইদহ',Magura:'মাগুরা',Narail:'নড়াইল',Kushtia:'কুষ্টিয়া',Chuadanga:'চুয়াডাঙ্গা',Meherpur:'মেহেরপুর',Barishal:'বরিশাল',Bhola:'ভোলা',Jhalokati:'ঝালকাঠি',Patuakhali:'পটুয়াখালী',Pirojpur:'পিরোজপুর',Barguna:'বরগুনা',Sylhet:'সিলেট',Moulvibazar:'মৌলভীবাজার',Habiganj:'হবিগঞ্জ',Sunamganj:'সুনামগঞ্জ',Rangpur:'রংপুর',Dinajpur:'দিনাজপুর',Kurigram:'কুড়িগ্রাম',Lalmonirhat:'লালমনিরহাট',Nilphamari:'নীলফামারী',Gaibandha:'গাইবান্ধা',Thakurgaon:'ঠাকুরগাঁও',Panchagarh:'পঞ্চগড়',Mymensingh:'ময়মনসিংহ',Jamalpur:'জামালপুর',Netrokona:'নেত্রকোনা',Sherpur:'শেরপুর'};
-const DVBN={Dhaka:'ঢাকা',Chattogram:'চট্টগ্রাম',Rajshahi:'রাজশাহী',Khulna:'খুলনা',Barishal:'বরিশাল',Sylhet:'সিলেট',Rangpur:'রংপুর',Mymensingh:'ময়মনসিংহ'};
-const BNUM = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
-const BT = n => '৳' + BNUM(Math.round(n || 0).toLocaleString('en-US'));
-const INV_PAY = { bkash: 'বিকাশ (bKash)', nagad: 'নগদ (Nagad)', rocket: 'রকেট (Rocket)', upay: 'উপায় (Upay)' };
-module.exports = { DBN, DVBN, BNUM, BT, INV_PAY };
+/* বাংলা/ফোন/টাকা/তারিখ হেল্পার */
+const BN = '০১২৩৪৫৬৭৮৯';
+const toEn = s => String(s == null ? '' : s).replace(/[০-৯]/g, d => String(BN.indexOf(d)));
+const toBn = s => String(s == null ? '' : s).replace(/\d/g, d => BN[d]);
+const money = n => '৳' + toBn(Math.round(Number(n) || 0).toLocaleString('en-US'));
+
+/* 017xxxxxxxx / +88017xxxxxxxx / ০১৭… → 017xxxxxxxx (ভুল হলে '') */
+function normPhone(v) {
+  let d = toEn(v).replace(/\D/g, '');
+  if (d.startsWith('88') && d.length === 13) d = d.slice(2);
+  return /^01[3-9]\d{8}$/.test(d) ? d : '';
+}
+const maskPhone = p => (p ? p.slice(0, 3) + '••••' + p.slice(-2) : '');
+
+const seg = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('bn', { granularity: 'grapheme' }) : null;
+const graphemes = s => (seg ? Array.from(seg.segment(s), x => x.segment) : Array.from(s));
+function maskName(n) {
+  n = String(n || '').trim();
+  if (!n) return '';
+  return n.split(/\s+/).map(w => { const g = graphemes(w); return g.length <= 1 ? w : g[0] + '•'.repeat(Math.min(g.length - 1, 4)); }).join(' ');
+}
+
+/* ব্যবহারকারীর লেখা টেক্সট পরিষ্কার: কন্ট্রোল ক্যারেক্টার বাদ + দৈর্ঘ্য সীমা */
+const clean = (s, max = 200) => String(s == null ? '' : s).replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+/* WhatsApp ফরম্যাটিং (* _ ~ `) ভাঙা আটকায় */
+const waSafe = (s, max = 200) => clean(s, max).replace(/[*_~`]/g, '');
+
+const toDate = v => {
+  if (!v) return null;
+  if (typeof v.toDate === 'function') return v.toDate();
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
+};
+function dateBn(v) {
+  const d = toDate(v) || new Date();
+  try {
+    return new Intl.DateTimeFormat('bn-BD', { timeZone: 'Asia/Dhaka', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }).format(d);
+  } catch (e) { return d.toISOString(); }
+}
+const iso = v => { const d = toDate(v); return d ? d.toISOString() : null; };
+
+module.exports = { toEn, toBn, money, normPhone, maskPhone, maskName, clean, waSafe, toDate, dateBn, iso };
