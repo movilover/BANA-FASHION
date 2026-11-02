@@ -1,30 +1,33 @@
 'use strict';
-/* Firebase Admin SDK — সার্ভারে একবারই চালু হয়। Admin SDK Firestore rules বাইপাস করে,
-   তাই এই ফাইলের credential কখনো ব্রাউজারে/গিটহাবে যাবে না (শুধু Railway Variables-এ থাকবে)। */
+/* Firebase Admin SDK — সার্ভার এটা দিয়ে Firestore পড়ে/লেখে (Firestore Rules এখানে প্রযোজ্য নয়) */
 const admin = require('firebase-admin');
 
-function loadCredential() {
-  /* দুই নামের যেকোনোটাতে বসালেই চলবে; মান হতে পারে আসল JSON অথবা base64 — সার্ভার নিজেই বুঝে নেয় */
-  let s = String(process.env.FIREBASE_SERVICE_ACCOUNT_B64 || process.env.FIREBASE_SERVICE_ACCOUNT || '').trim();
-  if (!s) throw new Error('Firebase key সেট করা নেই — Railway > Variables এ FIREBASE_SERVICE_ACCOUNT_B64 এ পুরো JSON বসান');
-  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) s = s.slice(1, -1).trim();
-  if (!s.startsWith('{')) s = Buffer.from(s.replace(/\s+/g, ''), 'base64').toString('utf8').trim();
-  let json;
-  try { json = JSON.parse(s); }
-  catch (e) { throw new Error('Firebase key পড়া যায়নি — JSON-এর শুরুর { থেকে শেষের } পর্যন্ত পুরোটা কপি করে বসান, কিছু বাদ বা বদলাবেন না'); }
-  if (!json.private_key || !json.client_email || !json.project_id) throw new Error('এটা Firebase service-account key নয় (private_key/client_email নেই)');
-  json.private_key = json.private_key.replace(/\\n/g, '\n');
-  return json;
+function loadCred() {
+  const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_B64;
+  const raw = b64 ? Buffer.from(b64, 'base64').toString('utf8') : process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!raw) throw new Error('Railway Variables-এ FIREBASE_SERVICE_ACCOUNT_B64 (বা FIREBASE_SERVICE_ACCOUNT) নেই');
+  const j = JSON.parse(raw);
+  if (j.private_key) j.private_key = String(j.private_key).replace(/\\n/g, '\n');
+  return j;
 }
 
-admin.initializeApp({ credential: admin.credential.cert(loadCredential()) });
+if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.cert(loadCred()) });
+
 const db = admin.firestore();
 db.settings({ ignoreUndefinedProperties: true });
+const FieldValue = admin.firestore.FieldValue;
+const Timestamp = admin.firestore.Timestamp;
 
-module.exports = {
-  admin,
-  db,
-  auth: admin.auth(),
-  FieldValue: admin.firestore.FieldValue,
-  Timestamp: admin.firestore.Timestamp,
-};
+/* কনফিগ ডকুমেন্টের ছোট ক্যাশ (ডিফল্ট ৩০ সেকেন্ড) — ইউজার বাড়লেও Firestore রিড কমে থাকে */
+const _c = new Map();
+function cfg(path, ttl = 30000) {
+  const now = Date.now(), e = _c.get(path);
+  if (e && now - e.t < ttl) return e.p;
+  const p = db.doc(path).get().then(s => (s.exists ? s.data() : {}));
+  _c.set(path, { t: now, p });
+  p.catch(() => _c.delete(path));
+  return p;
+}
+const dropCache = path => (path ? _c.delete(path) : _c.clear());
+
+module.exports = { admin, db, FieldValue, Timestamp, cfg, dropCache };
