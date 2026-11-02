@@ -1,128 +1,82 @@
 'use strict';
-/* BANA FASHION — Railway সার্ভার
-   সাইট (index/admin HTML, একই ফোল্ডারে) + API (/api/*) একই ডোমেইনে, তাই CORS লাগে না। */
+/* BANA FASHION — Railway সার্ভার: সাইট (index.html / অ্যাডমিন) + /api (Steadfast, WhatsApp, SMS OTP, অর্ডার খোঁজা) */
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 
-require('./firebase'); // credential না থাকলে এখানেই স্টার্টআপ ফেল (নিরাপদ ডিফল্ট)
+require('./firebase');   // শুরুতেই ক্রেডেনশিয়াল যাচাই — ভুল থাকলে সার্ভার চালুই হবে না (লগে কারণ দেখাবে)
 
 const app = express();
-const PROD = process.env.NODE_ENV === 'production';
-const fs = require('fs');
-/* সব ফাইল একই ফোল্ডারে (গিটহাবের রুটে) — তাই সার্ভার নিজে index ও admin HTML খুঁজে নেয়।
-   শুধু এই দুটি ফাইলই বাইরে দেওয়া হয়; server.js, rules ইত্যাদি কখনো খোলা হয় না। */
-const FILES = fs.readdirSync(__dirname);
-/* একাধিক কপি থাকলে (যেমন index.html আর index__1_.html) যার নম্বর সবচেয়ে বড় সেটাই নতুন ধরে নেওয়া হয়; ভেরিয়েবল দিয়ে জোর করে ঠিক করাও যায় */
-const ver = (f) => { const m = /__(\d+)_|\((\d+)\)/.exec(f); return m ? Number(m[1] || m[2]) : 0; };
-const best = (env, list, plain) => (env && list.includes(env)) ? env
-  : [...list].sort((x, y) => ver(y) - ver(x) || (x === plain ? -1 : y === plain ? 1 : x.localeCompare(y)))[0];
-const idxAll = FILES.filter((f) => /\.html$/i.test(f) && !/^(adm|rul)/i.test(f));
-const admAll = FILES.filter((f) => /^adm.*\.html$/i.test(f));
-const INDEX_FILE = best(process.env.INDEX_FILE, idxAll, 'index.html');
-const ADMIN_FILE = best(process.env.ADMIN_FILE, admAll, 'admin.html');
-if (!INDEX_FILE) console.warn('⚠️ index HTML পাওয়া যায়নি — গিটহাবে আপলোড করেছেন তো?');
-if (!ADMIN_FILE) console.warn('⚠️ admin HTML ফাইল পাওয়া যায়নি (নাম admin দিয়ে শুরু হতে হবে)');
-if (idxAll.length > 1) console.warn('⚠️ একাধিক index ফাইল আছে:', idxAll.join(', '), '→ ব্যবহার হচ্ছে:', INDEX_FILE, '(বদলাতে INDEX_FILE ভেরিয়েবল দিন বা পুরোনোটা গিটহাব থেকে মুছুন)');
-if (admAll.length > 1) console.warn('⚠️ একাধিক admin ফাইল আছে:', admAll.join(', '), '→ ব্যবহার হচ্ছে:', ADMIN_FILE, '(বদলাতে ADMIN_FILE ভেরিয়েবল দিন বা পুরোনোটা গিটহাব থেকে মুছুন)');
-console.log('Serving index:', INDEX_FILE, '| admin:', ADMIN_FILE);
-const ADMIN_PATH = (process.env.ADMIN_PATH || '/admin').replace(/\/+$/, '') || '/admin';
-const EXTRA_ORIGINS = String(process.env.SITE_ORIGINS || '').split(',').map((s) => s.trim().replace(/\/+$/, '')).filter(Boolean);
-
+const ROOT = __dirname;
 app.disable('x-powered-by');
-app.set('trust proxy', 1); // Railway-র প্রক্সির পেছনে — সঠিক ক্লায়েন্ট IP (rate-limit-এর জন্য জরুরি)
+app.set('trust proxy', Number(process.env.TRUST_PROXY || 1));
 
-/* ---------- নিরাপত্তা হেডার ---------- */
-const csp = {
-  useDefaults: false,
-  reportOnly: process.env.CSP_MODE === 'report',
-  directives: {
-    'default-src': ["'self'"],
-    // সাইটে inline script/onclick আছে, তাই 'unsafe-inline' লাগছে; বাকি সব হোস্ট নির্দিষ্ট করা
-    'script-src': ["'self'", "'unsafe-inline'", 'https://cdn.tailwindcss.com', 'https://cdnjs.cloudflare.com', 'https://www.gstatic.com', 'https://apis.google.com', 'https://www.google.com'],
-    'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
-    'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
-    'img-src': ["'self'", 'data:', 'blob:', 'https:'],
-    'connect-src': ["'self'", 'https://*.googleapis.com', 'https://*.firebaseio.com', 'https://*.firebasestorage.app', 'https://www.gstatic.com', 'https://nominatim.openstreetmap.org', 'https://cdnjs.cloudflare.com'],
-    'frame-src': ['https://*.firebaseapp.com', 'https://accounts.google.com', 'https://www.google.com'],
-    'object-src': ["'none'"],
-    'base-uri': ["'self'"],
-    'form-action': ["'self'"],
-    'frame-ancestors': ["'none'"],
-    ...(PROD ? { 'upgrade-insecure-requests': [] } : {}),
-  },
-};
+app.get('/healthz', (req, res) => res.json({ ok: true }));
+
 app.use(helmet({
-  contentSecurityPolicy: csp,
-  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }, // Google সাইন-ইন পপআপের জন্য আবশ্যক
+  contentSecurityPolicy: false,          // সাইটে inline স্ক্রিপ্ট/CDN আছে; CSP বসালে ভেঙে যেতে পারে
   crossOriginEmbedderPolicy: false,
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  hsts: { maxAge: 31536000, includeSubDomains: true },
+  crossOriginOpenerPolicy: false,        // Google লগইন পপআপের জন্য
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  frameguard: { action: 'sameorigin' },
+  hsts: { maxAge: 31536000 },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
-app.use((req, res, next) => {
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), payment=(), usb=()');
-  next();
-});
+app.use((req, res, next) => { res.set('Permissions-Policy', 'geolocation=(self), camera=(), microphone=(), payment=(), usb=()'); next(); });
 app.use(compression());
 
-/* ---------- Rate limit ---------- */
-const mk = (windowMs, max, msg) => rateLimit({ windowMs, max, standardHeaders: true, legacyHeaders: false, message: { error: 'too_many', message: msg || 'অনেক বেশি অনুরোধ, একটু পরে চেষ্টা করুন' } });
-app.use(mk(60_000, 300));                                  // সব রিকোয়েস্ট: IP প্রতি মিনিটে ৩০০
-app.use('/api/wa-notify', mk(10 * 60_000, 15));            // অর্ডার নোটিফাই: ১০ মিনিটে ১৫
-app.use('/api/sf-webhook', mk(60_000, 120));
-app.use(['/api/sf', '/api/wa'], mk(60_000, 120));
-app.use('/api/upload', mk(60_000, 90));                    // অ্যাডমিন ছবি আপলোড (পুরনো ছবি মাইগ্রেশনেও চলবে)
-app.use('/api/sms/test', mk(10 * 60_000, 10));
-app.use('/api/orders/lookup', mk(10 * 60_000, 40, 'অনেকবার খোঁজা হয়েছে, কয়েক মিনিট পরে চেষ্টা করুন'));
-app.use('/api/otp/send', mk(60 * 60_000, 8, 'অনেকবার কোড চাওয়া হয়েছে, ১ ঘণ্টা পরে চেষ্টা করুন'));
-app.use('/api/otp/verify', mk(10 * 60_000, 30, 'অনেকবার চেষ্টা হয়েছে, কয়েক মিনিট পরে আবার দেখুন'));
-
-/* ---------- Body parser (সীমিত সাইজ) ---------- */
-app.use('/api/upload', express.json({ limit: '14mb' }));   // প্রোডাক্ট ছবি (base64)
-app.use('/api/wa-notify', express.json({ limit: '3mb' })); // ইনভয়েস ছবি থাকে
-app.use('/api', express.json({ limit: '50kb' }));
-
-/* ---------- CSRF-সুরক্ষা: POST শুধু আমাদের নিজের সাইট থেকে (Steadfast webhook বাদে — সেটা টোকেন দিয়ে সুরক্ষিত) ---------- */
+/* ---- CORS: একই ডোমেইন বা ALLOWED_ORIGINS-এর তালিকা ---- */
+const ALLOWED = String(process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim().replace(/\/+$/, '')).filter(Boolean);
 app.use('/api', (req, res, next) => {
-  if (req.method !== 'POST' || req.path === '/sf-webhook') return next();
-  const o = req.headers.origin;
-  if (!o) return next(); // একই-অরিজিন সাধারণ রিকোয়েস্টে Origin না-ও থাকতে পারে; টোকেন যাচাই তো আছেই
-  const self = (req.headers['x-forwarded-proto'] || req.protocol) + '://' + req.headers.host;
-  if (o === self || EXTRA_ORIGINS.includes(o)) return next();
-  res.status(403).json({ error: 'অনুমোদিত অরিজিন নয়' });
+  res.set('Cache-Control', 'no-store');
+  const origin = req.get('origin');
+  if (origin) {
+    let sameHost = false; try { sameHost = new URL(origin).host === req.get('host'); } catch (e) {}
+    if (!sameHost && !ALLOWED.includes(origin)) return res.status(403).json({ error: 'forbidden_origin', message: 'এই ডোমেইনের অনুমতি নেই' });
+    res.set({ 'Access-Control-Allow-Origin': origin, Vary: 'Origin', 'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Firebase-AppCheck', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Max-Age': '86400' });
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
 });
+app.use('/api', rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false, message: { error: 'rate_limited', message: 'অনেক বেশি অনুরোধ — একটু পরে চেষ্টা করুন' } }));
 
-/* ---------- API ---------- */
-app.get('/healthz', (req, res) => res.type('text').send('ok'));
-app.use('/api', require('./products'));
+/* ---- API ---- */
 app.use('/api', require('./wa'));
-app.use('/api', require('./steadfast'));
+app.use('/api', require('./sms'));
 app.use('/api', require('./orders'));
-app.use('/api', require('./upload'));
-app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
+app.use('/api', require('./steadfast'));
+app.use('/api', (req, res) => res.status(404).json({ error: 'not_found', message: 'এই API নেই' }));
 
-/* ---------- পেজ (শুধু দুটি ফাইল) ---------- */
-const page = (file, headers) => (req, res) => {
-  if (!file) return res.status(404).type('text').send('Not found');
-  res.set(headers); res.sendFile(path.join(__dirname, file));
-};
-/* সাইট HTML: ১ মিনিট ক্যাশ + পুরোনোটা দেখিয়ে ব্যাকগ্রাউন্ডে নতুন আনে → রিপিট ভিজিটে সাইট প্রায় তাৎক্ষণিক খোলে */
-const SITE_CC = 'public, max-age=60, stale-while-revalidate=600';
-app.get(['/', '/index.html'], page(INDEX_FILE, { 'Cache-Control': SITE_CC }));
-app.get([ADMIN_PATH, ADMIN_PATH + '.html', '/admin.html'], page(ADMIN_FILE, { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' }));
-app.use((req, res) => (req.method === 'GET' && !path.extname(req.path)) ? page(INDEX_FILE, { 'Cache-Control': SITE_CC })(req, res) : res.status(404).type('text').send('Not found'));
+/* ---- স্ট্যাটিক: শুধু অনুমোদিত ফাইল। .env, server.js, package.json, *.js কখনোই পাবলিক হবে না ---- */
+const ADMIN_FILE = [process.env.ADMIN_FILE, 'admin.html', 'admin__3_.html'].filter(Boolean).find(f => fs.existsSync(path.join(ROOT, f))) || 'admin.html';
+const HTML_CACHE = 'public, max-age=60, stale-while-revalidate=600';
 
-/* ---------- ত্রুটি হ্যান্ডলার (স্ট্যাক ট্রেস কখনো বাইরে যায় না) ---------- */
-app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
-  if (err && err.type === 'entity.too.large') return res.status(413).json({ error: 'ডেটা অনেক বড়' });
-  if (err && err.type === 'entity.parse.failed') return res.status(400).json({ error: 'ভুল JSON' });
-  console.error('unhandled:', err && err.message);
-  res.status(500).json({ error: 'সার্ভার ত্রুটি' });
+app.get(['/', '/index.html'], (req, res) => res.set('Cache-Control', HTML_CACHE).sendFile(path.join(ROOT, 'index.html'), { dotfiles: 'deny' }, err => { if (err && !res.headersSent) res.status(404).send('Not found'); }));
+app.get(['/admin', /^\/admin[\w-]*\.html$/], (req, res) => res.set({ 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' }).sendFile(path.join(ROOT, ADMIN_FILE), { dotfiles: 'deny' }, err => { if (err && !res.headersSent) res.status(404).send('Not found'); }));
+
+const ASSET = /^\/[A-Za-z0-9_-]+\.(?:png|jpe?g|webp|gif|svg|ico|webmanifest)$/i;
+const FILES = new Set(['/manifest.json', '/robots.txt', '/sitemap.xml']);
+app.get('*', (req, res, next) => {
+  if (!(ASSET.test(req.path) || FILES.has(req.path))) return next();
+  res.sendFile(path.join(ROOT, req.path), { dotfiles: 'deny', maxAge: '1d' }, err => { if (err && !res.headersSent) next(); });
+});
+app.use((req, res) => res.status(404).send('Not found'));
+
+/* ---- ভুল JSON ইত্যাদি ---- */
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  const code = err.status || err.statusCode || 500;
+  if (code >= 500) console.error(err);
+  res.status(code).json({ error: code === 413 ? 'too_large' : code >= 500 ? 'server' : 'bad_request', message: code === 413 ? 'ডাটা অনেক বড়' : code >= 500 ? 'সার্ভারে সমস্যা হয়েছে' : 'অনুরোধ ঠিক নয়' });
 });
 
-const port = process.env.PORT || 3000;
-const server = app.listen(port, '0.0.0.0', () => console.log('BANA server listening on', port));
-process.on('SIGTERM', () => server.close(() => process.exit(0)));
-process.on('unhandledRejection', (e) => console.error('unhandledRejection:', e && e.message));
+process.on('unhandledRejection', e => console.error('unhandledRejection:', e));
+process.on('uncaughtException', e => console.error('uncaughtException:', e));
+
+const PORT = Number(process.env.PORT) || 3000;
+const server = app.listen(PORT, '0.0.0.0', () => console.log(`BANA FASHION server চালু — পোর্ট ${PORT}, অ্যাডমিন ফাইল: ${ADMIN_FILE}`));
+server.keepAliveTimeout = 65000; server.headersTimeout = 70000;
+process.on('SIGTERM', () => { console.log('SIGTERM — বন্ধ হচ্ছে'); server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 10000).unref(); });
