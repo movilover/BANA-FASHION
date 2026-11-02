@@ -1,79 +1,93 @@
 'use strict';
-/* WhatsApp সেন্ডার — Whapi.Cloud / UltraMsg / Meta Cloud API।
-   টোকেন Firestore-এর private/whatsapp ডকে থাকে (শুধু অ্যাডমিন পড়তে পারে; সার্ভার Admin SDK দিয়ে পড়ে)। */
-const { db } = require('./firebase');
-
-let cache = { t: 0, v: null };
-async function getConfig(force) {
-  if (!force && cache.v && Date.now() - cache.t < 30_000) return cache.v;
-  const s = await db.doc('private/whatsapp').get();
-  cache = { t: Date.now(), v: s.exists ? s.data() : {} };
-  return cache.v;
-}
-const invalidate = () => { cache = { t: 0, v: null }; };
+/* WhatsApp প্রোভাইডার: Whapi.Cloud / UltraMsg / Meta Cloud API */
 
 async function http(url, opt = {}) {
-  const r = await fetch(url, { ...opt, signal: AbortSignal.timeout(20_000) });
-  const txt = await r.text();
-  let j = {}; try { j = JSON.parse(txt); } catch (e) { j = { raw: txt.slice(0, 300) }; }
-  if (!r.ok) {
-    const msg = (j.error && (j.error.message || j.error)) || j.message || j.raw || ('HTTP ' + r.status);
-    throw new Error(String(typeof msg === 'string' ? msg : JSON.stringify(msg)).slice(0, 250));
-  }
-  return j;
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), opt.timeout || 15000);
+  try {
+    const r = await fetch(url, { ...opt, signal: ctl.signal });
+    const text = await r.text();
+    let json = null; try { json = JSON.parse(text); } catch (e) {}
+    return { ok: r.ok, status: r.status, json, text };
+  } catch (e) {
+    throw new Error(e.name === 'AbortError' ? 'WhatsApp সার্ভিস সময়মতো সাড়া দেয়নি' : 'WhatsApp সার্ভিসে সংযোগ যায়নি');
+  } finally { clearTimeout(t); }
 }
-const json = (token, body) => ({
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
-  body: JSON.stringify(body),
-});
+const errMsg = r => {
+  const j = r.json || {};
+  const m = (j.error && (j.error.message || j.error)) || j.message || (r.text || '').slice(0, 160) || ('HTTP ' + r.status);
+  return String(m).slice(0, 200);
+};
+const form = o => new URLSearchParams(o).toString();
+const FORM = { 'Content-Type': 'application/x-www-form-urlencoded' };
+const enc = encodeURIComponent;
+const isGroup = t => /@g\.us$/.test(String(t));
+const digits = t => String(t).replace(/\D/g, '');
 
-function need(cfg) {
-  if (!cfg || !cfg.token) throw new Error('WhatsApp API Token সেভ করা নেই (Admin > Settings)');
-  if (!cfg.target) throw new Error('WhatsApp গ্রুপ/নম্বর সেভ করা নেই (Admin > Settings)');
-}
-
-async function sendText(cfg, text) {
-  need(cfg);
-  const to = cfg.target, p = cfg.provider || 'whapi';
-  if (p === 'whapi') return http('https://gate.whapi.cloud/messages/text', json(cfg.token, { to, body: text }));
-  if (p === 'ultramsg') return http(`https://api.ultramsg.com/${encodeURIComponent(cfg.instance)}/messages/chat`, json(null, { token: cfg.token, to, body: text }));
-  if (p === 'meta') return http(`https://graph.facebook.com/v21.0/${encodeURIComponent(cfg.instance)}/messages`,
-    json(cfg.token, { messaging_product: 'whatsapp', to, type: 'text', text: { body: text } }));
-  throw new Error('অজানা WhatsApp সার্ভিস');
+function need(c) {
+  if (!c || !c.token) throw new Error('WhatsApp টোকেন সেট করা নেই');
+  if (c.provider === 'ultramsg' && !c.instance) throw new Error('UltraMsg Instance ID দিন');
+  if (c.provider === 'meta' && !c.instance) throw new Error('Meta Phone Number ID দিন');
 }
 
-/* dataUrl = "data:image/png;base64,...." */
-async function sendImage(cfg, dataUrl, caption) {
-  need(cfg);
-  const to = cfg.target, p = cfg.provider || 'whapi';
-  if (p === 'whapi') return http('https://gate.whapi.cloud/messages/image', json(cfg.token, { to, media: dataUrl, caption }));
-  if (p === 'ultramsg') return http(`https://api.ultramsg.com/${encodeURIComponent(cfg.instance)}/messages/image`, json(null, { token: cfg.token, to, image: dataUrl, caption }));
-  if (p === 'meta') {
-    const m = /^data:(image\/[a-z]+);base64,(.+)$/.exec(dataUrl);
-    const fd = new FormData();
-    fd.append('messaging_product', 'whatsapp');
-    fd.append('type', m[1]);
-    fd.append('file', new Blob([Buffer.from(m[2], 'base64')], { type: m[1] }), 'invoice.' + m[1].split('/')[1]);
-    const up = await http(`https://graph.facebook.com/v21.0/${encodeURIComponent(cfg.instance)}/media`, { method: 'POST', headers: { Authorization: 'Bearer ' + cfg.token }, body: fd });
-    return http(`https://graph.facebook.com/v21.0/${encodeURIComponent(cfg.instance)}/messages`,
-      json(cfg.token, { messaging_product: 'whatsapp', to, type: 'image', image: { id: up.id, caption } }));
-  }
-  throw new Error('অজানা WhatsApp সার্ভিস');
-}
-
-async function listGroups(cfg) {
-  if (!cfg || !cfg.token) throw new Error('WhatsApp API Token সেভ করা নেই (আগে সেভ করুন)');
-  const p = cfg.provider || 'whapi';
+async function sendText(c, to, text) {
+  need(c);
+  const p = c.provider || 'whapi';
+  let r;
   if (p === 'whapi') {
-    const j = await http('https://gate.whapi.cloud/groups?count=100', { headers: { Authorization: 'Bearer ' + cfg.token } });
-    return (j.groups || []).map((g) => ({ id: g.id, name: g.name }));
+    r = await http('https://gate.whapi.cloud/messages/text', { method: 'POST', headers: { Authorization: 'Bearer ' + c.token, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ to, body: text }) });
+    if (!r.ok || (r.json && r.json.sent === false)) throw new Error(errMsg(r));
+  } else if (p === 'ultramsg') {
+    r = await http(`https://api.ultramsg.com/${enc(c.instance)}/messages/chat`, { method: 'POST', headers: FORM, body: form({ token: c.token, to: isGroup(to) ? to : '+' + digits(to), body: text }) });
+    if (!r.ok || !r.json || r.json.error) throw new Error(errMsg(r));
+  } else if (p === 'meta') {
+    if (isGroup(to)) throw new Error('Meta Cloud API তে গ্রুপে পাঠানো যায় না — নম্বর দিন');
+    r = await http(`https://graph.facebook.com/v19.0/${enc(c.instance)}/messages`, { method: 'POST', headers: { Authorization: 'Bearer ' + c.token, 'Content-Type': 'application/json' }, body: JSON.stringify({ messaging_product: 'whatsapp', to: digits(to), type: 'text', text: { body: text, preview_url: false } }) });
+    if (!r.ok || (r.json && r.json.error)) throw new Error(errMsg(r));
+  } else throw new Error('অজানা WhatsApp সার্ভিস');
+  return true;
+}
+
+/* dataUrl = data:image/png;base64,... */
+async function sendImage(c, to, dataUrl, caption) {
+  need(c);
+  const p = c.provider || 'whapi';
+  const m = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl || '');
+  if (!m) throw new Error('ছবির ফরম্যাট ঠিক নয়');
+  let r;
+  if (p === 'whapi') {
+    r = await http('https://gate.whapi.cloud/messages/image', { method: 'POST', timeout: 30000, headers: { Authorization: 'Bearer ' + c.token, 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ to, media: dataUrl, caption }) });
+    if (!r.ok || (r.json && r.json.sent === false)) throw new Error(errMsg(r));
+  } else if (p === 'ultramsg') {
+    r = await http(`https://api.ultramsg.com/${enc(c.instance)}/messages/image`, { method: 'POST', timeout: 30000, headers: FORM, body: form({ token: c.token, to: isGroup(to) ? to : '+' + digits(to), image: dataUrl, caption }) });
+    if (!r.ok || !r.json || r.json.error) throw new Error(errMsg(r));
+  } else if (p === 'meta') {
+    const fd = new FormData();
+    fd.append('messaging_product', 'whatsapp'); fd.append('type', m[1]);
+    fd.append('file', new Blob([Buffer.from(m[2], 'base64')], { type: m[1] }), 'invoice.' + (m[1] === 'image/png' ? 'png' : m[1] === 'image/webp' ? 'webp' : 'jpg'));
+    const up = await http(`https://graph.facebook.com/v19.0/${enc(c.instance)}/media`, { method: 'POST', timeout: 30000, headers: { Authorization: 'Bearer ' + c.token }, body: fd });
+    if (!up.ok || !up.json || !up.json.id) throw new Error(errMsg(up));
+    r = await http(`https://graph.facebook.com/v19.0/${enc(c.instance)}/messages`, { method: 'POST', headers: { Authorization: 'Bearer ' + c.token, 'Content-Type': 'application/json' }, body: JSON.stringify({ messaging_product: 'whatsapp', to: digits(to), type: 'image', image: { id: up.json.id, caption } }) });
+    if (!r.ok || (r.json && r.json.error)) throw new Error(errMsg(r));
+  } else throw new Error('অজানা WhatsApp সার্ভিস');
+  return true;
+}
+
+async function listGroups(c) {
+  need(c);
+  const p = c.provider || 'whapi';
+  if (p === 'whapi') {
+    const r = await http('https://gate.whapi.cloud/groups?count=200', { headers: { Authorization: 'Bearer ' + c.token, Accept: 'application/json' }, timeout: 25000 });
+    if (!r.ok) throw new Error(errMsg(r));
+    return ((r.json && r.json.groups) || []).map(g => ({ id: g.id, name: g.name || g.id }));
   }
   if (p === 'ultramsg') {
-    const j = await http(`https://api.ultramsg.com/${encodeURIComponent(cfg.instance)}/groups?token=${encodeURIComponent(cfg.token)}`);
-    return (Array.isArray(j) ? j : []).map((g) => ({ id: g.id, name: g.name }));
+    const r = await http(`https://api.ultramsg.com/${enc(c.instance)}/groups?${form({ token: c.token })}`, { timeout: 25000 });
+    if (!r.ok) throw new Error(errMsg(r));
+    const a = Array.isArray(r.json) ? r.json : (r.json && r.json.groups) || [];
+    return a.map(g => ({ id: g.id, name: g.name || g.subject || g.id }));
   }
-  throw new Error('Meta Cloud API-তে গ্রুপ লিস্ট সাপোর্ট নেই — শুধু নম্বর ব্যবহার করুন');
+  throw new Error('এই সার্ভিসে গ্রুপ লিস্ট পাওয়া যায় না — সরাসরি নম্বর দিন');
 }
 
-module.exports = { getConfig, invalidate, sendText, sendImage, listGroups };
+module.exports = { sendText, sendImage, listGroups };
