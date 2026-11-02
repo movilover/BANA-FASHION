@@ -1,61 +1,32 @@
 'use strict';
-/* টোকেন যাচাই: requireUser = যেকোনো লগইন/অ্যানোনিমাস ব্যবহারকারী, requireAdmin = শুধু মালিক।
-   requireAdmin ঠিক Firestore rules-এর admin() ফাংশনের মতোই: নির্দিষ্ট ইমেইল + "password" সাইন-ইন প্রোভাইডার। */
-const crypto = require('crypto');
-const { admin, auth } = require('./firebase');
+/* অ্যাডমিন ও App Check যাচাই */
+const { admin } = require('./firebase');
+const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || 'banafashiongazipur@gmail.com').toLowerCase();
 
-const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
-if (!ADMIN_EMAIL) throw new Error('ADMIN_EMAIL সেট করা নেই');
-
-const bearer = (req) => {
-  const m = /^Bearer\s+(.+)$/i.exec(req.headers.authorization || '');
-  return m ? m[1].trim() : null;
-};
-
-/* দুটি স্ট্রিং টাইমিং-অ্যাটাক ছাড়া তুলনা */
-const safeEqual = (a, b) => {
-  const ha = crypto.createHash('sha256').update(String(a)).digest();
-  const hb = crypto.createHash('sha256').update(String(b)).digest();
-  return crypto.timingSafeEqual(ha, hb);
-};
-
-async function requireUser(req, res, next) {
+/* Firestore Rules-এর admin() এর সাথে হুবহু এক: নির্দিষ্ট ইমেইল + password সাইন-ইন */
+async function adminFromReq(req) {
+  const m = /^Bearer (.+)$/i.exec(req.get('authorization') || '');
+  if (!m) return null;
   try {
-    const t = bearer(req);
-    if (!t) return res.status(401).json({ error: 'লগইন সেশন নেই' });
-    req.user = await auth.verifyIdToken(t);
-    next();
-  } catch (e) {
-    res.status(401).json({ error: 'সেশন অবৈধ বা মেয়াদোত্তীর্ণ' });
-  }
+    const t = await admin.auth().verifyIdToken(m[1]);
+    if (String(t.email || '').toLowerCase() === ADMIN_EMAIL && t.firebase && t.firebase.sign_in_provider === 'password') return t;
+  } catch (e) { /* ভুল/মেয়াদোত্তীর্ণ টোকেন */ }
+  return null;
+}
+function requireAdmin(req, res, next) {
+  adminFromReq(req).then(t => {
+    if (!t) return res.status(401).json({ error: 'অ্যাডমিন লগইন প্রয়োজন — আবার লগইন করুন', code: 'unauthorized', message: 'অ্যাডমিন লগইন প্রয়োজন — আবার লগইন করুন' });
+    req.admin = t; next();
+  }).catch(() => res.status(401).json({ error: 'যাচাই করা যায়নি', code: 'unauthorized', message: 'যাচাই করা যায়নি' }));
 }
 
-async function requireAdmin(req, res, next) {
-  try {
-    const t = bearer(req);
-    if (!t) return res.status(401).json({ error: 'লগইন সেশন নেই, আবার লগইন করুন' });
-    const d = await auth.verifyIdToken(t, true); // true = রিভোক করা টোকেনও আটকায়
-    const ok = String(d.email || '').toLowerCase() === ADMIN_EMAIL
-      && d.firebase && d.firebase.sign_in_provider === 'password';
-    if (!ok) return res.status(403).json({ error: 'অনুমতি নেই' });
-    req.user = d;
-    next();
-  } catch (e) {
-    res.status(401).json({ error: 'সেশন অবৈধ বা মেয়াদোত্তীর্ণ' });
-  }
-}
-
-/* ঐচ্ছিক: APPCHECK_ENFORCE=true হলে শুধু আসল সাইট থেকে আসা রিকোয়েস্ট চলবে */
+/* App Check: টোকেন থাকলে যাচাই হয়; APPCHECK_ENFORCE=1 হলে টোকেন ছাড়া বন্ধ */
 async function appCheck(req, res, next) {
-  if (process.env.APPCHECK_ENFORCE !== 'true') return next();
-  try {
-    const tok = req.headers['x-firebase-appcheck'];
-    if (!tok) return res.status(401).json({ error: 'App Check টোকেন নেই' });
-    await admin.appCheck().verifyToken(String(tok));
-    next();
-  } catch (e) {
-    res.status(401).json({ error: 'App Check যাচাই ব্যর্থ' });
-  }
+  const enforce = process.env.APPCHECK_ENFORCE === '1';
+  const tok = req.get('x-firebase-appcheck');
+  if (!tok) return enforce ? res.status(401).json({ error: 'appcheck', message: 'অনুরোধ যাচাই হয়নি' }) : next();
+  try { await admin.appCheck().verifyToken(tok); return next(); }
+  catch (e) { return enforce ? res.status(401).json({ error: 'appcheck', message: 'অনুরোধ যাচাই হয়নি' }) : next(); }
 }
 
-module.exports = { requireUser, requireAdmin, appCheck, safeEqual, ADMIN_EMAIL };
+module.exports = { ADMIN_EMAIL, adminFromReq, requireAdmin, appCheck };
