@@ -1,13 +1,13 @@
 {
   "name": "bana-fashion-server",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "BANA FASHION — secure Express server for Railway (static site + Firebase Admin + WhatsApp + Steadfast)",
+  "description": "BANA FASHION — Railway API server (Steadfast, WhatsApp, SMS OTP, order lookup)",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=18" },
   "dependencies": {
-    "compression": "^1.8.0",
+    "compression": "^1.7.4",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
     "firebase-admin": "^12.6.0",
