@@ -1,114 +1,82 @@
 'use strict';
-/* GET  /api/wa-enabled   — পাবলিক: শুধু চালু/বন্ধ জানায় (টোকেন নয়)
-   POST /api/wa-notify    — কাস্টমার: নতুন অর্ডারের পর WhatsApp অ্যালার্ট (সার্ভার অর্ডার নিজে পড়ে মেসেজ বানায়)
-   POST /api/wa           — অ্যাডমিন: test / groups */
-const router = require('express').Router();
-const { db } = require('./firebase');
-const { requireUser, requireAdmin, appCheck } = require('./auth');
+/* /api/wa-enabled (পাবলিক) · /api/wa-notify (সাইট, নতুন অর্ডারের পর) · /api/wa (অ্যাডমিন: test, groups) */
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const { db, FieldValue, cfg, Timestamp } = require('./firebase');
+const { requireAdmin, appCheck } = require('./auth');
+const { toDate } = require('./bn');
+const { orderText } = require('./invoiceText');
+const { checkOrder } = require('./products');
 const wa = require('./whatsapp');
 
-const ORDER_ID = /^BF-[A-Z0-9]{4,20}$/;
-const money = (n) => '৳' + Math.round(Number(n) || 0).toLocaleString('en-US');
-const dhakaTime = () => new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Asia/Dhaka', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
-}).format(new Date()).toUpperCase();
+const router = express.Router();
+const lim = (windowMs, max) => rateLimit({ windowMs, max, standardHeaders: true, legacyHeaders: false, message: { error: 'rate_limited', message: 'অনেক বেশি অনুরোধ — একটু পরে চেষ্টা করুন' } });
+const MAX_AGE = 3 * 24 * 3600 * 1000;   // এর চেয়ে পুরনো অর্ডারের অ্যালার্ট আর পাঠানো হয় না
+const MAX_TRIES = 5;
 
-router.get('/wa-enabled', async (req, res) => {
-  try { res.set('Cache-Control', 'no-store'); res.json({ enabled: !!(await wa.getConfig()).enabled }); }
-  catch (e) { res.json({ enabled: false }); }
+router.get('/wa-enabled', lim(60 * 1000, 120), async (req, res) => {
+  try { const c = await cfg('private/whatsapp'); res.set('Cache-Control', 'no-store').json({ enabled: !!(c.enabled && c.token && c.target) }); }
+  catch (e) { res.json({ enabled: true }); }   // ভুল হলে সাইট নিজে থেকেই চেষ্টা করবে
 });
 
-/* দাম মিলিয়ে দেখে — rules শুধু যোগফল মেলায়, প্রোডাক্টের আসল দাম নয়। অমিল পেলে অ্যাডমিনকে সতর্ক করে */
-async function priceWarnings(items) {
+router.post('/wa-notify', lim(10 * 60 * 1000, 40), appCheck, express.json({ limit: '3mb' }), async (req, res) => {
   try {
-    items = items.filter((i) => i && typeof i === 'object' && i.id);
-    const refs = [...new Set(items.map((i) => i.id))].slice(0, 50).map((id) => db.collection('products').doc(String(id)));
-    const snaps = await db.getAll(...refs);
-    const price = {}; snaps.forEach((s) => { if (s.exists) price[s.id] = Number(s.data().price); });
-    return items.filter((i) => price[i.id] != null && Math.abs(price[i.id] - Number(i.price)) > 0.5)
-      .map((i) => `⚠️ দাম অমিল: ${i.title} — অর্ডারে ${money(i.price)}, সাইটে ${money(price[i.id])}`);
-  } catch (e) { return []; }
-}
-
-async function buildMessage(o) {
-  o = { ...o, items: (Array.isArray(o.items) ? o.items : []).filter((i) => i && typeof i === 'object') };
-  const addr = [o.address, o.upazila, o.district, o.division].filter(Boolean).join(', ');
-  const cod = (o.pay && o.deliveryPaid) ? o.subtotal - (o.discount || 0) : o.total;
-  const warn = await priceWarnings(o.items || []);
-  return [
-    '🛍️ *নতুন অর্ডার — BANA FASHION*',
-    '🆔 ' + o.orderId,
-    '🕒 ' + dhakaTime(),
-    '',
-    '👤 ' + o.customerName,
-    '📞 ' + o.phone,
-    '📍 ' + addr,
-    o.geo ? '🗺️ https://www.google.com/maps?q=' + Number(o.geo.lat) + ',' + Number(o.geo.lng) : null,
-    o.note ? '📝 ' + o.note : null,
-    '',
-    ...(o.items || []).map((i) => `• ${i.title}${i.size ? ' (' + i.size + ')' : ''} × ${i.qty} = ${money(i.price * i.qty)}`),
-    '',
-    'সাবটোটাল: ' + money(o.subtotal),
-    o.discount ? `ডিসকাউন্ট${o.promo && o.promo.code ? ' (' + o.promo.code + ')' : ''}: -${money(o.discount)}` : null,
-    'ডেলিভারি: ' + (o.delivery ? money(o.delivery) : 'ফ্রি'),
-    '*মোট: ' + money(o.total) + '*',
-    o.pay ? `💳 ডেলিভারি চার্জ: ${o.pay.method} • ${o.pay.sender} • TrxID ${o.pay.trxId} (যাচাই বাকি)` : null,
-    '💵 কুরিয়ারে COD: ' + money(cod),
-    ...(warn.length ? ['', ...warn] : []),
-  ].filter((x) => x !== null).join('\n');
-}
-
-router.post('/wa-notify', appCheck, requireUser, async (req, res) => {
-  try {
-    const { orderId, image } = req.body || {};
-    if (typeof orderId !== 'string' || !ORDER_ID.test(orderId)) return res.status(400).json({ error: 'অর্ডার আইডি সঠিক নয়' });
-    const cfg = await wa.getConfig();
-    if (!cfg.enabled) return res.json({ ok: true, skipped: 'disabled' });
+    const orderId = String((req.body || {}).orderId || '');
+    if (!/^BF-[A-Z0-9]{4,20}$/.test(orderId)) return res.status(400).json({ error: 'bad_order_id', message: 'অর্ডার আইডি ঠিক নয়' });
+    const c = await cfg('private/whatsapp');
+    if (!c.enabled || !c.token || !c.target) return res.json({ ok: true, skipped: 'disabled' });
 
     const q = await db.collection('orders').where('orderId', '==', orderId).limit(1).get();
-    if (q.empty) return res.status(404).json({ error: 'অর্ডার পাওয়া যায়নি' });
-    const ref = q.docs[0].ref, o = q.docs[0].data();
-    if (o.uid !== req.user.uid) return res.status(403).json({ error: 'এই অর্ডার আপনার নয়' });
-    const created = o.createdAt && o.createdAt.toMillis ? o.createdAt.toMillis() : 0;
-    if (!created || Date.now() - created > 48 * 3600_000) return res.status(410).json({ error: 'অর্ডারটি অনেক পুরোনো' });
+    if (q.empty) return res.status(404).json({ error: 'not_found', message: 'অর্ডার পাওয়া যায়নি' });
+    const ref = q.docs[0].ref;
 
-    /* একই অর্ডারের মেসেজ দুবার যাবে না (retry/ডাবল-ক্লিক) */
-    const st = await db.runTransaction(async (tx) => {
-      const s = (await tx.get(ref)).data();
-      if (s.waState === 'sent') return 'done';
-      if (s.waState === 'sending' && Date.now() - (s.waAt || 0) < 120_000) return 'busy';
-      tx.update(ref, { waState: 'sending', waAt: Date.now() });
-      return 'go';
+    /* একই অর্ডারের অ্যালার্ট দুবার যাওয়া আটকাতে ট্রানজ্যাকশনে "দাবি" করা হয় */
+    const claim = await db.runTransaction(async tx => {
+      const s = await tx.get(ref), o = s.data() || {};
+      const created = toDate(o.createdAt);
+      if (created && Date.now() - created.getTime() > MAX_AGE) return { skip: 'too_old' };
+      if (o.waState === 'sent') return { skip: 'already' };
+      const at = toDate(o.waAt);
+      if (o.waState === 'sending' && at && Date.now() - at.getTime() < 60000) return { skip: 'busy' };
+      if ((o.waTries || 0) >= MAX_TRIES) return { skip: 'too_many' };
+      tx.update(ref, { waState: 'sending', waAt: Timestamp.now(), waTries: FieldValue.increment(1) });
+      return { order: o };
     });
-    if (st !== 'go') return res.json({ ok: true, skipped: st });
+    if (claim.skip === 'too_old') return res.status(410).json({ error: 'too_old', message: 'অর্ডারটি পুরনো' });
+    if (claim.skip === 'too_many') return res.status(429).json({ error: 'too_many', message: 'অনেকবার চেষ্টা হয়েছে' });
+    if (claim.skip) return res.json({ ok: true, skipped: claim.skip });
 
+    const o = claim.order;
     try {
-      await wa.sendText(cfg, await buildMessage(o));
-      let img = false;
-      if (typeof image === 'string' && /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(image) && image.length < 3_000_000) {
-        try { await wa.sendImage(cfg, image, '🧾 ইনভয়েস ' + orderId); img = true; } catch (e) { console.warn('wa image:', e.message); }
-      }
-      await ref.update({ waState: 'sent', waAt: Date.now(), waImg: img, waErr: null });
-      res.json({ ok: true, image: img });
+      const flags = await checkOrder(o);
+      await wa.sendText(c, c.target, orderText(o, flags));
+      await ref.update({ waState: 'sent', waAt: Timestamp.now(), waErr: FieldValue.delete() });
+      const img = String((req.body || {}).image || '');
+      if (img && img.length < 2.5e6) { try { await wa.sendImage(c, c.target, img, 'ইনভয়েস — ' + orderId); } catch (e) { console.warn('wa image:', e.message); } }
+      return res.json({ ok: true });
     } catch (e) {
-      await ref.update({ waState: 'failed', waAt: Date.now(), waErr: String(e.message).slice(0, 200) }).catch(() => {});
-      console.error('wa-notify:', e.message);
-      res.status(502).json({ error: 'WhatsApp পাঠানো যায়নি' });
+      await ref.update({ waState: 'failed', waErr: String(e.message).slice(0, 200) }).catch(() => {});
+      console.warn('wa-notify failed:', orderId, e.message);
+      return res.status(502).json({ error: 'send_failed', message: 'WhatsApp অ্যালার্ট যায়নি' });
     }
   } catch (e) {
-    console.error('wa-notify:', e.message);
-    res.status(500).json({ error: 'সার্ভার ত্রুটি' });
+    console.error('wa-notify:', e);
+    res.status(500).json({ error: 'server', message: 'সার্ভারে সমস্যা' });
   }
 });
 
-router.post('/wa', requireAdmin, async (req, res) => {
+router.post('/wa', lim(60 * 1000, 30), requireAdmin, express.json({ limit: '20kb' }), async (req, res) => {
   try {
-    const cfg = await wa.getConfig(true);
-    const action = (req.body || {}).action;
-    if (action === 'test') { await wa.sendText(cfg, '✅ BANA FASHION — টেস্ট মেসেজ সফল! ' + dhakaTime()); return res.json({ ok: true }); }
-    if (action === 'groups') return res.json({ groups: await wa.listGroups(cfg) });
-    res.status(400).json({ error: 'অজানা action' });
-  } catch (e) { res.status(400).json({ error: e.message }); }
+    const c = await cfg('private/whatsapp', 0);   // অ্যাডমিন সেভ করেই টেস্ট করে — তাই ক্যাশ ছাড়া
+    const action = String((req.body || {}).action || '');
+    if (action === 'groups') return res.json({ ok: true, groups: await wa.listGroups(c) });
+    if (action === 'test') {
+      if (!c.target) throw new Error('গ্রুপ Chat ID / নম্বর সেট করা নেই');
+      await wa.sendText(c, c.target, '✅ BANA FASHION — WhatsApp টেস্ট মেসেজ। সংযোগ ঠিক আছে।');
+      return res.json({ ok: true });
+    }
+    res.status(400).json({ error: 'অজানা অ্যাকশন', message: 'অজানা অ্যাকশন' });
+  } catch (e) { res.status(400).json({ error: e.message, message: e.message }); }
 });
 
 module.exports = router;
