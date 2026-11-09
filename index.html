@@ -1214,7 +1214,8 @@ html.bf-lock{overflow:hidden!important}
 
 
 <section id="hangerRail" class="hidden"><div class="hr-lab">আমাদের কালেকশন</div><h2>নির্বাচিত পণ্য</h2><p class="hr-sub">যেকোনো পণ্যে ট্যাপ করুন, আবার ট্যাপ করলে বিস্তারিত দেখাযাবে</p><div class="hr-wrap"><div class="hr-stage" id="hrStage"></div></div></section>
-<section class="bn-offer-sec"><div class="bn-offer"><div class="bn-offer-t"><h3>Special Offer</h3><p>Up to <em>70%</em> OFF</p><a href="#shop" onclick="filterCategory('all')" class="bn-wbtn">Shop Now <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div><div class="bn-offer-i"><img data-bflogo alt=""></div></div></section>
+<!-- CATEGORIES (new): sits where the Special Offer banner was -->
+<section id="bfCats" aria-label="ক্যাটাগরি" style="display:none"><div class="bfc-card"><div class="bfc-ttl"><span>ক্যাটাগরি</span></div><div id="bfcGrid" class="bfc-grid"></div><div id="bfcMore" class="bfc-morewrap"></div></div></section>
 <style id="railCss">
 .rail-sec{position:relative;padding:38px 0 34px;background:linear-gradient(180deg,#fcfbf8 0%,#f3f4f6 100%);overflow:hidden;border-bottom:1px solid rgba(0,0,0,.05)}
 .rail-sec::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 0%,rgba(245,158,11,.11),transparent 72%);pointer-events:none}
@@ -1347,14 +1348,16 @@ html.bf-lock{overflow:hidden!important}
 </section>
 
 <section class="bn-start-sec"><div class="bn-start"><i class="fa-solid fa-bag-shopping"></i><div><h3>Start Shopping Now</h3><p>Get the best fashion at the best price!</p></div><a href="#shop" onclick="filterCategory('all')" class="bn-wbtn">Shop Now <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></section>
+<!-- BRAND HEADER (above About + Helpline) -->
+<section id="bfBrand" aria-label="BANA FASHION"><div class="bfb-card"><span class="bfb-logo"><img src="data:image/jpeg;base64,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" alt="BANA FASHION logo"></span><div class="bfb-txt"><div class="bfb-name">BANA FASHION</div><div class="bfb-tag">প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</div></div></div></section>
 <!-- ABOUT / BRAND STORY -->
 <section id="about" class="py-12 sm:py-16 bg-ink-900 text-white relative overflow-hidden">
   <div class="absolute -right-24 -bottom-24 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl"></div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div class="space-y-5 reveal max-w-3xl">
       <span class="text-gold-400 font-extrabold text-xs uppercase tracking-widest">আমাদের গল্প</span>
-      <h2 class="font-display font-extrabold text-3xl sm:text-5xl leading-tight">গাজীপুরে তৈরি। <br><span class="gold-text">গর্ব নিয়ে পরা।</span></h2>
-      <p class="text-silver-300 text-sm leading-relaxed">BANA FASHION একটি প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড, প্রতিষ্ঠাতা <b class="text-white">জনাব রাহাদ</b> । শফিপুর বাজার, কালিয়াকৈর, গাজীপুরে আমরা মানসম্মত কাপড়, যত্নের সেলাই আর আধুনিক ডিজাইন একসাথে এনেছি — যাতে প্রতিটি পুরুষ আত্মবিশ্বাসের সাথে, ন্যায্য দামে নিজেকে সাজাতে পারেন।</p>
+      <h2 class="font-display font-extrabold text-3xl sm:text-5xl leading-tight">গাজীপুরে তৈরি। <span class="gold-text">গর্ব নিয়ে পরা।</span></h2>
+      <p class="text-silver-300 text-sm leading-relaxed">প্রতিষ্ঠাতা <b class="text-white">জনাব রাহাদ</b>। শফিপুর বাজার, কালিয়াকৈর, গাজীপুর থেকে মানসম্মত কাপড় আর আধুনিক ডিজাইন — ন্যায্য দামে।</p>
       <div class="grid sm:grid-cols-2 gap-3 pt-2 text-sm text-silver-300">
         <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> প্রিমিয়াম মানের কাপড়</div>
         <div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-gold-500"></i> নিখুঁত আধুনিক ফিটিং</div>
@@ -1374,7 +1377,7 @@ html.bf-lock{overflow:hidden!important}
       <div class="inline-flex w-10 h-10 rounded-full btn-gold items-center justify-center text-sm mb-2"><i class="fa-solid fa-headset"></i></div>
       <span class="block text-gold-400 font-extrabold text-[11px] sm:text-xs">কাস্টমার হেল্পলাইন</span>
       <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-white mt-1.5">আমরা আছি <span class="gold-text">আপনার পাশে</span></h2>
-      <p class="text-silver-400 text-xs sm:text-sm mt-2 max-w-md mx-auto leading-relaxed">সাইজ, অর্ডার বা ডেলিভারি নিয়ে প্রশ্ন? সরাসরি কল বা মেসেজ করুন — আমরা দ্রুত উত্তর দিই।</p>
+      <p class="text-silver-400 text-xs sm:text-sm mt-2 max-w-md mx-auto leading-relaxed">সাইজ, অর্ডার বা ডেলিভারি নিয়ে কল বা মেসেজ করুন।</p>
     </div>
     <div class="grid sm:grid-cols-2 gap-2.5">
       <div class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3">
@@ -1414,12 +1417,6 @@ html.bf-lock{overflow:hidden!important}
           <a href="https://wa.me/8801353808618" target="_blank" rel="noopener" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-gold-500 hover:text-black flex items-center justify-center transition-colors"><i class="fa-brands fa-whatsapp text-xs"></i></a>
           <a href="mailto:banafashiongazipur@gmail.com" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-gold-500 hover:text-black flex items-center justify-center transition-colors"><i class="fa-solid fa-envelope text-xs"></i></a>
         </div>
-      </div>
-      <div>
-        <h4 class="text-white font-extrabold text-sm mb-4 uppercase tracking-wider">ঠিকানা</h4>
-        <p class="text-xs leading-relaxed">শফিপুর বাজার, কালিয়াকৈর,<br>গাজীপুর, বাংলাদেশ</p>
-        <h4 class="text-white font-extrabold text-sm mt-5 mb-2 uppercase tracking-wider">পেমেন্ট</h4>
-        <span class="inline-flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-lg bg-white/5 border border-white/10"><i class="fa-solid fa-money-bill-wave text-gold-400"></i> ক্যাশ অন ডেলিভারি</span>
       </div>
     </div>
     <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs gap-2">
@@ -1995,7 +1992,7 @@ function buildCatRowCore(){ const r=$('catRow'); if(!r) return;
   if(catsInView||_catsPlayed) playCats(); }
 /* ===== categories: 4 per row, 2 rows (8) first, then an "আরো দেখুন" button reveals the rest ===== */
 let _catExp=false;
-function buildCatRow(){ buildCatRowCore(); catMoreApply(); }
+function buildCatRow(){ buildCatRowCore(); catMoreApply(); try{ bfcRender(); }catch(e){ console.warn("bfcRender:",e); } }
 function catMoreApply(){ const r=$('catRow'); if(!r) return;
   const cards=[...r.querySelectorAll('.cat-card:not(.sk)')]; let w=$('catMoreWrap');
   if(cards.length<=8){ cards.forEach(c=>c.classList.remove('cat-extra')); r.classList.remove('cat-collapsed'); if(w) w.remove(); return; }
@@ -2005,6 +2002,47 @@ function catMoreApply(){ const r=$('catRow'); if(!r) return;
   w.innerHTML='<button type="button" class="cat-more'+(_catExp?' open':'')+'" onclick="catMoreToggle()" aria-expanded="'+(_catExp?'true':'false')+'"><span class="cat-more-ic"><i class="fa-solid fa-chevron-down"></i></span><span>'+(_catExp?'কম দেখুন':'আরো দেখুন')+'</span></button>'; }
 function catMoreToggle(){ _catExp=!_catExp; catMoreApply(); if(_catExp){ const r=$('catRow'); r.querySelectorAll('.cat-card').forEach(c=>{ c.classList.remove('lit'); c.classList.add('shown'); }); } }
 window.catMoreToggle=catMoreToggle;
+/* ===== NEW categories block: 4 per row, 2 rows; "আরও দেখুন" opens ALL categories as a sheet that rises from the bottom ===== */
+let _bfcSig='', _bfcAll=[], _bfcOpen=false;
+function bfcList(){
+  let list=[];
+  if(state.cats&&state.cats.length) list=state.cats.slice();                      /* the admin panel's categories (Firestore) */
+  else { const cc=load(CAT_CACHE,[]); if(Array.isArray(cc)&&cc.length) list=cc.slice(); else list=CATEGORIES.filter(c=>c.id!=='all'&&state.products.some(p=>p.category===c.id)); }
+  list=list.filter(c=>c&&c.id&&c.id!=='all');
+  /* a product whose category is not in the admin list still gets its own circle, so no product is unreachable */
+  const seen=new Set();
+  (state.products||[]).forEach(p=>{ const raw=p.category; if(raw==null||typeof raw==='object') return; const v=String(raw).trim(), k=_nk(v); if(!v||seen.has(k)) return; seen.add(k);
+    if(!list.some(c=>catKeys(c.id).has(k))) list.push({id:v,label:CATBN[v]||v,image:''}); });
+  return list;
+}
+function bfcItem(c,i){
+  const name=catLabel(c)||String(c.id||''), pr=(state.products||[]).find(p=>inCategory(p,c.id)), im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
+  return `<button type="button" class="bfc-item" style="--i:${i}" onclick="bfcPick('${esc(c.id)}')" aria-label="${esc(name)}"><span class="bfc-ic">${catIcon(c)}${im?`<img src="${esc(im)}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span class="bfc-nm">${esc(name)}</span></button>`;
+}
+function bfcFill(){ const g=$('bfsGrid'); if(g) g.innerHTML=_bfcAll.map(bfcItem).join(''); const t=$('bfsCount'); if(t) t.textContent=bnum(_bfcAll.length)+' টি ক্যাটাগরি'; }
+function bfcRender(){
+  const sec=$('bfCats'); if(!sec) return;
+  const list=bfcList(); _bfcAll=list;
+  if(!list.length){ sec.style.display='none'; return; }
+  sec.style.display='';
+  const sig=list.map(c=>c.id+'|'+(c.image||'')+'|'+catLabel(c)).join('~')+'#'+(state.products||[]).length;
+  if(sig===_bfcSig) return; _bfcSig=sig;
+  $('bfcGrid').innerHTML=list.slice(0,8).map(bfcItem).join('');
+  $('bfcMore').innerHTML=list.length>8?'<button type="button" class="bfc-more" onclick="bfcOpen()" aria-haspopup="dialog"><span>আরও দেখুন</span><b>+'+bnum(list.length-8)+'</b><i class="fa-solid fa-chevron-up"></i></button>':'';
+  if(_bfcOpen) bfcFill();
+}
+function bfcOpen(){
+  let sh=$('bfcSheet');
+  if(!sh){ sh=document.createElement('div'); sh.id='bfcSheet';
+    sh.innerHTML='<div class="bfs-bg" onclick="bfcClose()"></div><div class="bfs-panel" role="dialog" aria-modal="true" aria-label="সকল ক্যাটাগরি"><div class="bfs-grab" onclick="bfcClose()"><i></i></div><div class="bfs-top"><div><div class="bfs-ttl">সকল ক্যাটাগরি</div><div class="bfs-sub" id="bfsCount"></div></div><button type="button" class="bfs-x" onclick="bfcClose()" aria-label="বন্ধ করুন"><i class="fa-solid fa-xmark"></i></button></div><div class="bfs-body"><div id="bfsGrid" class="bfc-grid"></div></div></div>';
+    document.body.appendChild(sh); }
+  bfcFill(); _bfcOpen=true; document.body.style.overflow='hidden';
+  sh.classList.remove('show'); sh.classList.add('open'); void sh.offsetWidth; requestAnimationFrame(()=>sh.classList.add('show'));
+}
+function bfcClose(){ const sh=$('bfcSheet'); if(!sh||!_bfcOpen) return; _bfcOpen=false; sh.classList.remove('show'); document.body.style.overflow=''; setTimeout(()=>{ if(!_bfcOpen) sh.classList.remove('open'); },520); }
+function bfcPick(id){ if(_bfcOpen){ bfcClose(); setTimeout(()=>goShop(id),280); } else goShop(id); }
+window.bfcOpen=bfcOpen; window.bfcClose=bfcClose; window.bfcPick=bfcPick;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&_bfcOpen) bfcClose(); });
 /* ===== pencil-writing text + Bengali spacing fix ===== */
 /* section headings are plain text now (the animated pencil icon was removed) */
 function pencilInit(){ document.querySelectorAll('.penned').forEach(el=>{ const s=el.querySelector('.pen'); if(s) el.innerHTML=s.innerHTML; el.classList.remove('penned'); }); }
@@ -2047,26 +2085,29 @@ const INV_ST={pending:'অপেক্ষমান',confirmed:'কনফার�
 const SX=()=>Object.assign({addr:'শফিপুর বাজার, কালিয়াকৈর, গাজীপুর',phone:'+৮৮০ ১৮৭৩-৯৫৮৩৩৯'},window.SHOPX||{});
 function invHTML(o){
   const d=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate():new Date(o.createdAt||Date.now()), pay=o.pay, due=(pay&&o.deliveryPaid)?(o.subtotal-(o.discount||0)):o.total;
-  return `<div class="flex flex-col sm:flex-row justify-between gap-5 pb-5 border-b-2" style="border-color:#D99B00">
-  <div><div class="flex items-center gap-3"><img src="logo.png" alt="BANA FASHION" class="w-14 h-14 rounded-xl object-contain bg-black p-1" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl text-black',style:'background:#FFB800',textContent:'BF'}))"><div><div class="text-2xl font-extrabold tracking-wider">BANA <span style="color:#D99B00">FASHION</span></div><div class="text-xs text-gray-500">প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</div></div></div>
-  <div class="text-xs text-gray-600 mt-3 leading-relaxed"><i class="fa-solid fa-location-dot mr-1" style="color:#D99B00"></i>${esc(SX().addr)}<br><i class="fa-solid fa-phone mr-1" style="color:#D99B00"></i>হেল্পলাইন: <b>${esc(SX().phone)}</b></div></div>
-  <div class="sm:text-right"><span class="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest" style="background:#FFF3CD;color:#8a6100">ক্যাশ মেমো / INVOICE</span>
-  <div class="text-[10px] text-gray-500 mt-2">অর্ডার আইডি</div><div class="font-mono font-bold text-lg">${esc(o.orderId)}</div><div class="text-xs text-gray-500">তারিখ: ${d.toLocaleDateString('bn-BD',{day:'numeric',month:'long',year:'numeric'})}</div>
-  <div class="inline-block mt-2 p-1.5 border rounded-lg bg-white"><div id="invQR"></div></div><div class="text-[10px] text-gray-500">স্ক্যান করে অর্ডার যাচাই করুন</div></div></div>
-  <div class="grid sm:grid-cols-2 gap-4 p-4 rounded-xl text-xs" style="background:#f8f9fa">
-  <div class="space-y-1"><div class="font-bold border-b pb-1 mb-1" style="color:#D99B00">কাস্টমার তথ্য</div><div class="text-sm font-bold">${esc(o.customerName)}</div><div>মোবাইল: ${esc(o.phone)}</div><div>ঠিকানা: ${esc(o.address)}${o.upazila?', '+esc(o.upazila):''}${o.district?', '+esc(o.district):''}</div></div>
-  <div class="space-y-1"><div class="font-bold border-b pb-1 mb-1" style="color:#D99B00">পেমেন্ট তথ্য</div>
-  ${pay?`<div>ডেলিভারি চার্জ: <b>${INV_PAY[pay.method]||esc(pay.method)}</b></div><div>ট্রানজেকশন আইডি: <b class="font-mono">${esc(pay.trxId)}</b></div><div>অবস্থা: <b style="color:${o.deliveryPaid?'#059669':'#d97706'}">${o.deliveryPaid?'ডেলিভারি চার্জ পরিশোধিত (PAID)':'ভেরিফিকেশন বাকি'}</b></div>`:'<div>পেমেন্ট মাধ্যম: <b>ক্যাশ অন ডেলিভারি</b></div>'}
-  <div>অর্ডার স্ট্যাটাস: <b>${INV_ST[o.status]||esc(o.status)}</b></div></div></div>
-  <div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="text-left" style="background:#111;color:#FFB800"><th class="p-2.5">#</th><th class="p-2.5">প্রোডাক্ট</th><th class="p-2.5 text-center">সাইজ</th><th class="p-2.5 text-center">পরিমাণ</th><th class="p-2.5 text-right">একক মূল্য</th><th class="p-2.5 text-right">মোট</th></tr></thead><tbody>
-  ${(o.items||[]).map((i,n)=>`<tr class="border-b"><td class="p-2.5">${BNUM(n+1)}</td><td class="p-2.5 font-semibold">${esc(i.title)}</td><td class="p-2.5 text-center">${esc(i.size)}</td><td class="p-2.5 text-center">${BNUM(i.qty)}</td><td class="p-2.5 text-right">${BT(i.price)}</td><td class="p-2.5 text-right font-bold">${BT(i.price*i.qty)}</td></tr>`).join('')}</tbody></table></div>
-  <div class="flex flex-col sm:flex-row justify-between gap-4 text-xs"><div class="text-gray-600 space-y-1 max-w-xs"><b>শর্তাবলী:</b><div>১. ডেলিভারিম্যানের সামনে দেখে চেক করে রিসিভ করুন।</div><div>২. সাইজ পরিবর্তনের জন্য ৩ দিনের মধ্যে যোগাযোগ করুন।</div></div>
-  <div class="w-full sm:w-64 p-4 rounded-xl space-y-2" style="background:#f8f9fa"><div class="flex justify-between"><span>সাবটোটাল:</span><span>${BT(o.subtotal)}</span></div><div class="flex justify-between"><span>ডেলিভারি চার্জ:</span><span>${o.delivery?BT(o.delivery):'ফ্রি'}</span></div>${o.discount?`<div class="flex justify-between" style="color:#059669"><span>প্রোমো ডিসকাউন্ট${o.promo?' ('+esc(o.promo.code)+')':''}:</span><span>-${BT(o.discount)}</span></div>`:''}
-  <div class="flex justify-between text-base font-bold border-t pt-2"><span>সর্বমোট:</span><span style="color:#D99B00">${BT(o.total)}</span></div><div class="flex justify-between font-bold"><span>ক্যাশ অন ডেলিভারিতে দেবেন:</span><span>${BT(due)}</span></div></div></div>
-  <div class="pt-6 border-t flex justify-between items-end text-xs text-gray-500"><div class="text-center"><div class="w-32 border-b border-gray-400 mb-1"></div>গ্রাহকের স্বাক্ষর</div><div class="text-center"><div class="w-32 border-b mb-1" style="border-color:#D99B00"></div><b style="color:#D99B00">Bana Fashion Authorized</b></div></div>`;
+  return `<div class="inv-head">
+    <div style="min-width:0"><div style="display:flex;align-items:center;gap:12px"><img src="logo.png" alt="BANA FASHION" style="width:54px;height:54px;border-radius:12px;object-fit:contain;background:#fff;padding:4px" onerror="this.replaceWith(Object.assign(document.createElement('div'),{style:'width:54px;height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;background:#fff;color:#0a0a0a',textContent:'BF'}))"><div><div style="font-size:22px;font-weight:800;letter-spacing:.14em;color:#fff;line-height:1.2">BANA FASHION</div><div style="font-size:11.5px;color:#bdbdbd;margin-top:2px">প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড</div></div></div>
+    <div style="font-size:12px;color:#d4d4d4;margin-top:14px;line-height:1.7"><i class="fa-solid fa-location-dot" style="margin-right:6px"></i>${esc(SX().addr)}<br><i class="fa-solid fa-phone" style="margin-right:6px"></i>হেল্পলাইন: <b style="color:#fff">${esc(SX().phone)}</b></div></div>
+    <div style="text-align:right"><span class="inv-badge">ক্যাশ মেমো / INVOICE</span>
+    <div style="font-size:11px;color:#bdbdbd;margin-top:10px">অর্ডার আইডি</div><div style="font-family:monospace;font-weight:800;font-size:19px;color:#fff;letter-spacing:.04em">${esc(o.orderId)}</div><div style="font-size:12px;color:#d4d4d4">তারিখ: ${d.toLocaleDateString('bn-BD',{day:'numeric',month:'long',year:'numeric'})}</div>
+    <div style="display:inline-block;margin-top:10px;padding:6px;border-radius:10px;background:#fff"><div id="invQR"></div></div><div style="font-size:10.5px;color:#bdbdbd;margin-top:3px">স্ক্যান করে অর্ডার যাচাই করুন</div></div></div>
+  <div class="inv-sec" style="margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;font-size:13px;line-height:1.7">
+    <div class="inv-card"><div class="inv-ttl">কাস্টমার তথ্য</div><div style="font-size:15px;font-weight:800">${esc(o.customerName)}</div><div>মোবাইল: <b>${esc(o.phone)}</b></div><div>ঠিকানা: ${esc(o.address)}${o.upazila?', '+esc(o.upazila):''}${o.district?', '+esc(o.district):''}</div></div>
+    <div class="inv-card"><div class="inv-ttl">পেমেন্ট তথ্য</div>
+    ${pay?`<div>ডেলিভারি চার্জ: <b>${INV_PAY[pay.method]||esc(pay.method)}</b></div><div>ট্রানজেকশন আইডি: <b style="font-family:monospace">${esc(pay.trxId)}</b></div><div>অবস্থা: <b>${o.deliveryPaid?'✔ ডেলিভারি চার্জ পরিশোধিত (PAID)':'ভেরিফিকেশন বাকি'}</b></div>`:'<div>পেমেন্ট মাধ্যম: <b>ক্যাশ অন ডেলিভারি</b></div>'}
+    <div>অর্ডার স্ট্যাটাস: <b>${INV_ST[o.status]||esc(o.status)}</b></div></div></div>
+  <div class="inv-sec" style="margin-top:20px;overflow-x:auto"><table><thead><tr style="text-align:left"><th>#</th><th>প্রোডাক্ট</th><th style="text-align:center">সাইজ</th><th style="text-align:center">পরিমাণ</th><th style="text-align:right">একক মূল্য</th><th style="text-align:right">মোট</th></tr></thead><tbody>
+  ${(o.items||[]).map((i,n)=>`<tr><td>${BNUM(n+1)}</td><td style="font-weight:700">${esc(i.title)}</td><td style="text-align:center">${esc(i.size)}</td><td style="text-align:center">${BNUM(i.qty)}</td><td style="text-align:right">${BT(i.price)}</td><td style="text-align:right;font-weight:800">${BT(i.price*i.qty)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="inv-sec" style="margin-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;font-size:13px">
+    <div style="color:#525252;line-height:1.8;max-width:300px"><b style="color:#0a0a0a">শর্তাবলী</b><div>১. ডেলিভারিম্যানের সামনে দেখে চেক করে রিসিভ করুন।</div><div>২. সাইজ পরিবর্তনের জন্য ৩ দিনের মধ্যে যোগাযোগ করুন।</div></div>
+    <div class="inv-sum" style="width:100%;max-width:320px"><div style="display:flex;justify-content:space-between;padding:3px 0"><span>সাবটোটাল</span><b>${BT(o.subtotal)}</b></div><div style="display:flex;justify-content:space-between;padding:3px 0"><span>ডেলিভারি চার্জ</span><b>${o.delivery?BT(o.delivery):'ফ্রি'}</b></div>${o.discount?`<div style="display:flex;justify-content:space-between;padding:3px 0"><span>প্রোমো ডিসকাউন্ট${o.promo?' ('+esc(o.promo.code)+')':''}</span><b>-${BT(o.discount)}</b></div>`:''}
+    <div class="inv-grand"><span>সর্বমোট</span><span>${BT(o.total)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 2px 0;font-weight:800"><span>ক্যাশ অন ডেলিভারিতে দেবেন</span><span>${BT(due)}</span></div></div></div>
+  <div class="inv-foot" style="margin-top:26px"><div style="text-align:center"><div style="width:130px;border-bottom:1.5px solid #0a0a0a;margin-bottom:5px"></div>গ্রাহকের স্বাক্ষর</div><div style="text-align:center"><div style="width:130px;border-bottom:1.5px solid #0a0a0a;margin-bottom:5px"></div><b style="color:#0a0a0a">Bana Fashion Authorized</b></div></div>
+  <div class="inv-note">ধন্যবাদ — BANA FASHION</div>`;
 }
 function showInvoice(o){ const old=document.getElementById('invWrap'); if(old) old.remove(); const w=document.createElement('div'); w.id='invWrap'; w.className='fixed inset-0 z-[120] bg-black/85 overflow-y-auto p-3 sm:p-6'; w.onclick=e=>{ if(e.target===w) w.remove(); };
-  w.innerHTML=`<div class="max-w-3xl mx-auto flex gap-2 justify-end mb-3 no-print bf-invbar"><button onclick="window.print()" class="font-bold px-5 py-2.5 rounded-xl text-sm" style="background:#FFB800;color:#000"><i class="fa-solid fa-print mr-2"></i>প্রিন্ট / ডাউনলোড</button><button onclick="document.getElementById('invWrap').remove()" class="bg-white/15 text-white font-bold px-4 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-xmark mr-1.5"></i>বন্ধ করুন</button></div><div id="invSheet" class="max-w-3xl mx-auto bg-white text-black rounded-2xl p-6 sm:p-10 space-y-6" style="font-family:'Hind Siliguri',sans-serif">${invHTML(o)}</div>`;
+  w.innerHTML=`<div class="max-w-3xl mx-auto flex gap-2 justify-end mb-3 no-print bf-invbar"><button onclick="window.print()" class="font-bold px-5 py-2.5 rounded-xl text-sm" style="background:#fff;color:#0a0a0a"><i class="fa-solid fa-print mr-2"></i>প্রিন্ট / ডাউনলোড</button><button onclick="document.getElementById('invWrap').remove()" class="text-white font-bold px-4 py-2.5 rounded-xl text-sm" style="background:transparent;border:1.5px solid #fff"><i class="fa-solid fa-xmark mr-1.5"></i>বন্ধ করুন</button></div><div id="invSheet" class="max-w-3xl mx-auto bg-white text-black rounded-2xl" style="font-family:'Hind Siliguri',sans-serif">${invHTML(o)}</div>`;
   document.body.appendChild(w); try{ new QRCode(document.getElementById('invQR'),{text:location.origin+location.pathname+'?verify='+encodeURIComponent(o.orderId),width:88,height:88,correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
 
 /* ===== ORDER TRACKING (live from admin / Steadfast sync) ===== */
@@ -2591,27 +2632,27 @@ function tgImg(src){ return new Promise(res=>{ if(!src) return res(''); if(/^dat
   im.onerror=()=>{ clearTimeout(t); res(''); }; im.src=src; }); }
 function tgQR(text){ try{ const h=document.createElement('div'); h.style.cssText='position:fixed;left:-9999px;top:0'; document.body.appendChild(h); new QRCode(h,{text,width:120,height:120,correctLevel:QRCode.CorrectLevel.M}); const cv=h.querySelector('canvas'); const u=cv?cv.toDataURL('image/png'):((h.querySelector('img')||{}).src||''); h.remove(); return u; }catch(e){ return ''; } }
 /* ---- the invoice card (inline styles only, so the snapshot never depends on Tailwind) ---- */
-function tgCardHTML(o,items,stamp,imgs,qr){ const pay=o.pay, due=Math.max(0,o.total-(pay?o.delivery:0)), GOLD='#e9bd55', DIM='#a8a29a', dist=(DBN[o.district]||o.district||'');
-  const row=(i,n)=>`<div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(233,189,85,.15)">
-    ${imgs[n]?`<img src="${imgs[n]}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;border:1px solid rgba(233,189,85,.45);flex:none">`:`<div style="width:60px;height:60px;border-radius:10px;border:1px solid rgba(233,189,85,.45);background:#1c160a;color:${GOLD};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex:none">${esc(String(i.title||'B').charAt(0))}</div>`}
+function tgCardHTML(o,items,stamp,imgs,qr){ const pay=o.pay, due=Math.max(0,o.total-(pay?o.delivery:0)), GOLD='#ffffff', DIM='#b8b8b8', dist=(DBN[o.district]||o.district||'');
+  const row=(i,n)=>`<div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.16)">
+    ${imgs[n]?`<img src="${imgs[n]}" style="width:60px;height:60px;border-radius:10px;object-fit:cover;border:1px solid rgba(255,255,255,.4);flex:none">`:`<div style="width:60px;height:60px;border-radius:10px;border:1px solid rgba(255,255,255,.4);background:#1a1a1a;color:${GOLD};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex:none">${esc(String(i.title||'B').charAt(0))}</div>`}
     <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;color:#fff;line-height:1.3">${esc(i.title)}</div><div style="font-size:12px;color:${DIM};margin-top:3px">সাইজ: ${esc(i.size)} · ${BT(i.price)} × ${BNUM(i.qty)}</div></div>
     <div style="font-weight:800;color:${GOLD};font-size:14px;white-space:nowrap">${BT(i.price*i.qty)}</div></div>`;
   const tr=(a,b,s)=>`<div style="display:flex;justify-content:space-between;padding:3px 0;${s||''}"><span style="color:${DIM}">${a}</span><span>${b}</span></div>`;
-  return `<div id="tgCard" style="width:560px;box-sizing:border-box;padding:28px;background:linear-gradient(160deg,#1c1508 0%,#0b0b0b 55%,#000 100%);border:2px solid #8a6a1f;color:#f4efe6;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif;font-size:13px;line-height:1.45">
+  return `<div id="tgCard" style="width:560px;box-sizing:border-box;padding:28px;background:#0a0a0a;border:2px solid #ffffff;color:#f5f5f5;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif;font-size:13px;line-height:1.45">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
     <div><div style="font-weight:800;font-size:24px;letter-spacing:.14em;color:#fff">BANA <span style="color:${GOLD}">FASHION</span></div><div style="font-size:11px;color:${DIM};letter-spacing:.2em;margin-top:2px">ORDER INVOICE · ক্যাশ মেমো</div></div>
     <div style="text-align:right"><div style="font-size:11px;color:${DIM}">অর্ডার আইডি</div><div style="font-family:monospace;font-weight:700;font-size:16px;color:${GOLD}">${esc(o.orderId)}</div></div></div>
-  <div style="margin:12px 0 4px;padding:8px 12px;border-radius:10px;background:rgba(233,189,85,.1);border:1px solid rgba(233,189,85,.35);font-size:12.5px"><span style="color:${DIM}">আজকের তারিখ ও সময়:</span> <b style="color:#fff">${esc(stamp)}</b></div>
+  <div style="margin:12px 0 4px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.3);font-size:12.5px"><span style="color:${DIM}">আজকের তারিখ ও সময়:</span> <b style="color:#fff">${esc(stamp)}</b></div>
   <div style="margin-top:8px">${items.map(row).join('')}</div>
-  <div style="margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">
-    ${tr('সাবটোটাল',BT(o.subtotal))}${o.discount?tr('ডিসকাউন্ট','-'+BT(o.discount),'color:#34d399'):''}${tr('ডেলিভারি চার্জ',o.delivery?BT(o.delivery):'ফ্রি')}
-    <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(233,189,85,.35);margin-top:6px;padding-top:8px;font-weight:800;font-size:17px"><span>সর্বমোট</span><span style="color:${GOLD}">${BT(o.total)}</span></div>
+  <div style="margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.18)">
+    ${tr('সাবটোটাল',BT(o.subtotal))}${o.discount?tr('ডিসকাউন্ট','-'+BT(o.discount),'color:#ffffff'):''}${tr('ডেলিভারি চার্জ',o.delivery?BT(o.delivery):'ফ্রি')}
+    <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.3);margin-top:6px;padding-top:8px;font-weight:800;font-size:17px"><span>সর্বমোট</span><span style="color:${GOLD}">${BT(o.total)}</span></div>
     ${tr('ক্যাশ অন ডেলিভারিতে দেবেন',BT(due),'font-weight:700;color:#fff')}</div>
-  <div style="margin-top:12px;padding:11px 14px;border-radius:12px;${pay?'background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.45)':'background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4)'}">
-    <div style="font-weight:800;font-size:13px;color:${pay?'#34d399':(o.delivery?'#fbbf24':'#34d399')}">${pay?'✔ ডেলিভারি চার্জ অনলাইনে পরিশোধিত ('+esc(tgPayLbl(o))+')':(o.delivery?'✘ ডেলিভারি চার্জ অনলাইনে পরিশোধ হয়নি':'✔ ফ্রি ডেলিভারি')}</div>
+  <div style="margin-top:12px;padding:11px 14px;border-radius:12px;${pay?'background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.4)':'background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.4)'}">
+    <div style="font-weight:800;font-size:13px;color:#ffffff">${pay?'✔ ডেলিভারি চার্জ অনলাইনে পরিশোধিত ('+esc(tgPayLbl(o))+')':(o.delivery?'✘ ডেলিভারি চার্জ অনলাইনে পরিশোধ হয়নি':'✔ ফ্রি ডেলিভারি')}</div>
     ${pay?`<div style="margin-top:4px">ট্রানজেকশন আইডি (ট্রানজেকশন আইডি): <b style="font-family:monospace;color:#fff;font-size:14px">${esc(pay.trxId)}</b></div><div style="color:${DIM};font-size:12px">সেন্ডার: ${esc(pay.sender)} · পরিমাণ: ${BT(pay.amount)}</div>`:''}</div>
   <div style="display:flex;gap:14px;align-items:stretch;margin-top:12px">
-    <div style="flex:1;min-width:0;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">
+    <div style="flex:1;min-width:0;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.18)">
       <div style="font-weight:800;color:${GOLD};font-size:12px;letter-spacing:.08em;margin-bottom:5px">কাস্টমার তথ্য</div>
       <div style="font-weight:800;font-size:15px;color:#fff">${esc(o.customerName)}</div>
       <div>📞 ${esc(o.phone)}</div><div style="margin-top:2px">📍 ${esc(o.address)}${o.upazila?', '+esc(o.upazila):''}</div>
@@ -3654,6 +3695,304 @@ html body footer .bf-track{display:inline-flex;align-items:center;gap:8px;backgr
 html body footer .bf-track i{color:#fff!important}
 html body footer>div{padding-top:30px!important;padding-bottom:24px!important}
 @media(min-width:768px){html body footer .grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+</style>
+<style id="bwOrder">
+/* =====================================================================
+   BANA FASHION — অর্ডার সেকশন: পুরোপুরি কালো + সাদা থিম
+   (checkout · validation popup · success page · invoice · toast)
+   শুধু স্টাইল — কোনো ফাংশন/লজিক বদলানো হয়নি
+   ===================================================================== */
+:root{--bw-ink:#0a0a0a;--bw-ink2:#262626;--bw-mute:#525252;--bw-line:#e4e4e4;--bw-line2:#cfcfcf;--bw-bg:#f4f4f4;--bw-card:#fff}
+
+/* ---------- CHECKOUT ---------- */
+html body #checkoutModal .co-panel{background:var(--bw-bg)!important;color:var(--bw-ink)!important;border:1px solid var(--bw-line)!important;font-family:'Hind Siliguri','Plus Jakarta Sans',system-ui,sans-serif}
+html body #checkoutModal .co-head{background:rgba(255,255,255,.97)!important;border-bottom:1px solid var(--bw-line)!important}
+html body #checkoutModal .co-hic{background:var(--bw-ink)!important;color:#fff!important;box-shadow:0 8px 18px -8px rgba(0,0,0,.45)!important}
+html body #checkoutModal .co-head h3{color:var(--bw-ink)!important;font-weight:800}
+html body #checkoutModal .co-head p{color:var(--bw-mute)!important;font-size:12px}
+html body #checkoutModal .co-secure{background:#f4f4f4!important;border:1px solid var(--bw-line2)!important;color:var(--bw-ink)!important}
+html body #checkoutModal .co-head button[aria-label="বন্ধ করুন"]{background:#fff!important;border:1.5px solid var(--bw-ink)!important;color:var(--bw-ink)!important}
+html body #checkoutModal .co-head button[aria-label="বন্ধ করুন"]:hover{background:var(--bw-ink)!important;color:#fff!important}
+
+/* text colours: everything readable black / dark grey */
+html body #checkoutModal .text-white{color:var(--bw-ink)!important}
+html body #checkoutModal .text-silver-400,html body #checkoutModal .text-silver-300{color:var(--bw-mute)!important}
+html body #checkoutModal .text-gold-400,html body #checkoutModal .text-gold-500{color:var(--bw-ink)!important}
+html body #checkoutModal .text-emerald-400,html body #checkoutModal .text-red-400{color:var(--bw-ink)!important;font-weight:800}
+html body #checkoutModal .border-white\/10{border-color:var(--bw-line)!important}
+
+/* stepper */
+html body #checkoutModal .cow-st{color:#737373!important;font-weight:700}
+html body #checkoutModal .cow-st i{background:#fff!important;border:1.5px solid var(--bw-line2)!important;color:#737373!important}
+html body #checkoutModal .cow-st.on{color:var(--bw-ink)!important}
+html body #checkoutModal .cow-st.on i{background:var(--bw-ink)!important;color:#fff!important;border-color:var(--bw-ink)!important;box-shadow:0 0 0 5px rgba(0,0,0,.09)!important}
+html body #checkoutModal .cow-st.done i{background:var(--bw-ink)!important;color:#fff!important;border-color:var(--bw-ink)!important}
+html body #checkoutModal .cow-ln{background:var(--bw-line)!important}
+html body #checkoutModal .cow-ln i{background:var(--bw-ink)!important}
+
+/* cards */
+html body #checkoutModal .co-box,html body #checkoutModal .co-aside{background:var(--bw-card)!important;border:1px solid var(--bw-line)!important;box-shadow:0 2px 10px rgba(0,0,0,.05)!important;border-radius:20px!important}
+html body #checkoutModal .co-bt{color:var(--bw-ink)!important;font-size:15px!important;font-weight:800!important}
+html body #checkoutModal .co-bt>i{background:var(--bw-ink)!important;color:#fff!important}
+html body #checkoutModal .co-box>.co-bt{border-bottom:1px solid var(--bw-line)!important}
+html body #checkoutModal .co-box>.co-bt::after{background:#f0f0f0!important;color:var(--bw-ink)!important;border:1px solid var(--bw-line2)}
+
+/* fields */
+html body #checkoutModal .co-lbl{color:var(--bw-ink)!important;font-size:13px!important;font-weight:700!important}
+html body #checkoutModal .co-field>.fi{color:var(--bw-ink)!important}
+html body #checkoutModal .co-in{background:#fafafa!important;border:1.5px solid var(--bw-line2)!important;color:var(--bw-ink)!important;font-weight:600}
+html body #checkoutModal .co-in::placeholder{color:#8a8a8a!important;font-weight:500}
+html body #checkoutModal .co-in:hover{border-color:#8a8a8a!important}
+html body #checkoutModal .co-in:focus{background:#fff!important;border-color:var(--bw-ink)!important;box-shadow:0 0 0 4px rgba(0,0,0,.08)!important}
+html body #checkoutModal .co-in.bad{border-color:var(--bw-ink)!important;background:#fff!important;box-shadow:0 0 0 4px rgba(0,0,0,.14)!important}
+html body #checkoutModal select.co-in{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/></svg>")!important;background-repeat:no-repeat!important;background-position:right 14px center!important;background-size:12px 8px!important}
+html body #checkoutModal .co-in:-webkit-autofill{-webkit-text-fill-color:var(--bw-ink)!important;box-shadow:0 0 0 100px #fafafa inset!important}
+html body #checkoutModal .co-div{background:#fafafa!important;border:1.5px dashed var(--bw-line2)!important;color:var(--bw-mute)!important}
+html body #checkoutModal .co-div.ok{background:#f0f0f0!important;border:1.5px solid var(--bw-ink)!important;color:var(--bw-ink)!important}
+html body #checkoutModal .co-div i{color:var(--bw-ink)!important}
+
+/* delivery area + payment choices */
+html body #checkoutModal .co-area,html body #checkoutModal .co-pay{background:#fff!important;border:1.5px solid var(--bw-line2)!important;color:var(--bw-ink)!important;box-shadow:none!important}
+html body #checkoutModal .co-area b,html body #checkoutModal .co-pay{color:var(--bw-ink)!important;font-weight:800}
+html body #checkoutModal .co-area small,html body #checkoutModal .co-pay small,html body #checkoutModal .co-pay.on small{color:var(--bw-mute)!important}
+html body #checkoutModal .co-area:hover,html body #checkoutModal .co-pay:hover:not(.dis){border-color:var(--bw-ink)!important}
+html body #checkoutModal .co-area.on,html body #checkoutModal .co-pay.on{background:#fff!important;border:2px solid var(--bw-ink)!important;box-shadow:0 10px 24px -14px rgba(0,0,0,.5)!important}
+html body #checkoutModal .co-area .co-radio{border-color:#a3a3a3!important}
+html body #checkoutModal .co-area.on .co-radio{border-color:var(--bw-ink)!important}
+html body #checkoutModal .co-area.on .co-radio::after{background:var(--bw-ink)!important}
+html body #checkoutModal .co-pay .co-chk{color:var(--bw-ink)!important}
+
+/* info strips */
+html body #checkoutModal .co-tag,html body #checkoutModal .co-payinfo,html body #checkoutModal .co-delchk{background:#fafafa!important;border:1.5px dashed var(--bw-line2)!important;color:var(--bw-mute)!important}
+html body #checkoutModal .co-tag b,html body #checkoutModal .co-payinfo b{color:var(--bw-ink)!important}
+html body #checkoutModal .co-delchk span{color:var(--bw-ink)!important}
+html body #checkoutModal .co-delchk small{color:var(--bw-mute)!important}
+html body #checkoutModal .co-delchk input{accent-color:#0a0a0a!important}
+html body #checkoutModal .co-tag .fa-truck-fast{color:var(--bw-ink)!important}
+
+/* GPS card → solid black with white text */
+html body #checkoutModal .from-ink-900{background:var(--bw-ink)!important;background-image:none!important;border:1px solid var(--bw-ink)!important;box-shadow:0 12px 26px -14px rgba(0,0,0,.6)!important}
+html body #checkoutModal .from-ink-900 *{color:#fff!important}
+html body #checkoutModal .from-ink-900 #geoMsg{color:#d4d4d4!important}
+html body #checkoutModal .from-ink-900 .btn-gold{background:#fff!important;color:var(--bw-ink)!important;border:0!important}
+html body #checkoutModal .from-ink-900 .btn-gold *{color:var(--bw-ink)!important}
+html body #checkoutModal .from-ink-900 .w-12{background:#fff!important}
+html body #checkoutModal .from-ink-900 .w-12 *{color:var(--bw-ink)!important}
+
+/* order summary */
+html body #checkoutModal .co-item{background:#fafafa!important;border:1px solid var(--bw-line)!important}
+html body #checkoutModal .co-item img{border:1px solid var(--bw-line)}
+html body #checkoutModal .co-item .font-bold{color:var(--bw-ink)!important}
+html body #checkoutModal .co-item .text-gold-400{color:var(--bw-ink)!important;font-weight:800}
+html body #checkoutModal .co-qty{background:#fff!important;border:1.5px solid var(--bw-ink)!important}
+html body #checkoutModal .co-qty button{color:var(--bw-ink)!important}
+html body #checkoutModal .co-qty button:hover:not(:disabled){background:#eee!important}
+html body #checkoutModal .co-qty span{color:var(--bw-ink)!important}
+html body #checkoutModal button[onclick^="coRemove"]{color:#737373!important}
+html body #checkoutModal button[onclick^="coRemove"]:hover{color:var(--bw-ink)!important}
+html body #checkoutModal button[onclick="applyPromo()"]{background:#fff!important;border:1.5px solid var(--bw-ink)!important;color:var(--bw-ink)!important}
+html body #checkoutModal button[onclick="applyPromo()"]:hover{background:var(--bw-ink)!important;color:#fff!important}
+html body #checkoutModal .co-aside .co-row{color:var(--bw-ink)}
+html body #checkoutModal .co-aside .co-row.text-base{border-top:2px solid var(--bw-ink)!important}
+html body #checkoutModal #coTotal{color:var(--bw-ink)!important;font-size:1.75rem!important}
+html body #checkoutModal .co-trust{color:var(--bw-mute)!important;border-top:1px dashed var(--bw-line2)!important}
+html body #checkoutModal .co-trust i,html body #checkoutModal .fa-shield-halved{color:var(--bw-ink)!important}
+
+/* bottom bar */
+html body #checkoutModal .co-mbar{background:#fff!important;border-top:1px solid var(--bw-line)!important;box-shadow:0 -10px 28px -16px rgba(0,0,0,.3)!important}
+html body #checkoutModal .co-mbar .t small{color:var(--bw-mute)!important;font-weight:600}
+html body #checkoutModal #coMTotal{color:var(--bw-ink)!important}
+html body #checkoutModal .co-mbar .cow-bk{background:#fff!important;border:1.5px solid var(--bw-ink)!important;color:var(--bw-ink)!important}
+html body #checkoutModal .co-mbar .cow-go{background:var(--bw-ink)!important;color:#fff!important;border:1.5px solid var(--bw-ink)!important;box-shadow:0 14px 28px -14px rgba(0,0,0,.65)!important}
+html body #checkoutModal .co-mbar .cow-go *{color:#fff!important}
+html body #checkoutModal .co-mbar .cow-go::after{background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%)!important}
+
+/* ---------- VALIDATION POPUP (তথ্য সঠিক নয়) ---------- */
+html body .vp-wrap{background:rgba(0,0,0,.72)!important;backdrop-filter:blur(5px)}
+html body .vp-card{background:var(--bw-ink)!important;border:1px solid #3a3a3a!important;box-shadow:0 30px 70px -20px rgba(0,0,0,.9)!important;color:#fff!important;text-align:center}
+html body .vp-ic{background:#fff!important;color:var(--bw-ink)!important;border:0!important;box-shadow:0 0 0 6px rgba(255,255,255,.1)}
+html body .vp-card h3{color:#fff!important;font-size:1.15rem!important}
+html body .vp-card p.sub{color:#c8c8c8!important;font-size:.82rem!important}
+html body .vp-list li{background:#1a1a1a!important;border:1px solid #3a3a3a!important;color:#fff!important;font-size:.9rem!important}
+html body .vp-list li i{color:#fff!important}
+html body .vp-ok{background:#fff!important;color:var(--bw-ink)!important;box-shadow:none!important;font-size:.95rem!important}
+html body .vp-ok:hover{background:#e8e8e8!important}
+
+/* ---------- TOAST ---------- */
+html body #toastContainer>div{background:var(--bw-ink)!important;color:#fff!important;border:1px solid #3a3a3a!important}
+html body #toastContainer i{color:#fff!important}
+
+/* ---------- SUCCESS PAGE ---------- */
+html body #successModal{background:var(--bw-ink)!important}
+html body #successModal .pop{background:#fff!important;border:1px solid #fff!important;box-shadow:0 30px 80px -30px rgba(0,0,0,.8)!important;color:var(--bw-ink)!important}
+html body #successModal .text-white,html body #successModal h3{color:var(--bw-ink)!important}
+html body #successModal .text-silver-300,html body #successModal .text-silver-400,html body #successModal .text-silver-200,html body #successModal .text-slate-400{color:var(--bw-mute)!important}
+html body #successModal .text-gold-400,html body #successModal .text-emerald-400{color:var(--bw-ink)!important}
+html body #successModal .gold-text{background:none!important;-webkit-text-fill-color:var(--bw-ink)!important;color:var(--bw-ink)!important;animation:none!important}
+html body #successModal .w-20{background:var(--bw-ink)!important;color:#fff!important;box-shadow:0 0 0 8px rgba(0,0,0,.07)!important}
+html body #successModal .w-20 *{color:#fff!important}
+html body #successModal .bg-white\/5{background:#f6f6f6!important;border:1px solid var(--bw-line)!important}
+html body #successModal #successId{color:var(--bw-ink)!important;letter-spacing:.08em}
+html body #successModal #successSummary{color:var(--bw-ink)!important;font-size:12.5px!important}
+html body #successModal #successSummary b{color:var(--bw-ink)!important}
+html body #successModal #successSummary .border-white\/10{border-color:var(--bw-line)!important}
+html body #successModal button.border,html body #successModal button[onclick="showLastInv()"],html body #successModal #tgDlBtn{background:#fff!important;border:1.5px solid var(--bw-ink)!important;color:var(--bw-ink)!important}
+html body #successModal button[onclick="showLastInv()"]{background:var(--bw-ink)!important;color:#fff!important}
+html body #successModal button[onclick="showLastInv()"] *{color:#fff!important}
+html body #successModal button:hover:not([onclick="showLastInv()"]){background:#efefef!important}
+html body #successModal button i{color:inherit!important}
+html body #successModal #successWa{background:#fff!important;border:1.5px solid var(--bw-ink)!important;color:var(--bw-ink)!important}
+html body #successModal #successWa:hover{background:#efefef!important}
+html body #successModal .btn-gold{background:var(--bw-ink)!important;color:#fff!important}
+
+/* ---------- INVOICE (screen + print) ---------- */
+html body #invWrap{background:rgba(0,0,0,.88)!important}
+html body #invWrap .bf-invbar{background:linear-gradient(rgba(0,0,0,.92),rgba(0,0,0,.6) 80%,transparent)!important}
+html body #invSheet{padding:0!important;overflow:hidden;border-radius:18px!important;border:1px solid #d4d4d4;box-shadow:0 30px 80px -30px #000;background:#fff!important;color:var(--bw-ink)!important}
+#invSheet .inv-sec{padding:0 28px}
+#invSheet .inv-head{background:#0a0a0a;color:#fff;padding:26px 28px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:flex-start}
+#invSheet .inv-badge{display:inline-block;background:#fff;color:#0a0a0a;font-weight:800;font-size:11px;letter-spacing:.16em;padding:5px 12px;border-radius:999px}
+#invSheet .inv-card{border:1px solid #e4e4e4;border-radius:14px;padding:16px;background:#fafafa}
+#invSheet .inv-ttl{font-weight:800;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#0a0a0a;border-bottom:2px solid #0a0a0a;padding-bottom:6px;margin-bottom:9px;display:inline-block}
+#invSheet table{border-collapse:separate;border-spacing:0;width:100%;border:1px solid #0a0a0a;border-radius:12px;overflow:hidden}
+#invSheet thead th{background:#0a0a0a;color:#fff;font-weight:700;padding:10px 12px;font-size:12px}
+#invSheet tbody td{padding:11px 12px;border-bottom:1px solid #e4e4e4;font-size:13px;color:#0a0a0a}
+#invSheet tbody tr:last-child td{border-bottom:0}
+#invSheet tbody tr:nth-child(even) td{background:#f7f7f7}
+#invSheet .inv-sum{background:#fafafa;border:1px solid #e4e4e4;border-radius:14px;padding:16px}
+#invSheet .inv-grand{display:flex;justify-content:space-between;align-items:center;background:#0a0a0a;color:#fff;border-radius:12px;padding:12px 14px;margin-top:10px;font-weight:800;font-size:16px}
+#invSheet .inv-foot{border-top:1px dashed #bdbdbd;padding:20px 28px 26px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;font-size:12px;color:#525252}
+#invSheet .inv-note{text-align:center;background:#0a0a0a;color:#fff;font-size:12px;letter-spacing:.12em;padding:11px}
+@media(max-width:560px){#invSheet .inv-sec{padding:0 16px}#invSheet .inv-head{padding:20px 16px}#invSheet .inv-foot{padding:18px 16px 22px}#invSheet thead th,#invSheet tbody td{padding:9px 7px;font-size:11.5px}}
+@media print{#invSheet{border:0!important;box-shadow:none!important}}
+</style>
+<style id="bwBottom">
+/* ===== সাইটের নিচের অংশ: ব্র্যান্ড হেডার + আমাদের গল্প + হেল্পলাইন + ফুটার (compact, কালো-সাদা) ===== */
+html body #bfBrand{background:#f4f4f4;border-top:1px solid #0d0d0d;padding:18px 12px 4px}
+html body #bfBrand .bfb-card{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:14px;background:#fff;border:1px solid #e6e6e6;border-radius:22px;padding:14px 18px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+html body #bfBrand .bfb-logo{flex:none;width:58px;height:58px;border-radius:50%;background:#000;border:2px solid #0d0d0d;padding:2px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+html body #bfBrand .bfb-logo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+html body #bfBrand .bfb-name{font-family:Syne,'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(20px,5.4vw,30px);letter-spacing:.14em;color:#0d0d0d;line-height:1.1}
+html body #bfBrand .bfb-tag{font-size:clamp(10.5px,2.8vw,12.5px);color:#525252;letter-spacing:.12em;margin-top:4px;font-weight:600}
+html body #about{border-top:0!important;padding-top:10px!important;padding-bottom:6px!important}
+html body #about .max-w-7xl{max-width:900px!important}
+html body #about .space-y-5{padding:16px 18px!important;border-radius:22px}
+html body #about .space-y-5>*+*{margin-top:10px!important}
+html body #about h2{font-size:clamp(21px,5.6vw,32px)!important;line-height:1.25!important}
+html body #about .gold-text{border-bottom-width:3px!important}
+html body #about p{font-size:13.5px!important;line-height:1.65!important}
+html body #about .grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;padding-top:2px!important}
+html body #about .grid>div{padding:8px 10px!important;font-size:12.5px!important;border-radius:10px!important}
+@media(min-width:768px){html body #about .grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+html body #helpline{border-top:0!important;padding-top:8px!important;padding-bottom:8px!important}
+html body #helpline .max-w-4xl{max-width:900px!important}
+html body #helpline .max-w-4xl>div:first-child{border-top:0!important;padding-top:6px!important;margin-bottom:12px!important}
+html body #helpline h2{font-size:clamp(20px,5.4vw,30px)!important}
+html body #helpline .hl-num{font-size:clamp(16px,4.6vw,20px)!important}
+html body #helpline .helpline-card{padding:10px 12px!important}
+html body footer{border-top:0!important}
+html body footer .grid{grid-template-columns:minmax(0,1fr)!important;max-width:900px;margin-left:auto;margin-right:auto;margin-bottom:14px!important}
+html body footer .grid>div{padding:18px!important}
+html body footer>div{padding-top:10px!important;padding-bottom:20px!important}
+html body footer .pt-6{max-width:900px;margin-left:auto;margin-right:auto}
+</style>
+<style id="bfCatsCss">
+/* ===== ক্যাটাগরি ব্লক (Special Offer ব্যানারের জায়গায়) — কালো-সাদা, গোল, ছোট ===== */
+html body #categories{display:none!important}   /* পুরনো ক্যাটাগরি সেকশন, যেটা দেখা যাচ্ছিল না */
+#bfCats{background:#fff;padding:10px 12px 6px}
+#bfCats .bfc-card{max-width:900px;margin:0 auto;background:#fff;border:1.3px solid #0d0d0d;border-radius:26px;padding:14px 10px 14px;box-shadow:0 8px 22px -14px rgba(0,0,0,.35)}
+#bfCats .bfc-ttl{display:flex;align-items:center;gap:10px;margin:0 6px 12px;font-weight:800;font-size:14px;color:#0d0d0d;letter-spacing:.02em}
+#bfCats .bfc-ttl::before,#bfCats .bfc-ttl::after{content:"";flex:1;height:1px;background:#0d0d0d;opacity:.25}
+.bfc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 4px}
+.bfc-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 2px;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif}
+.bfc-ic{position:relative;width:min(100%,68px);aspect-ratio:1/1;border-radius:50%;border:1.5px solid #0d0d0d;background:#0d0d0d;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;box-shadow:0 0 0 3px #fff,0 0 0 4px #e0e0e0;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s}
+.bfc-ic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;background:#f4f4f4}
+.bfc-item:active .bfc-ic{transform:scale(.92)}
+.bfc-item:hover .bfc-ic{transform:scale(1.06);box-shadow:0 0 0 3px #fff,0 0 0 4px #0d0d0d}
+.bfc-nm{font-size:11.5px;font-weight:700;color:#0d0d0d;line-height:1.25;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%;letter-spacing:0}
+#bfcGrid .bfc-item{animation:bfcIn .55s cubic-bezier(.34,1.4,.55,1) both;animation-delay:calc(var(--i)*45ms)}
+@keyframes bfcIn{from{opacity:0;transform:translateY(22px) scale(.82)}to{opacity:1;transform:none}}
+.bfc-morewrap{display:flex;justify-content:center;margin-top:14px}
+.bfc-more{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:#0d0d0d;color:#fff;font-weight:800;font-size:13px;border:0;cursor:pointer;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif;box-shadow:0 10px 22px -12px rgba(0,0,0,.6);transition:transform .2s}
+.bfc-more:active{transform:scale(.96)}
+.bfc-more b{background:#fff;color:#0d0d0d;border-radius:999px;font-size:11px;font-weight:800;padding:1px 8px;font-family:'Plus Jakarta Sans',sans-serif}
+.bfc-more i{font-size:11px;animation:bfcBob 1.6s ease-in-out infinite}
+@keyframes bfcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media(min-width:640px){#bfCats .bfc-card{padding:18px 18px 18px}.bfc-grid{gap:20px 10px}.bfc-ic{width:min(100%,86px);font-size:28px}.bfc-nm{font-size:13.5px}}
+/* সব ক্যাটাগরি: নিচ থেকে উঠে আসা শিট */
+#bfcSheet{position:fixed;inset:0;z-index:130;display:none}
+#bfcSheet.open{display:block}
+#bfcSheet .bfs-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .4s ease;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#bfcSheet.show .bfs-bg{opacity:1}
+#bfcSheet .bfs-panel{position:absolute;left:0;right:0;bottom:0;max-width:680px;margin:0 auto;display:flex;flex-direction:column;max-height:84vh;max-height:84dvh;background:#fff;border:1.3px solid #0d0d0d;border-bottom:0;border-radius:28px 28px 0 0;box-shadow:0 -20px 50px -20px rgba(0,0,0,.55);transform:translateY(106%);transition:transform .55s cubic-bezier(.16,1,.3,1);padding-bottom:env(safe-area-inset-bottom,0px)}
+#bfcSheet.show .bfs-panel{transform:none}
+#bfcSheet .bfs-grab{display:flex;justify-content:center;padding:10px 0 2px;cursor:pointer}
+#bfcSheet .bfs-grab i{width:44px;height:5px;border-radius:9px;background:#cfcfcf}
+#bfcSheet .bfs-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 18px 12px;border-bottom:1px solid #ececec}
+#bfcSheet .bfs-ttl{font-weight:800;font-size:18px;color:#0d0d0d;font-family:'Hind Siliguri',sans-serif}
+#bfcSheet .bfs-sub{font-size:12px;color:#525252;font-weight:600;margin-top:1px}
+#bfcSheet .bfs-x{flex:none;width:38px;height:38px;border-radius:50%;border:1.5px solid #0d0d0d;background:#fff;color:#0d0d0d;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:background .2s,color .2s}
+#bfcSheet .bfs-x:hover,#bfcSheet .bfs-x:active{background:#0d0d0d;color:#fff}
+#bfcSheet .bfs-body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px 12px 22px}
+#bfsGrid .bfc-item{opacity:0}
+#bfcSheet.show #bfsGrid .bfc-item{animation:bfcIn .6s cubic-bezier(.34,1.4,.55,1) both;animation-delay:calc(var(--i)*38ms + 220ms)}
+@media(prefers-reduced-motion:reduce){#bfcGrid .bfc-item,#bfcSheet.show #bfsGrid .bfc-item{animation:none;opacity:1}#bfcSheet .bfs-panel{transition:none}.bfc-more i{animation:none}}
+</style>
+<style id="bwSections">
+/* ===== বাকি সেকশন কালো-সাদা: শপিং ব্যাগ · মিনি কার্ট · আপনার অর্ডার · অর্ডার ট্র্যাক · সাইড মেনু ===== */
+html body #cartContent,html body #miniCart,html body #myoWrap>.pop,html body #trkWrap>.pop,html body #mobileMenu>div:nth-child(2){background:#fff!important;color:#0a0a0a!important;box-shadow:0 30px 70px -25px rgba(0,0,0,.6)!important}
+html body #cartContent{border-left:1.3px solid #0a0a0a!important}
+html body #mobileMenu>div:nth-child(2){border-right:1.3px solid #0a0a0a!important}
+html body #myoWrap>.pop,html body #trkWrap>.pop,html body #miniCart{border:1.3px solid #0a0a0a!important}
+html body #cartContent .text-white,html body #cartContent h3,html body #cartContent h4,html body #miniCart .text-white,html body #miniCart h3,html body #miniCart h4,html body #myoWrap>.pop .text-white,html body #myoWrap>.pop h3,html body #myoWrap>.pop h4,html body #trkWrap>.pop .text-white,html body #trkWrap>.pop h3,html body #trkWrap>.pop h4,html body #mobileMenu>div:nth-child(2) .text-white,html body #mobileMenu>div:nth-child(2) h3,html body #mobileMenu>div:nth-child(2) h4{color:#0a0a0a!important}
+html body #cartContent .text-silver-200,html body #cartContent .text-silver-300,html body #cartContent .text-silver-400,html body #miniCart .text-silver-200,html body #miniCart .text-silver-300,html body #miniCart .text-silver-400,html body #myoWrap>.pop .text-silver-200,html body #myoWrap>.pop .text-silver-300,html body #myoWrap>.pop .text-silver-400,html body #trkWrap>.pop .text-silver-200,html body #trkWrap>.pop .text-silver-300,html body #trkWrap>.pop .text-silver-400,html body #mobileMenu>div:nth-child(2) .text-silver-200,html body #mobileMenu>div:nth-child(2) .text-silver-300,html body #mobileMenu>div:nth-child(2) .text-silver-400{color:#525252!important}
+html body #cartContent .text-gold-400,html body #cartContent .text-gold-500,html body #cartContent .text-gold-400\/80,html body #cartContent .text-emerald-300,html body #cartContent .text-emerald-400,html body #cartContent .text-red-300,html body #cartContent .text-red-400,html body #cartContent .hover\:text-gold-400:hover,html body #cartContent .hover\:text-red-400:hover,html body #miniCart .text-gold-400,html body #miniCart .text-gold-500,html body #miniCart .text-gold-400\/80,html body #miniCart .text-emerald-300,html body #miniCart .text-emerald-400,html body #miniCart .text-red-300,html body #miniCart .text-red-400,html body #miniCart .hover\:text-gold-400:hover,html body #miniCart .hover\:text-red-400:hover,html body #myoWrap>.pop .text-gold-400,html body #myoWrap>.pop .text-gold-500,html body #myoWrap>.pop .text-gold-400\/80,html body #myoWrap>.pop .text-emerald-300,html body #myoWrap>.pop .text-emerald-400,html body #myoWrap>.pop .text-red-300,html body #myoWrap>.pop .text-red-400,html body #myoWrap>.pop .hover\:text-gold-400:hover,html body #myoWrap>.pop .hover\:text-red-400:hover,html body #trkWrap>.pop .text-gold-400,html body #trkWrap>.pop .text-gold-500,html body #trkWrap>.pop .text-gold-400\/80,html body #trkWrap>.pop .text-emerald-300,html body #trkWrap>.pop .text-emerald-400,html body #trkWrap>.pop .text-red-300,html body #trkWrap>.pop .text-red-400,html body #trkWrap>.pop .hover\:text-gold-400:hover,html body #trkWrap>.pop .hover\:text-red-400:hover,html body #mobileMenu>div:nth-child(2) .text-gold-400,html body #mobileMenu>div:nth-child(2) .text-gold-500,html body #mobileMenu>div:nth-child(2) .text-gold-400\/80,html body #mobileMenu>div:nth-child(2) .text-emerald-300,html body #mobileMenu>div:nth-child(2) .text-emerald-400,html body #mobileMenu>div:nth-child(2) .text-red-300,html body #mobileMenu>div:nth-child(2) .text-red-400,html body #mobileMenu>div:nth-child(2) .hover\:text-gold-400:hover,html body #mobileMenu>div:nth-child(2) .hover\:text-red-400:hover{color:#0a0a0a!important}
+html body #cartContent .gold-text,html body #miniCart .gold-text,html body #myoWrap>.pop .gold-text,html body #trkWrap>.pop .gold-text,html body #mobileMenu>div:nth-child(2) .gold-text{background:none!important;-webkit-text-fill-color:#0a0a0a!important;color:#0a0a0a!important;animation:none!important}
+html body #cartContent .bg-ink-900,html body #cartContent .bg-ink-800,html body #cartContent .bg-white,html body #miniCart .bg-ink-900,html body #miniCart .bg-ink-800,html body #miniCart .bg-white,html body #myoWrap>.pop .bg-ink-900,html body #myoWrap>.pop .bg-ink-800,html body #myoWrap>.pop .bg-white,html body #trkWrap>.pop .bg-ink-900,html body #trkWrap>.pop .bg-ink-800,html body #trkWrap>.pop .bg-white,html body #mobileMenu>div:nth-child(2) .bg-ink-900,html body #mobileMenu>div:nth-child(2) .bg-ink-800,html body #mobileMenu>div:nth-child(2) .bg-white{background:#fff!important}
+html body #cartContent .bg-white\/5,html body #cartContent .bg-white\/10,html body #cartContent .bg-white\/25,html body #cartContent .bg-black\/30,html body #cartContent .bg-black\/40,html body #cartContent .bg-black\/50,html body #cartContent .bg-gold-500\/10,html body #cartContent .bg-gold-500\/15,html body #cartContent .bg-red-500\/10,html body #cartContent .bg-red-500\/15,html body #cartContent .bg-emerald-500\/15,html body #cartContent .bg-gradient-to-br,html body #miniCart .bg-white\/5,html body #miniCart .bg-white\/10,html body #miniCart .bg-white\/25,html body #miniCart .bg-black\/30,html body #miniCart .bg-black\/40,html body #miniCart .bg-black\/50,html body #miniCart .bg-gold-500\/10,html body #miniCart .bg-gold-500\/15,html body #miniCart .bg-red-500\/10,html body #miniCart .bg-red-500\/15,html body #miniCart .bg-emerald-500\/15,html body #miniCart .bg-gradient-to-br,html body #myoWrap>.pop .bg-white\/5,html body #myoWrap>.pop .bg-white\/10,html body #myoWrap>.pop .bg-white\/25,html body #myoWrap>.pop .bg-black\/30,html body #myoWrap>.pop .bg-black\/40,html body #myoWrap>.pop .bg-black\/50,html body #myoWrap>.pop .bg-gold-500\/10,html body #myoWrap>.pop .bg-gold-500\/15,html body #myoWrap>.pop .bg-red-500\/10,html body #myoWrap>.pop .bg-red-500\/15,html body #myoWrap>.pop .bg-emerald-500\/15,html body #myoWrap>.pop .bg-gradient-to-br,html body #trkWrap>.pop .bg-white\/5,html body #trkWrap>.pop .bg-white\/10,html body #trkWrap>.pop .bg-white\/25,html body #trkWrap>.pop .bg-black\/30,html body #trkWrap>.pop .bg-black\/40,html body #trkWrap>.pop .bg-black\/50,html body #trkWrap>.pop .bg-gold-500\/10,html body #trkWrap>.pop .bg-gold-500\/15,html body #trkWrap>.pop .bg-red-500\/10,html body #trkWrap>.pop .bg-red-500\/15,html body #trkWrap>.pop .bg-emerald-500\/15,html body #trkWrap>.pop .bg-gradient-to-br,html body #mobileMenu>div:nth-child(2) .bg-white\/5,html body #mobileMenu>div:nth-child(2) .bg-white\/10,html body #mobileMenu>div:nth-child(2) .bg-white\/25,html body #mobileMenu>div:nth-child(2) .bg-black\/30,html body #mobileMenu>div:nth-child(2) .bg-black\/40,html body #mobileMenu>div:nth-child(2) .bg-black\/50,html body #mobileMenu>div:nth-child(2) .bg-gold-500\/10,html body #mobileMenu>div:nth-child(2) .bg-gold-500\/15,html body #mobileMenu>div:nth-child(2) .bg-red-500\/10,html body #mobileMenu>div:nth-child(2) .bg-red-500\/15,html body #mobileMenu>div:nth-child(2) .bg-emerald-500\/15,html body #mobileMenu>div:nth-child(2) .bg-gradient-to-br{background:#f4f4f4!important;background-image:none!important}
+html body #cartContent .bg-gradient-to-r,html body #miniCart .bg-gradient-to-r,html body #myoWrap>.pop .bg-gradient-to-r,html body #trkWrap>.pop .bg-gradient-to-r,html body #mobileMenu>div:nth-child(2) .bg-gradient-to-r{background:#fff!important;background-image:none!important}
+html body #cartContent .bg-gold-500,html body #miniCart .bg-gold-500,html body #myoWrap>.pop .bg-gold-500,html body #trkWrap>.pop .bg-gold-500,html body #mobileMenu>div:nth-child(2) .bg-gold-500{background:#0a0a0a!important}
+html body #cartContent .border-white\/10,html body #cartContent .border-white\/15,html body #cartContent .border-white\/20,html body #cartContent .border-gold-500\/25,html body #cartContent .border-gold-500\/30,html body #cartContent .border-gold-500\/40,html body #cartContent .border-red-500\/10,html body #cartContent .border-red-500\/30,html body #cartContent .border-emerald-500\/30,html body #miniCart .border-white\/10,html body #miniCart .border-white\/15,html body #miniCart .border-white\/20,html body #miniCart .border-gold-500\/25,html body #miniCart .border-gold-500\/30,html body #miniCart .border-gold-500\/40,html body #miniCart .border-red-500\/10,html body #miniCart .border-red-500\/30,html body #miniCart .border-emerald-500\/30,html body #myoWrap>.pop .border-white\/10,html body #myoWrap>.pop .border-white\/15,html body #myoWrap>.pop .border-white\/20,html body #myoWrap>.pop .border-gold-500\/25,html body #myoWrap>.pop .border-gold-500\/30,html body #myoWrap>.pop .border-gold-500\/40,html body #myoWrap>.pop .border-red-500\/10,html body #myoWrap>.pop .border-red-500\/30,html body #myoWrap>.pop .border-emerald-500\/30,html body #trkWrap>.pop .border-white\/10,html body #trkWrap>.pop .border-white\/15,html body #trkWrap>.pop .border-white\/20,html body #trkWrap>.pop .border-gold-500\/25,html body #trkWrap>.pop .border-gold-500\/30,html body #trkWrap>.pop .border-gold-500\/40,html body #trkWrap>.pop .border-red-500\/10,html body #trkWrap>.pop .border-red-500\/30,html body #trkWrap>.pop .border-emerald-500\/30,html body #mobileMenu>div:nth-child(2) .border-white\/10,html body #mobileMenu>div:nth-child(2) .border-white\/15,html body #mobileMenu>div:nth-child(2) .border-white\/20,html body #mobileMenu>div:nth-child(2) .border-gold-500\/25,html body #mobileMenu>div:nth-child(2) .border-gold-500\/30,html body #mobileMenu>div:nth-child(2) .border-gold-500\/40,html body #mobileMenu>div:nth-child(2) .border-red-500\/10,html body #mobileMenu>div:nth-child(2) .border-red-500\/30,html body #mobileMenu>div:nth-child(2) .border-emerald-500\/30{border-color:#d9d9d9!important}
+html body #cartContent .hover\:border-gold-500\/40:hover,html body #miniCart .hover\:border-gold-500\/40:hover,html body #myoWrap>.pop .hover\:border-gold-500\/40:hover,html body #trkWrap>.pop .hover\:border-gold-500\/40:hover,html body #mobileMenu>div:nth-child(2) .hover\:border-gold-500\/40:hover{border-color:#0a0a0a!important}
+html body #cartContent span.rounded-full.border,html body #miniCart span.rounded-full.border,html body #myoWrap>.pop span.rounded-full.border,html body #trkWrap>.pop span.rounded-full.border,html body #mobileMenu>div:nth-child(2) span.rounded-full.border{border-color:#0a0a0a!important;background:#f4f4f4!important;color:#0a0a0a!important}
+html body #cartContent .btn-gold,html body #cartContent .bg-gold-500.text-black,html body #miniCart .btn-gold,html body #miniCart .bg-gold-500.text-black,html body #myoWrap>.pop .btn-gold,html body #myoWrap>.pop .bg-gold-500.text-black,html body #trkWrap>.pop .btn-gold,html body #trkWrap>.pop .bg-gold-500.text-black,html body #mobileMenu>div:nth-child(2) .btn-gold,html body #mobileMenu>div:nth-child(2) .bg-gold-500.text-black{background:#0a0a0a!important;background-image:none!important;color:#fff!important;box-shadow:none!important;border:0!important}
+html body #cartContent .btn-gold *,html body #miniCart .btn-gold *,html body #myoWrap>.pop .btn-gold *,html body #trkWrap>.pop .btn-gold *,html body #mobileMenu>div:nth-child(2) .btn-gold *{color:#fff!important}
+html body #cartContent .hover\:bg-gold-500:hover,html body #miniCart .hover\:bg-gold-500:hover,html body #myoWrap>.pop .hover\:bg-gold-500:hover,html body #trkWrap>.pop .hover\:bg-gold-500:hover,html body #mobileMenu>div:nth-child(2) .hover\:bg-gold-500:hover{background:#0a0a0a!important;color:#fff!important}
+html body #cartContent .hover\:bg-white\/5:hover,html body #cartContent .hover\:bg-white\/10:hover,html body #miniCart .hover\:bg-white\/5:hover,html body #miniCart .hover\:bg-white\/10:hover,html body #myoWrap>.pop .hover\:bg-white\/5:hover,html body #myoWrap>.pop .hover\:bg-white\/10:hover,html body #trkWrap>.pop .hover\:bg-white\/5:hover,html body #trkWrap>.pop .hover\:bg-white\/10:hover,html body #mobileMenu>div:nth-child(2) .hover\:bg-white\/5:hover,html body #mobileMenu>div:nth-child(2) .hover\:bg-white\/10:hover{background:#f4f4f4!important}
+html body #cartContent input,html body #miniCart input,html body #myoWrap>.pop input,html body #trkWrap>.pop input,html body #mobileMenu>div:nth-child(2) input{background:#fafafa!important;border:1.5px solid #cfcfcf!important;color:#0a0a0a!important}
+html body #cartContent input:focus,html body #miniCart input:focus,html body #myoWrap>.pop input:focus,html body #trkWrap>.pop input:focus,html body #mobileMenu>div:nth-child(2) input:focus{border-color:#0a0a0a!important;box-shadow:0 0 0 4px rgba(0,0,0,.08)!important}
+html body #cartContent input::placeholder,html body #miniCart input::placeholder,html body #myoWrap>.pop input::placeholder,html body #trkWrap>.pop input::placeholder,html body #mobileMenu>div:nth-child(2) input::placeholder{color:#8a8a8a!important}
+html body .ring-ink-900{--tw-ring-color:#fff!important}
+html body #myoWrap .bf-x,html body #trkWrap .bf-x{background:#fff!important;border:1.5px solid #0a0a0a!important;color:#0a0a0a!important}
+html body #myoWrap .bf-x:hover,html body #trkWrap .bf-x:hover{background:#0a0a0a!important;color:#fff!important}
+html body #cartContent .bag-item{background:#fff!important;border:1px solid #e2e2e2!important;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+html body #cartContent .bag-item .border.rounded-lg{border-color:#0a0a0a!important;background:#fff!important}
+html body #cartContent .bag-item img{border:1px solid #e2e2e2}
+html body #cartContent>div:first-child{border-bottom:1.3px solid #0a0a0a!important}
+html body #cartContent>div:first-child .btn-gold{border-radius:14px}
+html body #cartContent>div:last-child{background:#f4f4f4!important;border-top:1.3px solid #0a0a0a!important}
+html body #cartContent #shipText{font-weight:800}
+html body #cartContent #shipBar{background:#0a0a0a!important}
+html body #cartContent #shipBar{background-image:none!important}
+html body #cartContent .w-full.h-2{background:#e2e2e2!important}
+html body #cartContent #cartSubtotal{color:#0a0a0a!important;font-size:1.4rem;font-weight:800}
+html body #cartContent #emptyCart .w-20{background:#f0f0f0!important;border:1.5px solid #0a0a0a}
+html body #cartContent #emptyCart .w-20 *{color:#0a0a0a!important}
+html body #miniCart .rotate-45{background:#fff!important;border-color:#0a0a0a!important}
+html body #miniCart button.border{border-color:#0a0a0a!important;color:#0a0a0a!important;background:#fff!important}
+html body #miniCart #miniBar{background:#0a0a0a!important}
+html body #miniCart .bg-white\/10{background:#e6e6e6!important}
+html body #myoWrap .myo-card{background:#fff!important;border:1px solid #e2e2e2!important;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+html body #myoWrap .myo-card:hover{border-color:#0a0a0a!important}
+html body #myoWrap>.pop>div:nth-child(2),html body #myoWrap>.pop>div:nth-child(2){border-bottom:1px solid #e2e2e2!important}
+html body #myoWrap .fa-circle-info{color:#0a0a0a!important}
+html body #trkWrap #trkOut .btn-gold,html body #trkWrap #trkOut .rounded-full{box-shadow:none!important}
+html body #mobileMenu #mobileNav a{color:#0a0a0a!important;font-size:15px;font-weight:700;border-radius:14px;padding:9px 10px!important}
+html body #mobileMenu #mobileNav a:hover,html body #mobileMenu #mobileNav a:active{background:#f4f4f4!important}
+html body #mobileMenu #mobileNav a i{width:30px!important;height:30px;flex:none;border-radius:50%;background:#0a0a0a!important;color:#fff!important;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+html body #mobileMenu #mobileNav a.text-gold-400{border:1.5px solid #0a0a0a}
+html body #mobileMenu .font-display{color:#0a0a0a!important;font-weight:800}
+html body #mobileMenu>div:nth-child(2) .fa-xmark{color:#0a0a0a!important}
 </style>
 </body>
 </html>
