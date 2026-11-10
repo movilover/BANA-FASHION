@@ -1,0 +1,23 @@
+# ===== গোপন তথ্য — কখনো GitHub-এ যাবে না =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+serviceAccount*.json
+firebase-adminsdk*.json
+
+# ===== ডিপেন্ডেন্সি ও অস্থায়ী ফাইল =====
+node_modules/
+npm-debug.log*
+yarn-error.log*
+*.log
+.cache/
+dist/
+build/
+
+# ===== OS / এডিটর =====
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
