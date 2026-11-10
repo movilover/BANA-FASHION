@@ -2540,8 +2540,8 @@ function renderPP(){
         <div class="text-[10.5px] text-slate-500 mt-2.5"><i class="fa-solid fa-truck-fast text-gold-500 mr-1"></i>ডেলিভারি: ঢাকার ভিতরে ${money(SHIP.dhaka)} · ঢাকার বাইরে ${money(SHIP.outside)}${FREE_SHIP<99999999?` · ${money(FREE_SHIP)} এর বেশি অর্ডারে ফ্রি`:''}</div>
         <div class="mt-5 rounded-xl bg-white border border-slate-200 overflow-hidden">
           <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center gap-2 text-[12px] font-extrabold"><span class="w-1 h-4 rounded bg-gold-500"></span>পণ্যের বিবরণ</div>
-          <div class="p-4"><p id="ppDesc" class="text-[13px] text-slate-600 leading-[1.8] whitespace-pre-line ${String(p.description||'').length>260?'line-clamp-5':''}">${esc(p.description||'Premium quality product from BANA FASHION.')}</p>
-          ${String(p.description||'').length>260?`<button type="button" id="ppDescBtn" onclick="ppDescToggle()" class="mt-2 text-[12px] font-extrabold text-gold-600 hover:text-gold-500">আরও পড়ুন <i class="fa-solid fa-chevron-down text-[9px] ml-0.5"></i></button>`:''}</div>
+          <div class="p-4"><p id="ppDesc" class="text-[13px] text-slate-600 leading-[1.8] whitespace-pre-line break-words">${esc(p.description||'Premium quality product from BANA FASHION.')}</p>
+          </div>
         </div>
       </div>
     </div>
