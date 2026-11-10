@@ -1707,7 +1707,7 @@ function normProduct(p){ const o={...p};
   if(o.image&&typeof o.image==='object') o.image=_url(o.image);
   ['price','oldPrice','rating','reviews'].forEach(k=>{ if(o[k]&&typeof o[k]==='object') o[k]=Number(o[k].value??o[k].amount)||null; });
   return o; }
-const catLabel=c=>{ if(c&&typeof c==='object'){ const id=_s(c.id); return _s(c.nameBn||c.name_bn||c.bn||c.labelBn)||CATBN[id]||_s(c.name)||_s(c.label)||_s(c.title)||id; } return CATBN[c]||_s(c); };
+const catLabel=c=>{ if(c&&typeof c==='object'){ const id=_s(c.id); return _s(c.nameBn||c.name_bn||c.bn||c.labelBn)||_s(c.label)||_s(c.name)||_s(c.title)||CATBN[id]||id; } return CATBN[c]||_s(c); };
 const BADGEBN={new:'নতুন',hot:'হট',trending:'ট্রেন্ডিং',popular:'জনপ্রিয়',premium:'প্রিমিয়াম',limited:'লিমিটেড',bestseller:'বেস্টসেলার',set:'সেট',essential:'এসেনশিয়াল',value:'ভ্যালু',sale:'সেল',eid:'ঈদ'};
 const badgeBn=b=>BADGEBN[String(b||'').toLowerCase()]||b;
 const bnum=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
@@ -1788,7 +1788,7 @@ const _ordT=p=>{ const c=p&&p.createdAt; if(!c) return 0; if(c.toMillis) return 
 function _ordCmp(a,b){ const NOW=_ordCmp.n||(_ordCmp.n=Date.now()); const k=p=>(p.order!=null&&p.order!==''&&!isNaN(+p.order))?+p.order:-(_ordT(p)||NOW); return k(a)-k(b); }
 function _num(v){ const n=parseFloat(String(v==null?'':v).replace(/[^\d.\-]/g,'')); return isNaN(n)?0:n; }
 function _pageSize(){ return 10; }   /* home shows 10 products in a row, no 'load more' */
-function resetLimit(){ const home=state.cat==='all'&&!String(state.q||'').trim(); state.limit=home?bfCols()*2:100000; state.bfAll=0; }   /* home: first 2 rows only, the rest comes with "আরও দেখুন" */   /* only the home view is capped at 10 */
+function resetLimit(){ const home=state.cat==='all'&&!String(state.q||'').trim(); const mx=+((state.site||{}).maxProducts)||0; state.limit=home?(mx>0?mx:bfCols()*2):100000; state.bfAll=0; }   /* home: first 2 rows only, the rest comes with "আরও দেখুন" */   /* only the home view is capped at 10 */
 function updateLoadMore(){ try{ bfPgMore(); }catch(e){} try{ const es=$('emptyState'); if(es) es.classList.toggle('hidden',(state._list||[]).length>0); }catch(e){} const w=$('loadMoreWrap'); if(!w) return; w.classList.add('hidden'); return;
   const total=(state._list||[]).length, shown=$('productGrid').children.length, left=total-shown;
   w.classList.toggle('hidden',left<=0); if(left<=0) return;
@@ -1799,19 +1799,18 @@ function loadMore(){ const grid=$('productGrid'), list=state._list||[], from=gri
   state.limit=from+next.length; [...grid.children].slice(from).forEach((c,k)=>{ c.style.setProperty('--pd',(Math.min(k,7)*.07).toFixed(2)+'s'); c.classList.add('in2'); }); updateLoadMore(); }
 
 /* ===== HOME PRODUCT LIST: 2 rows -> "আরও দেখুন" line -> big 2-up showcase (3 rows) -> second "আরও দেখুন" ===== */
-function bfCols(){ return (window.matchMedia&&matchMedia('(min-width:768px)').matches)?4:3; }
+function bfCols(){ const big=!!(window.matchMedia&&matchMedia('(min-width:768px)').matches), s=state.site||{}, v=+(big?s.homeColsD:s.homeColsM); return (v>=1&&v<=6)?v:(big?4:3); }
 function bfFeatCard(p,i,on){
   const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0, wl=state.wishlist.includes(p.id);
   const im=(p.images&&p.images.length?p.images:[p.image]), all=im.length>1?[...im,im[0]]:im;
   return `<article class="bfx-card${on?' in':''}" data-pid="${esc(p.id)}" style="--d:${((i%2)*.1).toFixed(2)}s" onclick="openProduct('${p.id}')">
     <div class="bfx-img">
       ${off>0?`<span class="bfx-off">-${off}%</span>`:''}
-      ${p.badge?`<span class="bfx-bdg">${esc(badgeBn(p.badge))}</span>`:''}
       <button type="button" class="bfx-heart${wl?' on':''}" aria-label="Wishlist" onclick="event.stopPropagation();toggleWishlist('${p.id}')"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
       <div class="pslide" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" draggable="false" onerror="this.style.opacity=0">`).join('')}</div>
       ${im.length>1?`<div class="pdots">${im.map((_,k)=>`<span class="pdot${k?'':' bg-white'}"></span>`).join('')}</div>`:''}
     </div>
-    <div class="bfx-info"><h3>${esc(p.title)}</h3>
+    <div class="bfx-info">${p.badge?`<span class="pc-brand">${esc(badgeBn(p.badge))}</span>`:''}<h3>${esc(p.title)}</h3>
       <div class="bfx-row"><div class="bfx-pr"><b>${money(p.price)}</b>${p.oldPrice?`<s>${money(p.oldPrice)}</s>`:''}</div>
       <button type="button" class="bfx-add" aria-label="Add to cart" onclick="event.stopPropagation();addToCart('${p.id}',1,'${(p.sizes&&p.sizes[0])||'M'}')"><i class="fa-solid fa-plus"></i></button></div>
     </div></article>`;
@@ -1876,7 +1875,6 @@ function renderProducts(){
     const off=p.oldPrice?Math.round((p.oldPrice-p.price)/p.oldPrice*100):0, wl=state.wishlist.includes(p.id);
     return `<div class="pcard reveal in group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer" data-pid="${esc(p.id)}" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
       <div class="relative overflow-hidden bg-ink-800 aspect-[4/5]">
-        ${p.badge?`<span class="absolute bottom-3 left-3 z-10 px-2 py-0.5 rounded-md bg-white text-ink-900 shadow font-extrabold text-[10px] uppercase tracking-wider">${esc(badgeBn(p.badge))}</span>`:''}
         ${off>0?`<span class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black text-white font-extrabold text-[11px]">-${off}%</span>`:''}
         <button onclick="event.stopPropagation();toggleWishlist('${p.id}')" class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-all ${wl?'text-rose-500':'text-slate-700'}"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
         ${(()=>{ const im=(p.images&&p.images.length?p.images:[p.image]); const all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0" style="transition:transform .8s cubic-bezier(.65,0,.35,1)">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>${im.length>1?`<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">${im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}`; })()}
@@ -1884,7 +1882,7 @@ function renderProducts(){
       </div>
       <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
-          
+          ${p.badge?`<span class="pc-brand">${esc(badgeBn(p.badge))}</span>`:''}
           <h3 class="font-bold text-xs sm:text-[13px] text-ink-900 line-clamp-1 text-center">${esc(p.title)}</h3>${p.description?`<p class="text-[10.5px] sm:text-[11.5px] text-slate-500 leading-snug line-clamp-1 mt-0.5">${esc(p.description)}</p>`:''}
         </div>
         <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
@@ -1976,6 +1974,36 @@ async function loadFirestoreProducts(){
   if(!_same) renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash(); try{ if(state._fast) bfHydrate(); }catch(e){}
 }
 
+/* ===== ADMIN BANNERS: admin panel 'banners' collection -> home slider (shown before the built-in banners) ===== */
+const BAN_CACHE='bana_banners_v1';
+function bnrSlideHTML(b){
+  const t=b.showText!==false, cat=esc(_s(b.cat)||'all'), title=esc(_s(b.title)), sub=esc(_s(b.sub)).replace(/\n/g,'<br>'), cta=esc(_s(b.cta)||'SHOP NOW');
+  return `<div class="hero-slide bnr bnr-adm${t?'':' bnr-click'}" data-dur="5000" data-bid="${esc(b.id)}"${t?'':` onclick="goShop('${cat}')"`}>
+    <img class="bnr-full" src="${esc(_url(b.image))}" alt="${title}" decoding="async" draggable="false" onerror="this.style.opacity=0">
+    ${t?`<div class="bnr-shade"></div><div class="bnr-txt">${title?`<h2 class="bnr-h">${title}</h2>`:''}${sub?`<p class="bnr-p">${sub}</p>`:''}<a href="#shop" onclick="goShop('${cat}');return false" class="bnr-btn">${cta} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>`:''}
+  </div>`;
+}
+function applyBanners(list){
+  const wrap=$('bnrWrap'); if(!wrap) return;
+  const sig=JSON.stringify(list.map(b=>[b.id,b.title,b.sub,b.cta,b.cat,b.order,b.showText,String(_url(b.image)).length]));
+  if(wrap._bsig===sig) return; wrap._bsig=sig;
+  wrap.querySelectorAll('.bnr-adm').forEach(e=>e.remove());
+  const first=wrap.querySelector('.hero-slide'), html=list.map(bnrSlideHTML).join('');
+  if(html){ if(first) first.insertAdjacentHTML('beforebegin',html); else wrap.insertAdjacentHTML('beforeend',html); }
+  if(!state.heroStarted){ const all=wrap.querySelectorAll('.hero-slide'); all.forEach(s=>s.classList.remove('active')); if(all[0]) all[0].classList.add('active'); }
+  else restartHero();
+}
+async function loadBanners(){
+  try{ const c=load(BAN_CACHE,[]); if(Array.isArray(c)&&c.length) applyBanners(c); }catch(e){}
+  if(!FIREBASE_READY) return;
+  try{
+    const s=await getDocs(collection(db,'banners')), a=[]; s.forEach(d=>a.push({id:d.id,...d.data()}));
+    const list=a.filter(b=>b&&_url(b.image)&&b.active!==false).sort((x,y)=>(+x.order||0)-(+y.order||0));
+    applyBanners(list);
+    const j=JSON.stringify(list); if(j.length<1200000) save(BAN_CACHE,list); else { try{ localStorage.removeItem(BAN_CACHE); }catch(e){} }
+  }catch(e){ console.warn('banners not loaded:',e.message); }
+}
+
 /* ===== ADMIN-LINKED: site settings, categories, payment ===== */
 async function loadSite(){
   if(!FIREBASE_READY) return;
@@ -1989,9 +2017,9 @@ async function loadSite(){
   window.SHOPX={...(st.shopAddress?{addr:st.shopAddress}:{}),...(st.helpline?{phone:st.helpline}:{})}; if(st.shipDhaka>=0) SHIP.dhaka=st.shipDhaka; if(st.shipOutside>=0) SHIP.outside=st.shipOutside; if(st.freeShip>=0) FREE_SHIP=st.freeShip||999999999; updateCart();
   try{ updateCheckoutTotals(); }catch(e){ console.warn('checkout totals:',e); }
   
-  const d=st.colsDesktop||4, m=st.colsMobile||2;
+  const d=+st.homeColsD||0, m=+st.homeColsM||0;
   let el=$('gridStyle'); if(!el){ el=document.createElement('style'); el.id='gridStyle'; document.head.appendChild(el); }
-  el.textContent=`#productGrid{grid-template-columns:repeat(${m},minmax(0,1fr))!important}@media(min-width:640px){#productGrid{grid-template-columns:repeat(${Math.min(d,3)},minmax(0,1fr))!important}}@media(min-width:1024px){#productGrid{grid-template-columns:repeat(${d},minmax(0,1fr))!important}}`;
+  el.textContent=(m||d)?`html body #productGrid{grid-template-columns:repeat(${Math.min(3,Math.max(1,m||3))},minmax(0,1fr))!important}@media(min-width:768px){html body #productGrid{grid-template-columns:repeat(${Math.min(6,Math.max(2,d||4))},minmax(0,1fr))!important}}`:'';
   resetLimit(); renderProducts();
 }
 const SVG_TIE='<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor"><path d="M9 2h6l-1.2 3 1.7 12.2L12 22l-3.5-4.8L10.2 5z"/></svg>';
@@ -3268,9 +3296,9 @@ Object.assign(window,{railOpen,railClose,railPick,railSide,railSize,railQty,rail
 
 /* init */
 state.cart=load('bana_cart',[]); state.wishlist=load('bana_wish',[]);
-buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); clearTimeout(heroTimer); setupReveal(); setupCounters(); railBoot(); loadFirestoreProducts(); loadSite(); verifyOrder(); openFromHash(); buildCatRow(); pencilInit(); bnFix();
+buildLetters(); buildShatter(); setupCats(); renderTabs(); renderProducts(); updateCart(); updateWishlist(); renderMenu(); showHero(0); clearTimeout(heroTimer); setupReveal(); setupCounters(); railBoot(); loadFirestoreProducts(); loadSite(); loadBanners(); verifyOrder(); openFromHash(); buildCatRow(); pencilInit(); bnFix();
 /* hero starts together with the splash exit (banner 1 = 2s, banner 2 = 4s are counted from here) */
-{ let started=false; const startSite=()=>{ if(started) return; started=true; setTimeout(()=>restartHero(),350); };
+{ let started=false; const startSite=()=>{ if(started) return; started=true; setTimeout(()=>{ restartHero(); state.heroStarted=true; },350); };
   if((window.__splash||0)>=1||!$('preloader')) startSite(); else document.addEventListener('splash:exit',startSite,{once:true}); }
 setTimeout(()=>{ try{ myoBoot(); }catch(e){} },1200);
 setTimeout(()=>{ (window.__q||[]).splice(0,5).forEach(c=>{ try{ window[c[0]].apply(null,c[1]); }catch(e){} }); },0);
@@ -3621,10 +3649,10 @@ html body #header #cartBadge{color:#fff!important;background:#ef4444!important;r
 (function(){
  function init(){
   var lg=document.querySelector('#header img'); document.querySelectorAll('img[data-bflogo]').forEach(function(i){ if(lg) i.src=lg.src; });
-  var sl=[].slice.call(document.querySelectorAll('#bnrWrap .hero-slide')), d=document.getElementById('bnrDots'); if(!d||!sl.length) return;
-  d.innerHTML=sl.map(function(_,i){return '<i data-i="'+i+'"></i>';}).join('');
+  var d=document.getElementById('bnrDots'); if(!d) return; var sl=[].slice.call(document.querySelectorAll('#bnrWrap .hero-slide'));
+  function build(){ sl=[].slice.call(document.querySelectorAll('#bnrWrap .hero-slide')); d.innerHTML=sl.map(function(_,i){return '<i data-i="'+i+'"></i>';}).join(''); } build();
   d.onclick=function(e){ var i=e.target.dataset&&e.target.dataset.i; if(i!=null&&window.goToHeroSlide) goToHeroSlide(+i); };
-  setInterval(function(){ sl.forEach(function(x,i){ d.children[i].classList.toggle('on',x.classList.contains('active')); }); },250);
+  setInterval(function(){ if(d.children.length!==document.querySelectorAll('#bnrWrap .hero-slide').length) build(); sl.forEach(function(x,i){ if(d.children[i]) d.children[i].classList.toggle('on',x.classList.contains('active')); }); },250);
   var w=document.getElementById('bnrWrap'),x0=null;
   w.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
   w.addEventListener('touchend',function(e){ if(x0==null) return; var dx=e.changedTouches[0].clientX-x0; x0=null; if(Math.abs(dx)>40&&window.nextHeroSlide) (dx<0?nextHeroSlide:prevHeroSlide)(); },{passive:true});
@@ -4063,6 +4091,48 @@ html body #mobileMenu #mobileNav a i{width:30px!important;height:30px;flex:none;
 html body #mobileMenu #mobileNav a.text-gold-400{border:1.5px solid #0a0a0a}
 html body #mobileMenu .font-display{color:#0a0a0a!important;font-weight:800}
 html body #mobileMenu>div:nth-child(2) .fa-xmark{color:#0a0a0a!important}
+</style>
+<style id="bfAdmBanner">
+/* banners uploaded from the admin panel */
+.bnr.bnr-adm{background:#0d0d0d}
+.bnr-adm.bnr-click{cursor:pointer}
+.bnr-adm .bnr-full{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;transform:scale(1.07);transition:transform 6.5s ease-out;-webkit-user-drag:none;user-select:none}
+.hero-slide.active.bnr-adm .bnr-full{transform:scale(1)}
+.bnr-adm .bnr-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.76) 0%,rgba(0,0,0,.42) 48%,rgba(0,0,0,0) 80%);pointer-events:none}
+.bnr-adm .bnr-txt{max-width:62%;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.bnr-adm .bnr-h{color:#fff}.bnr-adm .bnr-p{color:#f1f1f1}
+.bnr-adm .bnr-btn{background:#fff;color:#0d0d0d;text-shadow:none}
+</style>
+<style id="bfCardFix">
+/* ===== product cards: photo first — tiny corner tags, small heart, brand name as text under the photo, bigger photos ===== */
+/* discount tag: small corner tab flush to the photo corner (does not sit on the product) */
+html body .pcard .absolute.top-3.left-3,html body .bfx-off{top:0!important;left:0!important;padding:2px 7px 3px!important;border-radius:0 0 10px 0!important;font-size:10px!important;line-height:1.25!important;font-weight:800!important;background:rgba(13,13,13,.78)!important;color:#fff!important;letter-spacing:.01em;box-shadow:none!important;backdrop-filter:none}
+/* heart: small, light, tucked in the top-right corner */
+html body .pcard .absolute.top-3.right-3,html body .bfx-heart{top:5px!important;right:5px!important;width:24px!important;height:24px!important;min-width:0!important;font-size:11px!important;background:rgba(255,255,255,.55)!important;box-shadow:0 1px 4px rgba(0,0,0,.12)!important;border-radius:50%!important}
+html body .pcard .absolute.top-3.right-3:active,html body .bfx-heart:active{background:rgba(255,255,255,.95)!important}
+html body .pcard .absolute.top-3.right-3.text-rose-500,html body .bfx-heart.on{background:rgba(255,255,255,.92)!important}
+/* image dots: thin, centred at the very bottom */
+html body .pcard .pdots,html body .bfx-img .pdots{left:50%!important;right:auto!important;transform:translateX(-50%);bottom:5px!important;gap:3px!important}
+html body .pcard .pdot,html body .bfx-img .pdot{width:4px!important;height:4px!important}
+html body .bfx-img .pdot.bg-white,html body .pcard .pdot.bg-white{width:11px!important}
+/* brand / badge name now lives under the photo as plain text */
+.pc-brand{display:block;text-align:center;font-weight:800;font-size:9px;line-height:1.2;letter-spacing:.14em;text-transform:uppercase;color:#b45309;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bfx-info .pc-brand{font-size:10px;margin-bottom:0}
+/* 3-up grid: bigger photos (less gap and frame, taller picture) */
+html body #productGrid{gap:5px!important;margin-left:-5px;margin-right:-5px}
+@media(min-width:768px){html body #productGrid{gap:14px!important;margin-left:0;margin-right:0}}
+html body .pcard{border-radius:14px!important}
+html body .pcard>div:first-child{margin:3px 3px 0!important;border-radius:11px!important;aspect-ratio:3/4!important}
+html body .pcard>div:last-child{padding:6px 4px 8px!important}
+html body .pcard .font-lux{font-size:13.5px!important}
+/* 2-up showcase: bigger photos */
+#bfFeat{max-width:none;padding:0}
+.bfx-grid{gap:7px!important;margin-left:-5px;margin-right:-5px}
+@media(min-width:640px){.bfx-grid{gap:16px!important;margin-left:0;margin-right:0}#bfFeat{max-width:760px}}
+.bfx-card{border-radius:16px!important}
+.bfx-img{margin:4px 4px 0!important;border-radius:12px!important;aspect-ratio:3/4!important}
+.bfx-info{padding:8px 8px 10px!important;gap:5px!important}
+.bfx-info h3{font-size:13.5px!important;min-height:0!important;margin-bottom:2px}
 </style>
 </body>
 </html>
