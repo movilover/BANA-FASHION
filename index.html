@@ -1980,7 +1980,7 @@ async function loadFirestoreProducts(){
   state.loaded=true;
   try{ if(RAIL.ready) railInject(); }catch(e){}
   /* drop cart / wishlist entries of deleted products and refresh price, title, image */
-  if(state.fetchOk){ state.cart=state.cart.filter(i=>state.products.some(p=>p.id===i.id)).map(i=>{ const p=state.products.find(x=>x.id===i.id); return {...i,title:p.title,price:p.price,image:((p.images&&p.images.length)?variantImg(p,i.size):'')||i.image||p.image||(p.images&&p.images[0])||''}; });
+  if(state.fetchOk){ state.cart=state.cart.filter(i=>state.products.some(p=>p.id===i.id)).map(i=>{ const p=state.products.find(x=>x.id===i.id); return {...i,title:p.title,price:p.price,image:((i.image&&p.images&&p.images.includes(i.image))?i.image:((p.images&&p.images.length)?variantImg(p,i.size):''))||i.image||p.image||(p.images&&p.images[0])||''}; });
   state.wishlist=state.wishlist.filter(id=>state.products.some(p=>p.id===id)); save('bana_wish',state.wishlist); }
   if(!_same) renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash(); try{ if(state._fast) bfHydrate(); }catch(e){}
 }
@@ -2363,7 +2363,7 @@ function ppAdd(buy){
   if(buy){ const _t=Date.now(); if(_t-(window.__buyT||0)<600) return; window.__buyT=_t; }
   const p=ppCurrent(), S=state.pp; if(!p) return; const st=stockOf(p);
   if(st!==null&&st<=0){ toast('দুঃখিত, এই পণ্যটির স্টক শেষ',false); return; }
-  const variant=S.size+(S.color?' / '+S.color:''), img=variantImg(p,variant)||p.image||'';
+  const variant=S.size+(S.color?' / '+S.color:''), img=(p._rail?variantImg(p,variant):(ppView(p)[S.img]||variantImg(p,variant)))||p.image||'';
   if(buy){
     /* BUY NOW: open the order form straight away with only this product (cart is not touched) */
     state.buyNow={id:p.id,title:p.title,price:p.price,image:img,size:variant,qty:S.qty};
