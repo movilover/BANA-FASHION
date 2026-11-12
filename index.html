@@ -3769,20 +3769,20 @@ html body #header input{background:#f1f1f1!important;color:#111!important;border
 html body #header .bg-gold-500,html body #header .btn-gold{background:#0d0d0d!important;color:#fff!important}
 /* banners */
 html body #hero{height:auto!important;background:#fff!important;padding:14px 12px 0;overflow:visible!important}
-.bnr-wrap{position:relative;max-width:900px;margin:0 auto;aspect-ratio:2.55/1;min-height:150px;border-radius:22px;overflow:hidden;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.12);border:1px solid #eee}
-@media(min-width:768px){.bnr-wrap{aspect-ratio:3.1/1}}
+.bnr-wrap{position:relative;max-width:900px;margin:0 auto;aspect-ratio:16/9;min-height:0;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.12);border:1px solid #eee}
+/* banners are 16:9 (YouTube-thumbnail ratio) on every screen — upload 1600x900 */
 .bnr{position:absolute;inset:0;background:linear-gradient(105deg,#fff 0 46%,#ececec 46% 52%,#fff 52%);display:flex;align-items:center}
 .bnr-txt{position:relative;z-index:2;padding:0 0 0 clamp(14px,4vw,34px);max-width:56%}
-.bnr-h{font-family:'Syne','Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(17px,4.6vw,32px);line-height:1.05;color:#0d0d0d;letter-spacing:.01em}
-.bnr-p{margin:6px 0 10px;font-weight:600;font-size:clamp(11px,3vw,17px);line-height:1.3;color:#1a1a1a;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif}
-.bnr-btn,.bn-wbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:999px;font-weight:800;font-size:clamp(10.5px,2.8vw,13px);text-decoration:none;cursor:pointer;white-space:nowrap}
+.bnr-h{font-family:'Syne','Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(20px,5.4vw,46px);line-height:1.05;color:#0d0d0d;letter-spacing:.01em}
+.bnr-p{margin:8px 0 14px;font-weight:600;font-size:clamp(12px,3.4vw,23px);line-height:1.3;color:#1a1a1a;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif}
+.bnr-btn,.bn-wbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:999px;font-weight:800;font-size:clamp(11px,3vw,15px);text-decoration:none;cursor:pointer;white-space:nowrap}
 .bnr-btn{background:#0d0d0d;color:#fff}.bn-wbtn{background:#fff;color:#0d0d0d}
 .bnr-photo{position:absolute;right:0;top:0;bottom:0;width:60%;clip-path:polygon(22% 0,100% 0,100% 100%,0 100%)}
 .bnr-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(.15) contrast(1.05)}
 .bnr-black{position:absolute;right:0;top:0;bottom:0;width:52%;background:#0d0d0d;clip-path:polygon(24% 0,100% 0,100% 100%,0 100%);display:flex;align-items:center;justify-content:center;padding-left:14%}
-.bnr-logo{width:clamp(64px,19vw,130px);aspect-ratio:1;border-radius:50%;background:#000;border:3px solid #fff;box-shadow:0 0 0 6px rgba(255,255,255,.14);overflow:hidden}
+.bnr-logo{width:clamp(80px,25vw,200px);aspect-ratio:1;border-radius:50%;background:#000;border:3px solid #fff;box-shadow:0 0 0 6px rgba(255,255,255,.14);overflow:hidden}
 .bnr-logo img{width:100%;height:100%;object-fit:contain}
-.bnr-spark{position:absolute;right:12%;top:14%;color:#fff;font-size:clamp(14px,3.6vw,24px)}
+.bnr-spark{position:absolute;right:12%;top:14%;color:#fff;font-size:clamp(18px,4.6vw,34px)}
 .bnr-dots{display:flex;justify-content:center;gap:8px;margin:10px 0 2px}
 .bnr-dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid #0d0d0d;cursor:pointer;transition:all .25s}.bnr-dots i.on{background:#0d0d0d}
 /* stats */
