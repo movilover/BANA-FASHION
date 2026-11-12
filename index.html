@@ -8,6 +8,9 @@
 /* FRESH START: leaving the site and coming back always lands on the home page (never on the products section) */
 (function(){
   try{ history.scrollRestoration='manual'; }catch(e){}
+  /* PRODUCT SHARE LINK: https://site/?product=<id>  -> remember the id, clean the address bar, mark this history entry as HOME
+     (the product is pushed on top of it once loaded, so the Back button always lands on the shop's home page) */
+  try{ var _sp=new URLSearchParams(location.search), _pv=_sp.get('product'); if(_pv){ window.__DL=_pv; _sp.delete('product'); var _q=_sp.toString(); history.replaceState({home:1},'',location.pathname+(_q?'?'+_q:'')); } }catch(e){}
   var nav=''; try{ var n=performance.getEntriesByType('navigation')[0]; nav=n&&n.type||''; }catch(e){}
   var seen=false; try{ seen=sessionStorage.getItem('bf_seen')==='1'; sessionStorage.setItem('bf_seen','1'); }catch(e){}
   var h=location.hash||'';
@@ -23,6 +26,7 @@
 
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
 <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js">
 <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js">
 <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js">
@@ -1491,6 +1495,12 @@ html.bf-lock{overflow:hidden!important}
         <a href="tel:+8801357317938" aria-label="কল করুন" title="কল করুন" class="hl-btn btn-gold"><i class="fa-solid fa-phone"></i></a>
         <a href="https://wa.me/8801357317938" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp" class="hl-btn bg-emerald-500 hover:bg-emerald-600 text-white"><i class="fa-brands fa-whatsapp text-sm"></i></a>
       </div>
+      <div class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3" style="grid-column:1/-1">
+        <span class="hl-ic"><i class="fa-solid fa-circle-exclamation"></i></span>
+        <div class="min-w-0 flex-1"><div class="hl-lbl">প্রবাসী ভাইয়ের অভিযোগ<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span></div><div class="hl-num">01849-898910</div></div>
+        <a href="tel:+8801849898910" aria-label="কল করুন" title="কল করুন" class="hl-btn btn-gold"><i class="fa-solid fa-phone"></i></a>
+        <a href="https://wa.me/8801849898910" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp" class="hl-btn bg-emerald-500 hover:bg-emerald-600 text-white"><i class="fa-brands fa-whatsapp text-sm"></i></a>
+      </div>
     </div>
     <div class="grid sm:grid-cols-3 gap-2.5 mt-2.5">
       <a href="mailto:banafashiongazipur@gmail.com" class="helpline-card reveal rounded-xl px-3.5 py-3 flex items-center gap-3"><span class="hl-ic "><i class="fa-solid fa-envelope"></i></span><div class="min-w-0"><div class="hl-lbl">ইমেইল</div><div class="text-white text-[12px] font-semibold truncate">banafashiongazipur@gmail.com</div></div></a>
@@ -1807,6 +1817,8 @@ CATEGORIES.forEach(c=>{ if(CATBN[c.id]) c.label=CATBN[c.id]; });
 /* label of a category: accepts an id string OR a Firestore category object (this used to return the object itself -> "[object Object]") */
 const _s=v=>typeof v==='string'?v.trim():(typeof v==='number'?String(v):(v&&typeof v==='object'?_s(v.bn||v.bangla||v.en||v.name||v.label||''):''));
 const _url=u=>typeof u==='string'?u:(u&&typeof u==='object'?_s(u.url||u.src||u.image||u.href):'');
+/* Cloudinary responsive delivery: DB urls carry f_auto,q_auto (full-HD original). Cap the width per use so phones never download the big file for a small card; c_limit never upscales. */
+const CLX=(u,w)=>(typeof u==='string'&&w&&u.indexOf('res.cloudinary.com/')>0)?u.replace('/upload/f_auto,q_auto/','/upload/f_auto,q_auto,c_limit,w_'+w+'/'):u;
 const _list=(a,f)=>(Array.isArray(a)?a:(a==null||a===''?[]:[a])).map(f).filter(Boolean);
 /* Firestore sometimes stores text/lists as objects -> coerce every displayed product field to plain strings once, at load time */
 function normProduct(p){ const o={...p};
@@ -1900,7 +1912,7 @@ const _ordT=p=>{ const c=p&&p.createdAt; if(!c) return 0; if(c.toMillis) return 
 function _ordCmp(a,b){ const NOW=_ordCmp.n||(_ordCmp.n=Date.now()); const k=p=>(p.order!=null&&p.order!==''&&!isNaN(+p.order))?+p.order:-(_ordT(p)||NOW); return k(a)-k(b); }
 function _num(v){ const n=parseFloat(String(v==null?'':v).replace(/[^\d.\-]/g,'')); return isNaN(n)?0:n; }
 function _pageSize(){ return 10; }   /* home shows 10 products in a row, no 'load more' */
-function resetLimit(){ const home=state.cat==='all'&&!String(state.q||'').trim(); const mx=+((state.site||{}).maxProducts)||0; state.limit=home?(mx>0?mx:bfCols()*2):100000; state.bfAll=0; }   /* home: first 2 rows only, the rest comes with "আরও দেখুন" */   /* only the home view is capped at 10 */
+function resetLimit(){ const home=state.cat==='all'&&!String(state.q||'').trim(); const mx=+((state.site||{}).maxProducts)||0; const cl=bfCols(); state.limit=home?cl*Math.max(2,Math.ceil((mx||0)/cl)):100000;   /* full rows only: 2 rows x cols (e.g. 3+3); a custom maxProducts is rounded UP to a whole row so no gap is left */ state.bfAll=0; }   /* home: first 2 rows only, the rest comes with "আরও দেখুন" */   /* only the home view is capped at 10 */
 function updateLoadMore(){ try{ bfPgMore(); }catch(e){} try{ const es=$('emptyState'); if(es) es.classList.toggle('hidden',(state._list||[]).length>0); }catch(e){} const w=$('loadMoreWrap'); if(!w) return; w.classList.add('hidden'); return;
   const total=(state._list||[]).length, shown=$('productGrid').children.length, left=total-shown;
   w.classList.toggle('hidden',left<=0); if(left<=0) return;
@@ -1919,7 +1931,8 @@ function bfFeatCard(p,i,on){
     <div class="bfx-img">
       ${off>0?`<span class="bfx-off">-${off}%</span>`:''}
       <button type="button" class="bfx-heart${wl?' on':''}" aria-label="Wishlist" onclick="event.stopPropagation();toggleWishlist('${p.id}')"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
-      <div class="pslide" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" draggable="false" onerror="this.style.opacity=0">`).join('')}</div>
+      <button type="button" class="bf-lk" aria-label="লিংক কপি করুন" title="প্রোডাক্টের লিংক কপি করুন" onclick="copyProdLink('${p.id}',this,event)"><i class="fa-solid fa-link"></i></button>
+      <div class="pslide" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(CLX(u,800))}" alt="${esc(p.title)}" loading="lazy" decoding="async" draggable="false" onerror="this.style.opacity=0">`).join('')}</div>
       ${im.length>1?`<div class="pdots">${im.map((_,k)=>`<span class="pdot${k?'':' bg-white'}"></span>`).join('')}</div>`:''}
     </div>
     <div class="bfx-info">${p.badge?`<span class="pc-brand">${esc(badgeBn(p.badge))}</span>`:''}<h3>${esc(p.title)}</h3>
@@ -1961,7 +1974,7 @@ function renderHangerRail(base){
   const rot=[-2.4,1.8,-1.6,2.2,-2,1.5], n=items.length, k=Math.max(n-1,1);
   const hook='<svg class="hr-hanger" viewBox="0 0 100 38" aria-hidden="true"><path d="M50 17V7.5a4.2 4.2 0 1 1 4.2 4.2" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"/><path d="M50 17L8 33.5Q5 35.5 8.5 36.5L91.5 36.5Q95 35.5 92 33.5Z" fill="none" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/></svg>';
   st.style.setProperty('--k',k);
-  st.innerHTML=items.map((p,i)=>{ const im=(p.images&&p.images.length?p.images[0]:p.image)||''; return '<div class="hr-item'+(i===0?' on':'')+'" data-pid="'+esc(p.id)+'" style="--i:'+i+';--r:'+rot[i%6]+'deg;z-index:'+(n-i)+'" onclick="hrTap(this)" onmouseenter="hrHover(this)">'+hook+'<div class="hr-frame"><img src="'+esc(im)+'" alt="'+esc(p.title)+'" decoding="async"'+(i>1?' loading="lazy"':'')+' draggable="false"></div><div class="hr-tag"><b>'+esc(p.title)+'</b><span>'+money(p.price)+'</span></div></div>'; }).join('');
+  st.innerHTML=items.map((p,i)=>{ const im=(p.images&&p.images.length?p.images[0]:p.image)||''; return '<div class="hr-item'+(i===0?' on':'')+'" data-pid="'+esc(p.id)+'" style="--i:'+i+';--r:'+rot[i%6]+'deg;z-index:'+(n-i)+'" onclick="hrTap(this)" onmouseenter="hrHover(this)">'+hook+'<div class="hr-frame"><img src="'+esc(CLX(im,700))+'" alt="'+esc(p.title)+'" decoding="async"'+(i>1?' loading="lazy"':'')+' draggable="false"></div><div class="hr-tag"><b>'+esc(p.title)+'</b><span>'+money(p.price)+'</span></div></div>'; }).join('');
   sec.classList.remove('hidden');
 }
 function hrOn(el){ el.parentNode.querySelectorAll('.hr-item.on').forEach(x=>x.classList.remove('on')); el.classList.add('on'); }
@@ -1989,7 +2002,8 @@ function renderProducts(){
       <div class="relative overflow-hidden bg-ink-800 aspect-[4/5]">
         ${off>0?`<span class="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black text-white font-extrabold text-[11px]">-${off}%</span>`:''}
         <button onclick="event.stopPropagation();toggleWishlist('${p.id}')" class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-all ${wl?'text-rose-500':'text-slate-700'}"><i class="${wl?'fa-solid':'fa-regular'} fa-heart"></i></button>
-        ${(()=>{ const im=(p.images&&p.images.length?p.images:[p.image]); const all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0" style="transition:transform .8s cubic-bezier(.65,0,.35,1)">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>${im.length>1?`<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">${im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}`; })()}
+        <button type="button" class="bf-lk" aria-label="লিংক কপি করুন" title="প্রোডাক্টের লিংক কপি করুন" onclick="copyProdLink('${p.id}',this,event)"><i class="fa-solid fa-link"></i></button>
+        ${(()=>{ const im=(p.images&&p.images.length?p.images:[p.image]); const all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0" style="transition:transform .8s cubic-bezier(.65,0,.35,1)">${all.map(u=>`<img src="${esc(CLX(u,800))}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>${im.length>1?`<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">${im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')}</div>`:''}`; })()}
         <div class="hidden sm:flex absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity justify-center"><span class="w-full py-2.5 rounded-xl bg-white text-ink-900 text-center font-extrabold text-xs">দেখুন ও অর্ডার করুন <i class="fa-solid fa-arrow-right ml-1"></i></span></div>
       </div>
       <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between">
@@ -2049,7 +2063,7 @@ function bfHydrate(){
       ch.forEach(id=>{ const p=state.products.find(x=>x.id===id); if(!p||!p.images||p.images.length<2) return; const im=p.images;
         [...document.querySelectorAll('.pcard[data-pid]')].filter(c=>c.getAttribute('data-pid')===id).forEach(card=>{ const sl=card.querySelector('.pslide'); if(!sl) return;
           sl.dataset.n=im.length; sl.dataset.i=0; sl.style.transition='none'; sl.style.transform='translateX(0)';
-          sl.innerHTML=[...im,im[0]].map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('');
+          sl.innerHTML=[...im,im[0]].map(u=>`<img src="${esc(CLX(u,800))}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('');
           if(!card.querySelector('.pdots')) sl.insertAdjacentHTML('afterend','<div class="pdots absolute bottom-3 right-3 z-10 flex gap-1">'+im.map((_,k)=>`<span class="pdot w-1.5 h-1.5 rounded-full ${k?'bg-white/50':'bg-white'}"></span>`).join('')+'</div>'); }); });
       if(ch.length&&document.body.classList.contains('pp-open')&&state.pp&&ch.includes(state.pp.id)){ const a=document.activeElement; if(!(a&&/INPUT|TEXTAREA/.test(a.tagName))){ try{ ppSafeRender(); }catch(e){} } }
     }catch(e){}
@@ -2091,7 +2105,7 @@ const BAN_CACHE='bana_banners_v1';
 function bnrSlideHTML(b){
   const t=b.showText!==false, cat=esc(_s(b.cat)||'all'), title=esc(_s(b.title)), sub=esc(_s(b.sub)).replace(/\n/g,'<br>'), cta=esc(_s(b.cta)||'SHOP NOW');
   return `<div class="hero-slide bnr bnr-adm${t?'':' bnr-click'}" data-dur="5000" data-bid="${esc(b.id)}"${t?'':` onclick="goShop('${cat}')"`}>
-    <img class="bnr-full" src="${esc(_url(b.image))}" alt="${title}" decoding="async" draggable="false" onerror="this.style.opacity=0">
+    <img class="bnr-full" src="${esc(CLX(_url(b.image),1600))}" alt="${title}" decoding="async" draggable="false" onerror="this.style.opacity=0">
     ${t?`<div class="bnr-shade"></div><div class="bnr-txt">${title?`<h2 class="bnr-h">${title}</h2>`:''}${sub?`<p class="bnr-p">${sub}</p>`:''}<a href="#shop" onclick="goShop('${cat}');return false" class="bnr-btn">${cta} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>`:''}
   </div>`;
 }
@@ -2160,7 +2174,7 @@ function buildCatRowCore(){ const r=$('catRow'); if(!r) return;
   _catSig=sig; delete r.dataset.sk;
   r.innerHTML=list.map((c,i)=>{ const name=catLabel(c)||String(c.id||''); const n=cnt(c);
     const pr=state.products.find(p=>p.category===c.id); const im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
-    return `<div onclick="goShop('${esc(c.id)}')" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(im)}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
+    return `<div onclick="goShop('${esc(c.id)}')" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
   if(catsInView||_catsPlayed) playCats(); }
 /* ===== categories: 4 per row, 2 rows (8) first, then an "আরো দেখুন" button reveals the rest ===== */
 let _catExp=false;
@@ -2189,7 +2203,7 @@ function bfcList(){
 }
 function bfcItem(c,i){
   const name=catLabel(c)||String(c.id||''), pr=(state.products||[]).find(p=>inCategory(p,c.id)), im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
-  return `<button type="button" class="bfc-item" style="--i:${i}" onclick="bfcPick('${esc(c.id)}')" aria-label="${esc(name)}"><span class="bfc-ic">${catIcon(c)}${im?`<img src="${esc(im)}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span class="bfc-nm">${esc(name)}</span></button>`;
+  return `<button type="button" class="bfc-item" style="--i:${i}" onclick="bfcPick('${esc(c.id)}')" aria-label="${esc(name)}"><span class="bfc-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span class="bfc-nm">${esc(name)}</span></button>`;
 }
 function bfcFill(){ const g=$('bfsGrid'); if(g) g.innerHTML=_bfcAll.map(bfcItem).join(''); const t=$('bfsCount'); if(t) t.textContent=bnum(_bfcAll.length)+' টি ক্যাটাগরি'; }
 function bfcRender(){
@@ -2325,6 +2339,15 @@ function doTrack(raw){
 function showLastInv(){ if(state.lastOrder) showInvoice({...state.lastOrder,createdAt:new Date()}); }
 function showMyInv(i){ if(state.my&&state.my[i]) showInvoice(state.my[i]); }
 function copyNum(n){ const done=()=>toast('নম্বর কপি হয়েছে: '+n); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(n).then(done,done); else { const t=document.createElement('textarea'); t.value=n; document.body.appendChild(t); t.select(); try{document.execCommand('copy')}catch(e){} t.remove(); done(); } }
+/* Copies this product's share link (https://site/?product=ID) - works on http/old browsers too */
+function prodLink(id){ return location.origin+location.pathname+'?product='+encodeURIComponent(id); }
+function copyProdLink(id,btn,ev){
+  if(ev){ try{ ev.stopPropagation(); ev.preventDefault(); }catch(e){} }
+  const url=prodLink(id);
+  const done=()=>{ toast('প্রোডাক্টের লিংক কপি হয়েছে ✓'); if(!btn) return; btn.classList.add('ok'); const ic=btn.querySelector('i'); if(ic) ic.className='fa-solid fa-check'; setTimeout(()=>{ btn.classList.remove('ok'); if(ic) ic.className='fa-solid fa-link'; },1700); };
+  const fallback=()=>{ const t=document.createElement('textarea'); t.value=url; t.setAttribute('readonly',''); t.style.cssText='position:fixed;top:0;left:0;opacity:0'; document.body.appendChild(t); t.focus(); t.select(); try{ t.setSelectionRange(0,url.length); }catch(e){} let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} t.remove(); if(ok) done(); else window.prompt('লিংকটি কপি করে নিন:',url); };
+  if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(url).then(done,fallback); else fallback();
+}
 let trxT; function chkTrx(){ clearTimeout(trxT); const el=$('coTrxErr'); el.textContent=''; const t=$('coTrx').value.trim().toUpperCase(); if(!FIREBASE_READY||!/^[A-Z0-9]{6,20}$/.test(t)) return;
   trxT=setTimeout(async()=>{ try{ const sn=await getDoc(doc(db,'trx',t)); if(sn.exists()) el.textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; }catch(e){} },400); }
 async function verifyOrder(){ const id=new URLSearchParams(location.search).get('verify'); if(!id||!FIREBASE_READY) return; let r=null; try{ const sn=await getDoc(doc(db,'receipts',id)); if(sn.exists()) r=sn.data(); }catch(e){}
@@ -2375,7 +2398,7 @@ async function applyPromo(){ const code=$('coPromo').value.trim().toUpperCase().
 function renderEid(){ const st=state.site||{}, list=state.products.filter(p=>p.eid), sec=$('eid'); if(!sec) return;
   const on=st.eidOn&&list.length; sec.classList.toggle('hidden',!on); if(!on) return;
   $('eidTitle').textContent=st.eidTitle||'ঈদ কালেকশন'; $('eidSub').textContent=st.eidSub||'Celebrate Eid in style - handpicked festive collection';
-  $('eidGrid').innerHTML=list.map((p,i)=>`<div class="eid-card rounded-2xl overflow-hidden cursor-pointer reveal in" style="animation:fadeUp .6s ${(i%4)*.08}s backwards" onclick="openProduct('${p.id}')"><div class="aspect-[4/5] overflow-hidden relative bg-ink-800"><img src="${esc(p.image)}" alt="" loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"><span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-gold-500 text-black font-extrabold text-[10px]"><i class="fa-solid fa-moon mr-1"></i>EID</span></div><div class="p-3"><div class="text-white font-bold text-sm truncate">${esc(p.title)}</div><div class="mt-1 flex items-center gap-2"><span class="text-gold-400 font-extrabold">${money(p.price)}</span>${p.oldPrice?`<span class="text-[11px] text-white/40 line-through">${money(p.oldPrice)}</span>`:''}</div></div></div>`).join(''); }
+  $('eidGrid').innerHTML=list.map((p,i)=>`<div class="eid-card rounded-2xl overflow-hidden cursor-pointer reveal in" style="animation:fadeUp .6s ${(i%4)*.08}s backwards" onclick="openProduct('${p.id}')"><div class="aspect-[4/5] overflow-hidden relative bg-ink-800"><img src="${esc(CLX(p.image,800))}" alt="" loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"><span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-gold-500 text-black font-extrabold text-[10px]"><i class="fa-solid fa-moon mr-1"></i>EID</span></div><div class="p-3"><div class="text-white font-bold text-sm truncate">${esc(p.title)}</div><div class="mt-1 flex items-center gap-2"><span class="text-gold-400 font-extrabold">${money(p.price)}</span>${p.oldPrice?`<span class="text-[11px] text-white/40 line-through">${money(p.oldPrice)}</span>`:''}</div></div></div>`).join(''); }
 function renderMenu(){ const nav=$('mobileNav'); if(!nav) return; const st=state.site||{};
   const it=[['#hero','হোম','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'ঈদ কালেকশন','fa-moon','']]:[]),['#shop','সব পণ্য','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory('${c.id}');`]),['javascript:void(0)','আপনার অর্ডার','fa-receipt','openMyOrders();'],['javascript:void(0)','অর্ডার ট্র্যাক করুন','fa-truck-fast','openTrack();'],['#about','আমাদের কথা','fa-circle-info',''],['#helpline','হেল্পলাইন','fa-headset','']];
   nav.innerHTML=it.map((x,i)=>`<a href="${x[0]}" onclick="${x[3]}toggleMobileMenu()" style="--i:${i}" class="mnav flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-gold-400 ${x[0]==='#helpline'?'text-gold-400':''}"><i class="fa-solid ${x[2]} w-5 text-center text-gold-400/80"></i>${esc(x[1])}</a>`).join(''); }
@@ -2427,7 +2450,20 @@ function openProduct(id,push=true){
 }
 function hidePP(){ if(!document.body.classList.contains('pp-open')) return; if(state.rvUnsub){ try{state.rvUnsub();}catch(e){} state.rvUnsub=null; } document.body.classList.remove('pp-open'); $('productPage').classList.add('hidden'); $('productPage').innerHTML=''; document.title=DOC_TITLE; }
 function closeProduct(){ if(history.state&&history.state.pid){ history.back(); } else { hidePP(); if(location.hash.startsWith('#product-')){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} } setTimeout(()=>{ const sh=$('shop'); if(sh) sh.scrollIntoView(); },30); } }
-function openFromHash(){ const m=location.hash.match(/^#product-(.+)$/); if(!m) return; const id=decodeURIComponent(m[1]); if(state.pp&&state.pp.id===id&&document.body.classList.contains('pp-open')) return; openProduct(id,false); }
+/* Opens a product from a share link (?product=ID, kept in window.__DL) or from a legacy #product-ID hash.
+   Landing straight on a product builds the history  [home] -> [product]  so Back / the arrow button always goes to the shop home page. */
+function openFromHash(){
+  let id=null, viaDL=false;
+  if(window.__DL){ id=window.__DL; viaDL=true; }
+  else { const m=location.hash.match(/^#product-(.+)$/); if(!m) return; id=decodeURIComponent(m[1]); }
+  if(state.pp&&state.pp.id===id&&document.body.classList.contains('pp-open')){ window.__DL=null; return; }
+  const p=(state.products||[]).find(x=>x.id===id);
+  if(!p){ if(viaDL&&state.fetchOk){ window.__DL=null; toast('দুঃখিত, এই প্রোডাক্টটি এখন পাওয়া যাচ্ছে না',false); } return; }   /* not loaded yet -> try again after the product list arrives */
+  window.__DL=null;
+  if(history.state&&history.state.pid){ openProduct(id,false); return; }
+  try{ history.replaceState({home:1},'',location.pathname+location.search); }catch(e){}
+  openProduct(id,true);
+}
 window.addEventListener('popstate',e=>{ const pid=e.state&&e.state.pid; if(pid) openProduct(pid,false); else hidePP(); });
 document.addEventListener('click',e=>{ const a=e.target.closest('a[href^="#"]'); if(!a||!document.body.classList.contains('pp-open')) return; const h=a.getAttribute('href'); if(!h||h.length<2||h.startsWith('#product-')||h==='#ppReviews') return; e.preventDefault(); hidePP(); try{ history.replaceState(null,'',location.pathname+location.search); }catch(_){} setTimeout(()=>{ const t=document.querySelector(h); if(t) t.scrollIntoView({behavior:'smooth'}); },30); });
 
@@ -2440,10 +2476,10 @@ function ppVarsHTML(p){
 function ppCurrent(){ return state.products.find(x=>x.id===state.pp.id); }
 function ppSize(z){ state.pp.size=z; $('ppVars').innerHTML=ppVarsHTML(ppCurrent()); }
 const ppView=p=>colorImgs(p,state.pp&&state.pp.color);   /* photos of the colour that is selected right now */
-const ppTrackHTML=(p,im)=>im.map(u=>`<div class="ppsl" style="--bg:url('${esc(u)}')"><img src="${esc(u)}" alt="${esc(p.title)}" decoding="async" onerror="this.style.opacity=0"></div>`).join('');
+const ppTrackHTML=(p,im)=>im.map(u=>`<div class="ppsl" style="--bg:url('${esc(CLX(u,500))}')"><img src="${esc(CLX(u,2000))}" alt="${esc(p.title)}" decoding="async" onerror="this.style.opacity=0"></div>`).join('');
 const ppNavHTML=(im,cur=0)=>im.length>1?`<button onclick="ppGo(-1,true)" aria-label="Previous" class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button><button onclick="ppGo(1,true)" aria-label="Next" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
           <div class="absolute bottom-3 inset-x-0 flex justify-center gap-1.5">${im.map((_,k)=>`<span class="ppdot w-2 h-2 rounded-full ${k===cur?'bg-white':'bg-white/50'}"></span>`).join('')}</div>`:'';
-const ppThumbsHTML=(im,cur=0)=>im.length>1?`<div class="flex gap-2.5 mt-3 overflow-x-auto pb-1">${im.map((u,k)=>`<button onclick="ppGo(${k})" aria-label="Photo ${k+1}" class="ppthumb shrink-0 w-16 sm:w-20 aspect-[4/5] rounded-lg overflow-hidden border-2 ${k===cur?'border-ink-900':'border-transparent'} bg-silver-100"><img src="${esc(u)}" class="w-full h-full object-contain" onerror="this.style.opacity=0"></button>`).join('')}</div>`:'';
+const ppThumbsHTML=(im,cur=0)=>im.length>1?`<div class="flex gap-2.5 mt-3 overflow-x-auto pb-1">${im.map((u,k)=>`<button onclick="ppGo(${k})" aria-label="Photo ${k+1}" class="ppthumb shrink-0 w-16 sm:w-20 aspect-[4/5] rounded-lg overflow-hidden border-2 ${k===cur?'border-ink-900':'border-transparent'} bg-silver-100"><img src="${esc(CLX(u,200))}" class="w-full h-full object-contain" onerror="this.style.opacity=0"></button>`).join('')}</div>`:'';
 function ppGal(){   /* swap the gallery to the photos of the selected colour (with a soft fade) */
   const p=ppCurrent(), tr=$('ppTrack'); if(!p||!tr) return;
   const im=ppView(p), S=state.pp; S.img=0;
@@ -2476,7 +2512,7 @@ function ppAdd(buy){
   addToCart(p.id,S.qty,variant,false,img);
 }
 function ppHeart(btn,id){ toggleWishlist(id); const on=state.wishlist.includes(id); btn.className=btn.className.replace(/text-rose-500|text-slate-700/,on?'text-rose-500':'text-slate-700'); btn.querySelector('i').className=(on?'fa-solid':'fa-regular')+' fa-heart'; }
-function ppSlide(p){ const im=ppImgs(p), all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(u)}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>`; }
+function ppSlide(p){ const im=ppImgs(p), all=im.length>1?[...im,im[0]]:im; return `<div class="pslide flex h-full" data-n="${im.length}" data-i="0">${all.map(u=>`<img src="${esc(CLX(u,800))}" alt="${esc(p.title)}" loading="lazy" decoding="async" class="w-full h-full object-cover shrink-0" onerror="this.style.opacity=0">`).join('')}</div>`; }
 function ppRelCard(p,i){
   const wl=state.wishlist.includes(p.id);
   return `<div class="pcard group cursor-pointer" style="--pd:${(i%4)*.08}s" onclick="openProduct('${p.id}')">
@@ -2503,7 +2539,7 @@ function renderPP(){
   const dis=(st!==null&&st<=0)?'disabled':'';
   const pay=['bkash','nagad','rocket','upay'].map(k=>{ const c=(typeof PCOL!=='undefined'&&PCOL[k])||['#555',k]; return `<span class="px-2 py-0.5 rounded text-[9px] font-extrabold text-white" style="background:${c[0]}">${c[1]}</span>`; }).join('');
   $('productPage').innerHTML=`<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
-    <button onclick="closeProduct()" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-ink-900"><i class="fa-solid fa-arrow-left"></i>কেনাকাটা চালিয়ে যান</button>
+    <div class="flex items-center justify-between gap-3"><button onclick="closeProduct()" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-ink-900"><i class="fa-solid fa-arrow-left"></i>কেনাকাটা চালিয়ে যান</button><button type="button" class="bf-lkpp" onclick="copyProdLink('${p.id}',this,event)" aria-label="প্রোডাক্টের লিংক কপি করুন"><i class="fa-solid fa-link"></i><span>লিংক কপি</span></button></div>
     <div class="grid md:grid-cols-2 gap-6 lg:gap-12 mt-4">
       <div class="md:sticky md:top-24 self-start">
         <div id="ppStage" class="relative overflow-hidden rounded-2xl bg-silver-100 aspect-[4/5]">
@@ -2645,7 +2681,7 @@ function updateCart(){
 }
 function renderCartDom(){
   $('cartList').innerHTML=state.cart.map((it,i)=>`<div class="bag-item flex gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 items-center">
-    <img src="${esc(it.image)}" class="w-16 h-20 rounded-xl object-cover shrink-0 bg-ink-800" onerror="this.style.opacity=0">
+    <img src="${esc(CLX(it.image,240))}" class="w-16 h-20 rounded-xl object-cover shrink-0 bg-ink-800" onerror="this.style.opacity=0">
     <div class="flex-1 min-w-0"><h4 class="font-extrabold text-xs truncate text-white">${esc(it.title)}</h4><span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-bold text-silver-300">সাইজ ${esc(it.size)}</span><div class="font-display text-sm text-gold-400 mt-1">${money(it.price*it.qty)}</div></div>
     <div class="flex flex-col items-end gap-2">
       <button onclick="removeItem(${i})" class="text-silver-400 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>
@@ -2676,7 +2712,7 @@ function updateWishlist(){
   const c=$('wishlistContent');
   if(!state.wishlist.length){ c.innerHTML='<p class="text-center text-xs text-slate-400 py-6">এখনো কোনো পছন্দের পণ্য নেই।</p>'; return; }
   c.innerHTML=state.wishlist.map(id=>state.products.find(p=>p.id===id)).filter(Boolean).map(p=>`<div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/70">
-    <div class="flex items-center gap-3 min-w-0"><img src="${esc(p.image)}" class="w-12 h-12 rounded-xl object-cover bg-ink-800"><div class="min-w-0"><h4 class="font-extrabold text-xs truncate">${esc(p.title)}</h4><span class="text-xs font-bold text-gold-600">${money(p.price)}</span></div></div>
+    <div class="flex items-center gap-3 min-w-0"><img src="${esc(CLX(p.image,200))}" class="w-12 h-12 rounded-xl object-cover bg-ink-800"><div class="min-w-0"><h4 class="font-extrabold text-xs truncate">${esc(p.title)}</h4><span class="text-xs font-bold text-gold-600">${money(p.price)}</span></div></div>
     <div class="flex gap-2 shrink-0"><button onclick="toggleWishlistModal();openProduct('${p.id}')" class="px-3 py-1.5 rounded-lg btn-gold font-extrabold text-xs">দেখুন</button><button onclick="toggleWishlist('${p.id}')" class="p-1.5 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div></div>`).join('');
 }
 function toggleWishlistModal(){ $('wishlistModal').classList.toggle('hidden'); }
@@ -2699,7 +2735,7 @@ function startCheckout(){
 /* ---- order summary with live + / - quantity ---- */
 function renderCoItems(){
   const items=checkoutItems(), cart=!state.buyNow;
-  $('coItems').innerHTML=items.map((i,k)=>`<div class="co-item"><img src="${esc(i.image)}" alt="" class="w-14 h-16 rounded-lg object-cover bg-ink-800 shrink-0" onerror="this.style.opacity=0">
+  $('coItems').innerHTML=items.map((i,k)=>`<div class="co-item"><img src="${esc(CLX(i.image,240))}" alt="" class="w-14 h-16 rounded-lg object-cover bg-ink-800 shrink-0" onerror="this.style.opacity=0">
     <div class="flex-1 min-w-0 flex flex-col justify-between"><div><div class="font-bold text-[13px] text-white truncate">${esc(i.title)}</div><div class="text-[11px] text-silver-400 mt-0.5">Size ${esc(i.size)} · ${money(i.price)}</div></div>
     <div class="flex items-center justify-between mt-1.5"><div class="co-qty"><button type="button" onclick="coQty(${k},-1)" aria-label="কমান"${i.qty<=1?' disabled style="opacity:.4"':''}>−</button><span>${i.qty}</span><button type="button" onclick="coQty(${k},1)" aria-label="বাড়ান">+</button></div><div class="font-display font-bold text-gold-400 text-sm">${money(i.price*i.qty)}</div></div></div>
     ${cart?`<button type="button" onclick="coRemove(${k})" aria-label="সরান" class="self-start text-silver-400 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>`:''}</div>`).join('');
@@ -3264,7 +3300,7 @@ Object.assign(window,{myoOpen,myoBack,myoInv,myoSearch,myoOtpStart,myoOtpVerify,
   let was=false; new MutationObserver(()=>{ const open=!modal.classList.contains('hidden'); if(open&&!was) go(1); was=open; }).observe(modal,{attributes:true,attributeFilter:['class']});
   go(1);
 })();
-Object.assign(window,{loadMore,ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleForm,ppSubmitReview,showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,showLastInv,showMyInv,showInvoice,openTrack,closeTrack,doTrack,copyNum,chkTrx,updateCheckoutTotals,placeOrder,setArea,coQty,coRemove,closeConfirm,closeValPop,ppDescToggle,ppRvMore,openMyOrders,closeMyOrders,myoInv,myoFromConfirm,onDelChk,tgDownloadInvoice});
+Object.assign(window,{copyProdLink,loadMore,ppGo,ppSize,ppColor,ppQty,ppAdd,ppHeart,ppRate,ppToggleForm,ppSubmitReview,showMini,hideMini,toggleHelp,toggleMobileMenu,nextHeroSlide,prevHeroSlide,goToHeroSlide,filterCategory,goShop,handleSearch,setSort,resetFilters,openProduct,closeProduct,addToCart,cartQty,removeItem,toggleCartDrawer,toggleWishlist,toggleWishlistModal,openAccount,closeAuth,setAuthTab,submitAuth,googleSignIn,doSignOut,startCheckout,closeCheckout,setPayM,onDist,applyPromo,useMyLocation,showLastInv,showMyInv,showInvoice,openTrack,closeTrack,doTrack,copyNum,chkTrx,updateCheckoutTotals,placeOrder,setArea,coQty,coRemove,closeConfirm,closeValPop,ppDescToggle,ppRvMore,openMyOrders,closeMyOrders,myoInv,myoFromConfirm,onDelChk,tgDownloadInvoice});
 
 /* ================= HANGER RAIL (settings/rail_1 … rail_6 — অ্যাডমিন > হ্যাঙ্গার) ================= */
 const RAIL_N=6, RAIL={items:[],ready:false,idx:-1,inView:false,paused:false,busy:false,timer:null,touchT:0};
@@ -4123,6 +4159,15 @@ html body footer .pt-6{max-width:900px;margin-left:auto;margin-right:auto}
 .bfx-off{position:absolute;top:10px;left:10px;z-index:3;padding:4px 10px;border-radius:999px;background:#0d0d0d;color:#fff;font-weight:800;font-size:12px}
 .bfx-bdg{position:absolute;left:10px;bottom:10px;z-index:3;padding:3px 9px;border-radius:8px;background:#fff;color:#0d0d0d;font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 2px 6px rgba(0,0,0,.15)}
 .bfx-heart{position:absolute;top:10px;right:10px;z-index:3;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#333;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:transform .2s}
+/* copy-product-link button: sits right under the wishlist heart on every product card */
+.bf-lk{position:absolute;top:35px;right:5px;z-index:11;width:24px;height:24px;min-width:0;border-radius:50%;border:0;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.72);color:#1f2937;font-size:10.5px;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.14);-webkit-tap-highlight-color:transparent;transition:transform .18s,background .18s,color .18s}
+.bf-lk::after{content:"";position:absolute;inset:-3px}
+.bf-lk:hover{background:#fff;transform:scale(1.1)}
+.bf-lk:active{transform:scale(.9)}
+.bf-lk.ok{background:#16a34a;color:#fff;transform:scale(1.1)}
+.bf-lkpp{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid #e2e8f0;background:#fff;color:#334155;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s;-webkit-tap-highlight-color:transparent}
+.bf-lkpp:hover{border-color:#0d0d0d;color:#0d0d0d}
+.bf-lkpp.ok{background:#16a34a;border-color:#16a34a;color:#fff}
 .bfx-heart.on{color:#f43f5e}.bfx-heart:active{transform:scale(.9)}
 .bfx-img .pdots{position:absolute;right:10px;bottom:12px;z-index:3;display:flex;gap:4px}
 .bfx-img .pdot{width:6px;height:6px;border-radius:9px;background:rgba(255,255,255,.55);transition:width .4s,background .4s}
