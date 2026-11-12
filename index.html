@@ -1657,7 +1657,7 @@ html.bf-lock{overflow:hidden!important}
               <div class="co-field"><i class="fa-solid fa-mobile-screen-button fi"></i><input id="coSender" inputmode="tel" class="co-in" placeholder="আপনার সেন্ডার নম্বর (01XXXXXXXXX)"></div>
               <div class="co-field"><i class="fa-solid fa-hashtag fi"></i><input id="coTrx" class="co-in uc" placeholder="Transaction ID (TrxID)" oninput="chkTrx()"></div>
               <div id="coTrxErr" class="text-[11px] font-extrabold text-red-400"></div>
-              <div class="text-[11px] text-silver-400">প্রতিটি TrxID শুধু একবার ব্যবহার করা যাবে।</div>
+              <div class="text-[11px] text-silver-400">আপনার পেমেন্ট আমরা পরে যাচাই করে নেব, এখন অর্ডার সাথে সাথে কনফার্ম হবে।</div>
             </div>
           </div>
           <div class="co-tag"><i class="fa-solid fa-truck-fast text-gold-400 text-lg"></i><div class="leading-relaxed"><b>ডেলিভারি চার্জ</b><div class="mt-0.5">ঢাকার ভিতরে: <span id="noteIn" class="text-gold-400 font-bold"></span> &nbsp;|&nbsp; ঢাকার বাইরে: <span id="noteOut" class="text-gold-400 font-bold"></span></div><div id="noteFree" class="text-silver-400 mt-0.5"></div></div></div>
@@ -1849,7 +1849,6 @@ const state = { products:[],loaded:false,rvUnsub:null, cart:[], wishlist:[], cat
 const $ = id => document.getElementById(id);
 const money = n => 'Tk ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:(Number(n)%1?2:0),maximumFractionDigits:2});
 const esc = s => String((s&&typeof s==='object'&&!Array.isArray(s))?(s.bn||s.label||s.name||s.title||''):(s ?? '')).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const jsArg = v => esc(JSON.stringify(String(v ?? '')));
 const save = (k,v) => { try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} };
 const load = (k,d) => { try{const v=JSON.parse(localStorage.getItem(k)); return v ?? d}catch(e){return d} };
 /* show the admin's categories instantly from the last visit (the live list from the admin panel replaces them as soon as it loads) */
@@ -2182,7 +2181,7 @@ function buildCatRowCore(){ const r=$('catRow'); if(!r) return;
   _catSig=sig; delete r.dataset.sk;
   r.innerHTML=list.map((c,i)=>{ const name=catLabel(c)||String(c.id||''); const n=cnt(c);
     const pr=state.products.find(p=>p.category===c.id); const im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
-    return `<div onclick="goShop(${jsArg(c.id)})" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
+    return `<div onclick="goShop('${esc(c.id)}')" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
   if(catsInView||_catsPlayed) playCats(); }
 /* ===== categories: 4 per row, 2 rows (8) first, then an "আরো দেখুন" button reveals the rest ===== */
 let _catExp=false;
@@ -2211,7 +2210,7 @@ function bfcList(){
 }
 function bfcItem(c,i){
   const name=catLabel(c)||String(c.id||''), pr=(state.products||[]).find(p=>inCategory(p,c.id)), im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
-  return `<button type="button" class="bfc-item" style="--i:${i}" onclick="bfcPick(${jsArg(c.id)})" aria-label="${esc(name)}"><span class="bfc-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span class="bfc-nm">${esc(name)}</span></button>`;
+  return `<button type="button" class="bfc-item" style="--i:${i}" onclick="bfcPick('${esc(c.id)}')" aria-label="${esc(name)}"><span class="bfc-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span class="bfc-nm">${esc(name)}</span></button>`;
 }
 function bfcFill(){ const g=$('bfsGrid'); if(g) g.innerHTML=_bfcAll.map(bfcItem).join(''); const t=$('bfsCount'); if(t) t.textContent=bnum(_bfcAll.length)+' টি ক্যাটাগরি'; }
 function bfcRender(){
@@ -2365,7 +2364,8 @@ function copyProdLink(id,btn,ev){
   const fallback=()=>{ const t=document.createElement('textarea'); t.value=url; t.setAttribute('readonly',''); t.style.cssText='position:fixed;top:0;left:0;opacity:0'; document.body.appendChild(t); t.focus(); t.select(); try{ t.setSelectionRange(0,url.length); }catch(e){} let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} t.remove(); if(ok) done(); else window.prompt('লিংকটি কপি করে নিন:',url); };
   if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(url).then(done,fallback); else fallback();
 }
-let trxT; function chkTrx(){ clearTimeout(trxT); const el=$('coTrxErr'); if(el) el.textContent=''; /* no pre-check any more: the order is placed straight away; duplicate TrxID is still blocked at save time by the trx/{TrxID} write */ }
+/* TrxID is NOT verified at checkout any more: any value is accepted, admin checks the payment later */
+let trxT; function chkTrx(){ const el=$('coTrxErr'); if(el) el.textContent=''; }
 async function verifyOrder(){ const id=new URLSearchParams(location.search).get('verify'); if(!id||!FIREBASE_READY) return; let r=null; try{ const sn=await getDoc(doc(db,'receipts',id)); if(sn.exists()) r=sn.data(); }catch(e){}
   const w=document.createElement('div'); w.className='fixed inset-0 z-[130] bg-black/85 flex items-center justify-center p-4';
   w.innerHTML=`<div class="pop bg-white rounded-3xl p-8 max-w-sm w-full text-center"><div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${r?'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-500'}"><i class="fa-solid ${r?'fa-circle-check':'fa-circle-xmark'}"></i></div><h3 class="font-display font-extrabold text-xl mt-3">${r?'Order Verified':'Invalid Order'}</h3>${r?`<div class="mt-3 p-3 rounded-xl bg-slate-100 text-xs space-y-1"><div>অর্ডার আইডি: <b class="font-mono">${esc(r.orderId)}</b></div><div>কাস্টমার: <b>${esc(r.name||'')}</b></div><div>স্ট্যাটাস: <b class="uppercase text-gold-600">${esc(r.status)}</b></div><div>মোট: <b>${money(r.total)}</b></div></div>`:`<p class="text-xs text-slate-500 mt-2">No order found with this ID: ${esc(id)}</p>`}<button onclick="this.closest('.fixed').remove()" class="mt-5 w-full py-3 rounded-xl btn-gold font-extrabold text-xs">Close</button></div>`; document.body.appendChild(w); }
@@ -2416,7 +2416,7 @@ function renderEid(){ const st=state.site||{}, list=state.products.filter(p=>p.e
   $('eidTitle').textContent=st.eidTitle||'ঈদ কালেকশন'; $('eidSub').textContent=st.eidSub||'Celebrate Eid in style - handpicked festive collection';
   $('eidGrid').innerHTML=list.map((p,i)=>`<div class="eid-card rounded-2xl overflow-hidden cursor-pointer reveal in" style="animation:fadeUp .6s ${(i%4)*.08}s backwards" onclick="openProduct('${p.id}')"><div class="aspect-[4/5] overflow-hidden relative bg-ink-800"><img src="${esc(CLX(p.image,800))}" alt="" loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"><span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-gold-500 text-black font-extrabold text-[10px]"><i class="fa-solid fa-moon mr-1"></i>EID</span></div><div class="p-3"><div class="text-white font-bold text-sm truncate">${esc(p.title)}</div><div class="mt-1 flex items-center gap-2"><span class="text-gold-400 font-extrabold">${money(p.price)}</span>${p.oldPrice?`<span class="text-[11px] text-white/40 line-through">${money(p.oldPrice)}</span>`:''}</div></div></div>`).join(''); }
 function renderMenu(){ const nav=$('mobileNav'); if(!nav) return; const st=state.site||{};
-  const it=[['#hero','হোম','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'ঈদ কালেকশন','fa-moon','']]:[]),['#shop','সব পণ্য','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory(${jsArg(c.id)});`]),['javascript:void(0)','আপনার অর্ডার','fa-receipt','openMyOrders();'],['javascript:void(0)','অর্ডার ট্র্যাক করুন','fa-truck-fast','openTrack();'],['#about','আমাদের কথা','fa-circle-info',''],['#helpline','হেল্পলাইন','fa-headset','']];
+  const it=[['#hero','হোম','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'ঈদ কালেকশন','fa-moon','']]:[]),['#shop','সব পণ্য','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory('${c.id}');`]),['javascript:void(0)','আপনার অর্ডার','fa-receipt','openMyOrders();'],['javascript:void(0)','অর্ডার ট্র্যাক করুন','fa-truck-fast','openTrack();'],['#about','আমাদের কথা','fa-circle-info',''],['#helpline','হেল্পলাইন','fa-headset','']];
   nav.innerHTML=it.map((x,i)=>`<a href="${x[0]}" onclick="${x[3]}toggleMobileMenu()" style="--i:${i}" class="mnav flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-gold-400 ${x[0]==='#helpline'?'text-gold-400':''}"><i class="fa-solid ${x[2]} w-5 text-center text-gold-400/80"></i>${esc(x[1])}</a>`).join(''); }
 function flyToCart(src){
   const bag=$('cartBadge').parentElement, t=bag.getBoundingClientRect();
@@ -2842,7 +2842,7 @@ async function placeOrder(e){
   e.preventDefault(); if(!checkoutItems().length){ toast('আপনার ব্যাগ খালি',false); return; }
   const phone=validateOrderForm(); if(!phone) return;      /* wrong/missing phone or incomplete address -> pop-up, nothing is submitted */
   let pay=null; if(state.payM&&state.payM!=='cod'&&shipCost()>0){ const sender=$('coSender').value.replace(/[\s-]/g,''), trx=$('coTrx').value.trim().toUpperCase();
-    if(!/^01[3-9]\d{8}$/.test(sender)||!/^[A-Z0-9]{6,20}$/.test(trx)){ toast('আপনার সেন্ডার নম্বর ও TrxID দিন',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
+    if(!/^01[3-9]\d{8}$/.test(sender)||trx.length<3||trx.length>40){ toast('আপনার সেন্ডার নম্বর ও TrxID দিন',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
   const btn=$('coSubmit'); btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i>অর্ডার হচ্ছে...';
   /* wait for the (anonymous) Firebase session so the order is written with a real uid / auth */
   if(FIREBASE_READY){ try{ await Promise.race([authReady,new Promise(r=>setTimeout(r,4000))]); if(auth&&auth.currentUser) state.user={uid:auth.currentUser.uid,name:'',email:''}; }catch(e){} }
@@ -2851,7 +2851,7 @@ async function placeOrder(e){
   const order={orderId,uid,email:(state.user&&state.user.email)||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,district:$('coDist').value,division:$('coDiv').value,upazila:$('coUp').value,address:$('coAddress').value.trim(),geo:$('coLat').value?{lat:+$('coLat').value,lng:+$('coLng').value}:null,note:$('coNote').value.trim(),
     items:checkoutItems().map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,discount:disc,promo:(disc&&state.promo)?{code:state.promo.code,type:state.promo.type,value:state.promo.value}:null,delivery:ship,total:sub-disc+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
   try{
-    if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); bt.set(doc(db,'rl',uid),{t:serverTimestamp()}); if(pay) bt.set(doc(db,'trx',pay.trxId),{uid:uid,orderId,at:serverTimestamp()}); bt.set(doc(db,'receipts',orderId),{orderId,uid:uid,status:'pending',total:order.total,name:(order.customerName||'').split(' ')[0],createdAt:serverTimestamp()}); if(disc&&state.promo){ bt.update(doc(db,'promos',state.promo.code),{used:increment(1)}); bt.set(doc(db,'promoUses',state.promo.code+'_'+uid),{uid:uid,orderId,at:serverTimestamp()}); } await bt.commit(); }
+    if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); bt.set(doc(db,'rl',uid),{t:serverTimestamp()}); bt.set(doc(db,'receipts',orderId),{orderId,uid:uid,status:'pending',total:order.total,name:(order.customerName||'').split(' ')[0],createdAt:serverTimestamp()}); if(disc&&state.promo){ bt.update(doc(db,'promos',state.promo.code),{used:increment(1)}); bt.set(doc(db,'promoUses',state.promo.code+'_'+uid),{uid:uid,orderId,at:serverTimestamp()}); } await bt.commit(); }
     else { const all=load('bana_orders',[]); all.push({...order,createdAt:new Date().toISOString()}); save('bana_orders',all); }
     /* ---- order is saved in the database from here on ---- */
     try{
@@ -3768,20 +3768,20 @@ html body #header input{background:#f1f1f1!important;color:#111!important;border
 html body #header .bg-gold-500,html body #header .btn-gold{background:#0d0d0d!important;color:#fff!important}
 /* banners */
 html body #hero{height:auto!important;background:#fff!important;padding:14px 12px 0;overflow:visible!important}
-.bnr-wrap{position:relative;max-width:900px;margin:0 auto;aspect-ratio:16/9;min-height:0;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.12);border:1px solid #eee}
-/* banners are 16:9 (YouTube-thumbnail ratio) on every screen — upload 1600x900 */
+.bnr-wrap{position:relative;max-width:900px;margin:0 auto;aspect-ratio:2.55/1;min-height:150px;border-radius:22px;overflow:hidden;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.12);border:1px solid #eee}
+@media(min-width:768px){.bnr-wrap{aspect-ratio:3.1/1}}
 .bnr{position:absolute;inset:0;background:linear-gradient(105deg,#fff 0 46%,#ececec 46% 52%,#fff 52%);display:flex;align-items:center}
 .bnr-txt{position:relative;z-index:2;padding:0 0 0 clamp(14px,4vw,34px);max-width:56%}
-.bnr-h{font-family:'Syne','Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(20px,5.4vw,46px);line-height:1.05;color:#0d0d0d;letter-spacing:.01em}
-.bnr-p{margin:8px 0 14px;font-weight:600;font-size:clamp(12px,3.4vw,23px);line-height:1.3;color:#1a1a1a;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif}
-.bnr-btn,.bn-wbtn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:999px;font-weight:800;font-size:clamp(11px,3vw,15px);text-decoration:none;cursor:pointer;white-space:nowrap}
+.bnr-h{font-family:'Syne','Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(17px,4.6vw,32px);line-height:1.05;color:#0d0d0d;letter-spacing:.01em}
+.bnr-p{margin:6px 0 10px;font-weight:600;font-size:clamp(11px,3vw,17px);line-height:1.3;color:#1a1a1a;font-family:'Hind Siliguri','Plus Jakarta Sans',sans-serif}
+.bnr-btn,.bn-wbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:999px;font-weight:800;font-size:clamp(10.5px,2.8vw,13px);text-decoration:none;cursor:pointer;white-space:nowrap}
 .bnr-btn{background:#0d0d0d;color:#fff}.bn-wbtn{background:#fff;color:#0d0d0d}
 .bnr-photo{position:absolute;right:0;top:0;bottom:0;width:60%;clip-path:polygon(22% 0,100% 0,100% 100%,0 100%)}
 .bnr-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(.15) contrast(1.05)}
 .bnr-black{position:absolute;right:0;top:0;bottom:0;width:52%;background:#0d0d0d;clip-path:polygon(24% 0,100% 0,100% 100%,0 100%);display:flex;align-items:center;justify-content:center;padding-left:14%}
-.bnr-logo{width:clamp(80px,25vw,200px);aspect-ratio:1;border-radius:50%;background:#000;border:3px solid #fff;box-shadow:0 0 0 6px rgba(255,255,255,.14);overflow:hidden}
+.bnr-logo{width:clamp(64px,19vw,130px);aspect-ratio:1;border-radius:50%;background:#000;border:3px solid #fff;box-shadow:0 0 0 6px rgba(255,255,255,.14);overflow:hidden}
 .bnr-logo img{width:100%;height:100%;object-fit:contain}
-.bnr-spark{position:absolute;right:12%;top:14%;color:#fff;font-size:clamp(18px,4.6vw,34px)}
+.bnr-spark{position:absolute;right:12%;top:14%;color:#fff;font-size:clamp(14px,3.6vw,24px)}
 .bnr-dots{display:flex;justify-content:center;gap:8px;margin:10px 0 2px}
 .bnr-dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid #0d0d0d;cursor:pointer;transition:all .25s}.bnr-dots i.on{background:#0d0d0d}
 /* stats */
