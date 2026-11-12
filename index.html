@@ -2131,8 +2131,15 @@ async function loadBanners(){
 }
 
 /* ===== ADMIN-LINKED: site settings, categories, payment ===== */
+/* payment numbers + logos from admin: wait for the (anonymous) login first, then listen live; retries if the first read is refused */
+let _payUnsub=null,_payTry=0;
+async function payWatch(){ if(!FIREBASE_READY||_payUnsub) return;
+  try{ await Promise.race([authReady,new Promise(r=>setTimeout(r,4000))]); }catch(e){}
+  try{ _payUnsub=onSnapshot(doc(db,'settings','payment'),s=>{ state.payCfg=s.exists()?s.data():{}; state.payErr=''; try{ renderPay(); }catch(e){} },
+    err=>{ state.payErr=err&&err.code||'err'; console.warn('payment settings read failed ['+state.payErr+'] - Firestore rules must allow read on /settings/payment'); _payUnsub=null; if(_payTry++<3) setTimeout(payWatch,4000); }); }catch(e){} }
 async function loadSite(){
   if(!FIREBASE_READY) return;
+  payWatch();
   const [_rs,_rp,_rc]=await Promise.all([getDoc(doc(db,'settings','site')).catch(()=>null),getDoc(doc(db,'settings','payment')).catch(()=>null),getDocs(collection(db,'categories')).catch(()=>null)]);   /* 3 requests at once instead of one after another */
   try{ if(_rs&&_rs.exists()) state.site=_rs.data(); }catch(e){}
   try{ if(_rp&&_rp.exists()) state.payCfg=_rp.data(); }catch(e){}
@@ -2239,23 +2246,32 @@ function bnFix(){ const BN=/[\u0980-\u09FF]/, SKIP=/^(SCRIPT|STYLE)$/;
   new MutationObserver(ms=>{ for(const m of ms){ const el=m.target.nodeType===1?m.target:m.target.parentElement; if(el&&el.closest&&el.closest('.counter,#preloader')) continue; if(m.type==='characterData') q.add(m.target); else m.addedNodes.forEach(x=>q.add(x)); }
     if(!q.size) return; clearTimeout(t); t=setTimeout(()=>{ const a=[...q]; q=new Set(); a.forEach(scan); },200); }).observe(document.body,{childList:true,subtree:true,characterData:true}); }
 
-function payIcon(k,m){ if(k==='cod') return '<span class="w-9 h-9 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-money-bill-wave"></i></span>';
-  if(m&&m.logo) return `<img src="${esc(m.logo)}" class="w-9 h-9 rounded-lg object-contain bg-white shrink-0">`;
-  const c=PCOL[k]||['#555',String(k).toUpperCase()]; return `<span class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-extrabold text-[9px] shrink-0" style="background:${c[0]}">${c[1]}</span>`; }
+function payIcon(k,m){ if(k==='cod') return '<span class="co-ico co-ico-cod"><i class="fa-solid fa-money-bill-wave"></i></span>';
+  const c=PCOL[k]||['#555',String(k).toUpperCase()];
+  const badge=`<span class="co-ico co-ico-badge" style="background:${c[0]}">${c[1]}</span>`;
+  if(m&&m.logo){ const fb=badge.replace(/"/g,'&quot;'); return `<span class="co-ico co-ico-logo"><img src="${esc(m.logo)}" alt="${esc(c[1])}" loading="lazy" decoding="async" onerror="this.parentNode.outerHTML=this.dataset.fb" data-fb="${fb}"></span>`; }
+  return badge; }
+/* delivery charge must be paid online first whenever it is > 0 and at least one wallet number is saved in admin */
+function advMandatory(){ const cfg=state.payCfg||{}; return shipCost()>0 && ['bkash','nagad','rocket','upay'].some(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false); }
 function renderPay(){ const cfg=state.payCfg||{}, ship=shipCost(), free=ship===0;
   const isOn=k=>!!(cfg[k]&&cfg[k].number&&cfg[k].on!==false);               /* number saved in admin panel */
   const mfs=['bkash','nagad'].concat(['rocket','upay'].filter(isOn));        /* bKash & Nagad cards always show */
   const act=mfs.filter(isOn);
   if(free&&state.payM&&state.payM!=='cod') state.payM='cod';
-  const req=!!(state.site&&state.site.requireAdvance&&act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
+  const req=!!(act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
   if(state.payM&&state.payM!=='cod'&&!act.includes(state.payM)) state.payM='cod';
   state.payM=state.payM||'cod';
   $('coPayOpts').innerHTML=(req?[]:['cod']).concat(mfs).map(k=>{
     const ready=k==='cod'||isOn(k), on=state.payM===k, dis=!ready||(free&&k!=='cod');
-    const sub=k==='cod'?'পণ্য হাতে পেয়ে টাকা দিন':(!ready?'শীঘ্রই আসছে':(free?'ফ্রি ডেলিভারি':'ডেলিভারি চার্জ অগ্রিম'));
+    const sub=k==='cod'?'পণ্য হাতে পেয়ে টাকা দিন':(!ready?(state.payErr?'লোড হয়নি, রিফ্রেশ দিন':'শীঘ্রই আসছে'):(free?'ফ্রি ডেলিভারি':'ডেলিভারি চার্জ অগ্রিম'));
     return `<button type="button" ${dis?'disabled':`onclick="setPayM('${k}')"`} class="co-pay ${on?'on':''} ${dis?'dis':''}" role="radio" aria-checked="${on}">${payIcon(k,cfg[k])}<span class="leading-tight">${k==='cod'?'ক্যাশ অন ডেলিভারি':(PCOL[k]||[0,k])[1]}<small>${sub}</small></span><i class="fa-solid fa-circle-check co-chk"></i></button>`; }).join('');
   const adv=state.payM!=='cod'; $('coPayInfo').classList.toggle('hidden',!adv);
-  $('coPayMsg').innerHTML=adv?`অনুগ্রহ করে ডেলিভারি চার্জ <b>${money(ship)}</b> ${(PCOL[state.payM]||[0,state.payM])[1]} নম্বরে <b>Send Money</b> করুন: <b class="text-base select-all">${esc(cfg[state.payM].number)}</b> <button type="button" onclick="copyNum('${esc(cfg[state.payM].number)}')" class="ml-1 px-2.5 py-1 rounded-lg bg-ink-900 border border-gold-500/50 text-gold-400 text-[11px] font-extrabold"><i class="fa-regular fa-copy mr-1"></i>কপি</button>। তারপর নিচে আপনার নম্বর ও TrxID দিন। বাকি টাকা ক্যাশ অন ডেলিভারিতে দেবেন।`:'';
+  const _pn=adv&&cfg[state.payM]?String(cfg[state.payM].number||''):'', _pl=(PCOL[state.payM]||[0,state.payM])[1], _dh=($('coArea')&&$('coArea').value==='dhaka');
+  $('coPayMsg').innerHTML=adv?`<div class="co-pm"><div class="co-pm-amt"><span>${_dh?'ঢাকার ভিতরে ডেলিভারি চার্জ':'ঢাকার বাইরে ডেলিভারি চার্জ'}<small>এই টাকাটি আগে পাঠাতে হবে</small></span><b>${money(ship)}</b></div>
+    <div class="co-pm-steps"><div><i>১</i><span>${_pl} অ্যাপ/ডায়াল থেকে নিচের নম্বরে <b>Send Money</b> করুন</span></div></div>
+    <div class="co-pm-num"><div><small>${_pl} নম্বর (Personal)</small><b class="select-all">${esc(_pn)}</b></div><button type="button" onclick="copyNum('${esc(_pn)}')" aria-label="নম্বর কপি"><i class="fa-regular fa-copy"></i>কপি</button></div>
+    <div class="co-pm-steps"><div><i>২</i><span>পাঠানো শেষে যে নম্বর থেকে পাঠালেন সেটি ও <b>TrxID</b> নিচে দিন</span></div></div>
+    <div class="co-pm-note">বাকি টাকা পণ্য হাতে পেয়ে ক্যাশ অন ডেলিভারিতে দেবেন।</div></div>`:'';
   try{ syncDelChk(); }catch(e){}
 }
 function setPayM(k){ state.payM=k; renderPay(); }
@@ -2804,7 +2820,7 @@ function validateOrderForm(){
 ['coName','coPhone','coDist','coAddress'].forEach(id=>document.addEventListener('input',e=>{ if(e.target&&e.target.id===id) e.target.classList.remove('bad'); }));
 document.addEventListener('input',e=>{ if(e.target&&e.target.id==='coPhone'){ const v=BN2EN(e.target.value); if(v!==e.target.value) e.target.value=v; } });
 function shipCost(){ return subtotal()>=FREE_SHIP ? 0 : SHIP[$('coArea').value]; }
-function updateCheckoutTotals(){ renderArea(); try{ renderPay(); }catch(err){ console.error('renderPay:',err); }
+function updateCheckoutTotals(){ try{ payWatch(); }catch(e){} renderArea(); try{ renderPay(); }catch(err){ console.error('renderPay:',err); }
   { const n=checkoutItems().reduce((a,i)=>a+i.qty,0); if($('coCnt')) $('coCnt').textContent=bnum(n)+' টি পণ্য'; if($('coShipLbl')) $('coShipLbl').textContent='ডেলিভারি ('+(($('coArea').value||'dhaka')==='dhaka'?'ঢাকার ভেতরে':'ঢাকার বাইরে')+')'; } const s=subtotal(),sh=shipCost(); $('coSub').textContent=money(s); $('coShip').textContent=sh?money(sh):'ফ্রি'; if(state.promo&&s<(state.promo.minOrder||0)){ state.promo=null; $('promoMsg').textContent=''; } const dc=discAmt(); $('coDiscRow').classList.toggle('hidden',!dc); $('coDisc').textContent='-'+money(dc); if(state.promo) $('coDiscCode').textContent=state.promo.code; $('coTotal').textContent=money(s-dc+sh);
   $('noteIn').textContent=money(SHIP.dhaka); $('noteOut').textContent=money(SHIP.outside); $('noteFree').textContent=sh===0?'আপনার ডেলিভারি ফ্রি — অগ্রিম পেমেন্ট লাগবে না।':(FREE_SHIP<99999999?money(FREE_SHIP)+' এর বেশি অর্ডারে ডেলিভারি ফ্রি।':''); }
 const BD={"Dhaka":"Adabor,Badda,Banani,Bangshal,Bimanbandar,Cantonment,Chawkbazar,Dakshinkhan,Darus Salam,Demra,Dhamrai,Dhanmondi,Dohar,Gendaria,Gulshan,Hazaribagh,Jatrabari,Kadamtali,Kafrul,Kalabagan,Kamrangirchar,Keraniganj,Khilgaon,Khilkhet,Kotwali,Lalbagh,Mirpur,Mohammadpur,Motijheel,Nawabganj,New Market,Pallabi,Paltan,Ramna,Rampura,Sabujbagh,Savar,Shahbagh,Shyampur,Sutrapur,Tejgaon,Turag,Uttara,Uttar Khan,Wari","Gazipur":"Gazipur Sadar,Kaliakair,Kaliganj,Kapasia,Sreepur,Tongi","Narayanganj":"Araihazar,Bandar,Narayanganj Sadar,Rupganj,Sonargaon","Narsingdi":"Belabo,Monohardi,Narsingdi Sadar,Palash,Raipura,Shibpur","Manikganj":"Daulatpur,Ghior,Harirampur,Manikganj Sadar,Saturia,Shivalaya,Singair","Munshiganj":"Gazaria,Lohajang,Munshiganj Sadar,Sirajdikhan,Sreenagar,Tongibari","Faridpur":"Alfadanga,Bhanga,Boalmari,Charbhadrasan,Faridpur Sadar,Madhukhali,Nagarkanda,Sadarpur,Saltha","Gopalganj":"Gopalganj Sadar,Kashiani,Kotalipara,Muksudpur,Tungipara","Madaripur":"Kalkini,Madaripur Sadar,Rajoir,Shibchar","Rajbari":"Baliakandi,Goalanda,Kalukhali,Pangsha,Rajbari Sadar","Shariatpur":"Bhedarganj,Damudya,Gosairhat,Naria,Shariatpur Sadar,Zajira","Tangail":"Basail,Bhuapur,Delduar,Dhanbari,Ghatail,Gopalpur,Kalihati,Madhupur,Mirzapur,Nagarpur,Sakhipur,Tangail Sadar","Kishoreganj":"Austagram,Bajitpur,Bhairab,Hossainpur,Itna,Karimganj,Katiadi,Kishoreganj Sadar,Kuliarchar,Mithamain,Nikli,Pakundia,Tarail","Chattogram":"Anwara,Banshkhali,Boalkhali,Chandanaish,Chattogram City,Fatikchhari,Hathazari,Karnaphuli,Lohagara,Mirsharai,Patiya,Rangunia,Raozan,Sandwip,Satkania,Sitakunda","Cox's Bazar":"Chakaria,Cox's Bazar Sadar,Eidgaon,Kutubdia,Maheshkhali,Pekua,Ramu,Teknaf,Ukhia","Cumilla":"Barura,Brahmanpara,Burichang,Chandina,Chauddagram,Cumilla Sadar,Cumilla Sadar Dakshin,Daudkandi,Debidwar,Homna,Laksam,Lalmai,Meghna,Monohorgonj,Muradnagar,Nangalkot,Titas","Feni":"Chhagalnaiya,Daganbhuiyan,Feni Sadar,Fulgazi,Parshuram,Sonagazi","Brahmanbaria":"Akhaura,Ashuganj,Bancharampur,Bijoynagar,Brahmanbaria Sadar,Kasba,Nabinagar,Nasirnagar,Sarail","Noakhali":"Begumganj,Chatkhil,Companiganj,Hatiya,Kabirhat,Noakhali Sadar,Senbagh,Sonaimuri,Subarnachar","Lakshmipur":"Kamalnagar,Lakshmipur Sadar,Raipur,Ramganj,Ramgati","Chandpur":"Chandpur Sadar,Faridganj,Haimchar,Haziganj,Kachua,Matlab Dakshin,Matlab Uttar,Shahrasti","Khagrachhari":"Dighinala,Khagrachhari Sadar,Lakshmichhari,Mahalchhari,Manikchhari,Matiranga,Panchhari,Ramgarh","Rangamati":"Baghaichhari,Barkal,Belaichhari,Juraichhari,Kaptai,Kawkhali,Langadu,Naniarchar,Rajasthali,Rangamati Sadar","Bandarban":"Alikadam,Bandarban Sadar,Lama,Naikhongchhari,Rowangchhari,Ruma,Thanchi","Rajshahi":"Bagha,Bagmara,Charghat,Durgapur,Godagari,Mohanpur,Paba,Puthia,Rajshahi City,Tanore","Chapainawabganj":"Bholahat,Gomastapur,Nachole,Nawabganj Sadar,Shibganj","Naogaon":"Atrai,Badalgachhi,Dhamoirhat,Mahadebpur,Manda,Naogaon Sadar,Niamatpur,Patnitala,Porsha,Raninagar,Sapahar","Natore":"Bagatipara,Baraigram,Gurudaspur,Lalpur,Naldanga,Natore Sadar,Singra","Pabna":"Atgharia,Bera,Bhangura,Chatmohar,Faridpur,Ishwardi,Pabna Sadar,Santhia,Sujanagar","Sirajganj":"Belkuchi,Chauhali,Kamarkhanda,Kazipur,Raiganj,Shahjadpur,Sirajganj Sadar,Tarash,Ullahpara","Bogura":"Adamdighi,Bogura Sadar,Dhunat,Dhupchanchia,Gabtali,Kahaloo,Nandigram,Sariakandi,Shajahanpur,Sherpur,Shibganj,Sonatola","Joypurhat":"Akkelpur,Joypurhat Sadar,Kalai,Khetlal,Panchbibi","Khulna":"Batiaghata,Dacope,Dighalia,Dumuria,Khulna City,Koyra,Paikgachha,Phultala,Rupsha,Terokhada","Bagerhat":"Bagerhat Sadar,Chitalmari,Fakirhat,Kachua,Mollahat,Mongla,Morrelganj,Rampal,Sarankhola","Satkhira":"Assasuni,Debhata,Kalaroa,Kaliganj,Satkhira Sadar,Shyamnagar,Tala","Jashore":"Abhaynagar,Bagherpara,Chaugachha,Jashore Sadar,Jhikargachha,Keshabpur,Manirampur,Sharsha","Jhenaidah":"Harinakunda,Jhenaidah Sadar,Kaliganj,Kotchandpur,Maheshpur,Shailkupa","Magura":"Magura Sadar,Mohammadpur,Shalikha,Sreepur","Narail":"Kalia,Lohagara,Narail Sadar","Kushtia":"Bheramara,Daulatpur,Khoksa,Kumarkhali,Kushtia Sadar,Mirpur","Chuadanga":"Alamdanga,Chuadanga Sadar,Damurhuda,Jibannagar","Meherpur":"Gangni,Meherpur Sadar,Mujibnagar","Barishal":"Agailjhara,Babuganj,Bakerganj,Banaripara,Barishal Sadar,Gournadi,Hizla,Mehendiganj,Muladi,Wazirpur","Bhola":"Bhola Sadar,Burhanuddin,Char Fasson,Daulatkhan,Lalmohan,Manpura,Tazumuddin","Jhalokati":"Jhalokati Sadar,Kathalia,Nalchity,Rajapur","Patuakhali":"Bauphal,Dashmina,Dumki,Galachipa,Kalapara,Mirzaganj,Patuakhali Sadar,Rangabali","Pirojpur":"Bhandaria,Kawkhali,Mathbaria,Nazirpur,Nesarabad,Pirojpur Sadar,Zianagar","Barguna":"Amtali,Bamna,Barguna Sadar,Betagi,Patharghata,Taltali","Sylhet":"Balaganj,Beanibazar,Bishwanath,Companiganj,Dakshin Surma,Fenchuganj,Golapganj,Gowainghat,Jaintiapur,Kanaighat,Osmani Nagar,Sylhet Sadar,Zakiganj","Moulvibazar":"Barlekha,Juri,Kamalganj,Kulaura,Moulvibazar Sadar,Rajnagar,Sreemangal","Habiganj":"Ajmiriganj,Bahubal,Baniachong,Chunarughat,Habiganj Sadar,Lakhai,Madhabpur,Nabiganj,Shayestaganj","Sunamganj":"Bishwamvarpur,Chhatak,Dakshin Sunamganj,Derai,Dharampasha,Dowarabazar,Jagannathpur,Jamalganj,Sullah,Sunamganj Sadar,Tahirpur","Rangpur":"Badarganj,Gangachara,Kaunia,Mithapukur,Pirgachha,Pirganj,Rangpur Sadar,Taraganj","Dinajpur":"Birampur,Birganj,Biral,Bochaganj,Chirirbandar,Dinajpur Sadar,Fulbari,Ghoraghat,Hakimpur,Kaharole,Khansama,Nawabganj,Parbatipur","Kurigram":"Bhurungamari,Char Rajibpur,Chilmari,Kurigram Sadar,Nageshwari,Phulbari,Rajarhat,Raomari,Ulipur","Lalmonirhat":"Aditmari,Hatibandha,Kaliganj,Lalmonirhat Sadar,Patgram","Nilphamari":"Dimla,Domar,Jaldhaka,Kishoreganj,Nilphamari Sadar,Saidpur","Gaibandha":"Fulchhari,Gaibandha Sadar,Gobindaganj,Palashbari,Sadullapur,Saghata,Sundarganj","Thakurgaon":"Baliadangi,Haripur,Pirganj,Ranisankail,Thakurgaon Sadar","Panchagarh":"Atwari,Boda,Debiganj,Panchagarh Sadar,Tetulia","Mymensingh":"Bhaluka,Dhobaura,Fulbaria,Gaffargaon,Gauripur,Haluaghat,Ishwarganj,Muktagachha,Mymensingh Sadar,Nandail,Phulpur,Tarakanda,Trishal","Jamalpur":"Bakshiganj,Dewanganj,Islampur,Jamalpur Sadar,Madarganj,Melandaha,Sarishabari","Netrokona":"Atpara,Barhatta,Durgapur,Kalmakanda,Kendua,Khaliajuri,Madan,Mohanganj,Netrokona Sadar,Purbadhala","Sherpur":"Jhenaigati,Nakla,Nalitabari,Sherpur Sadar,Sreebardi"};
@@ -2937,10 +2953,10 @@ async function tgDownloadInvoice(){ const L=state.lastTg, o=state.lastOrder, b=$
 /* ---- checkout: "delivery charge paid online" checkbox (drives the existing payment-method + TrxID fields) ---- */
 function onDelChk(){ const chk=$('coDelChk'), cfg=state.payCfg||{};
   if(chk.checked){ const k=['bkash','nagad','rocket','upay'].find(x=>cfg[x]&&cfg[x].number&&cfg[x].on!==false); if(!k){ chk.checked=false; toast('অনলাইন পেমেন্ট এখনো চালু নেই',false); return; } state.payM=(state.payM&&state.payM!=='cod')?state.payM:k; }
-  else { if(state.site&&state.site.requireAdvance&&shipCost()>0){ chk.checked=true; toast('ডেলিভারি চার্জ আগে পরিশোধ করা বাধ্যতামূলক',false); return; } state.payM='cod'; }
+  else { if(advMandatory()){ chk.checked=true; toast('ডেলিভারি চার্জ আগে পরিশোধ করা বাধ্যতামূলক',false); return; } state.payM='cod'; }
   renderPay(); if(chk.checked){ const t=$('coTrx'); if(t) setTimeout(()=>{ try{ $('coPayInfo').scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} },60); } }
-function syncDelChk(){ const chk=$('coDelChk'); if(!chk) return; const free=shipCost()===0; chk.checked=!free&&state.payM!=='cod'; chk.disabled=free; $('coDelChkWrap').classList.toggle('dis',free);
-  $('coDelChkTxt').innerHTML=free?'আপনার ডেলিভারি ফ্রি — অগ্রিম পেমেন্ট লাগবে না':'ডেলিভারি চার্জ অনলাইনে পরিশোধ করেছি<small>বিকাশ/নগদে পাঠিয়ে নিচে ট্রানজেকশন আইডি (TrxID) দিন</small>'; }
+function syncDelChk(){ const chk=$('coDelChk'); if(!chk) return; const free=shipCost()===0; const man=advMandatory(); chk.checked=!free&&state.payM!=='cod'; chk.disabled=free||man; $('coDelChkWrap').classList.toggle('dis',free);
+  $('coDelChkTxt').innerHTML=free?'আপনার ডেলিভারি ফ্রি — অগ্রিম পেমেন্ট লাগবে না':(man?'ডেলিভারি চার্জ অগ্রিম পরিশোধ করুন (বাধ্যতামূলক)<small>নিচে বিকাশ/নগদ বেছে টাকা পাঠিয়ে TrxID দিন</small>':'ডেলিভারি চার্জ অনলাইনে পরিশোধ করেছি<small>বিকাশ/নগদে পাঠিয়ে নিচে ট্রানজেকশন আইডি (TrxID) দিন</small>'); }
 
 /* ================= MISC ================= */
 function toggleMobileMenu(){ const m=$('mobileMenu'); m.classList.toggle('hidden'); if(!m.classList.contains('hidden')){ const n=$('mobileNav'); n.classList.remove('anim'); void n.offsetWidth; n.classList.add('anim'); } }
@@ -4359,5 +4375,46 @@ html body footer .grid>div.space-y-4>:not([hidden])~:not([hidden]){margin-top:10
 html body footer .pt-6{padding:9px 14px!important;margin-top:0!important;border-radius:12px!important;justify-content:center!important;text-align:center;font-size:11.5px;line-height:1.4}
 </style>
 
+
+<style id="bana-co-fix">
+/* ===== checkout: payment logos + bottom bar polish (visual only) ===== */
+html body #checkoutModal .co-pay{gap:12px!important;padding:12px!important;min-height:66px!important;align-items:center!important}
+html body #checkoutModal .co-pay .leading-tight{display:block;min-width:0;line-height:1.25}
+html body #checkoutModal .co-pay small{white-space:normal}
+html body #checkoutModal .co-ico{width:46px;height:46px;border-radius:12px;flex:0 0 46px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box}
+html body #checkoutModal .co-ico-logo{background:#fff!important;border:1px solid #e5e7eb;padding:4px;box-shadow:0 2px 8px -3px rgba(0,0,0,.18)}
+html body #checkoutModal .co-ico-logo img{width:100%;height:100%;object-fit:contain;display:block;border-radius:8px;background:#fff}
+html body #checkoutModal .co-ico-badge{color:#fff;font-weight:800;font-size:11px;letter-spacing:0;text-align:center;line-height:1.1}
+html body #checkoutModal .co-ico-cod{background:#10b981;color:#fff;font-size:18px}
+html body #checkoutModal .co-pay.dis{opacity:1!important}
+html body #checkoutModal .co-pay.dis .leading-tight{opacity:.55}
+html body #checkoutModal .co-pay.dis .co-ico{filter:saturate(.55) opacity(.7)}
+html body #checkoutModal .co-pay.dis .co-ico-logo{filter:none;opacity:.85}
+/* bottom bar: tidy back button + total + confirm */
+html body #checkoutModal .co-mbar{gap:12px!important;align-items:center!important}
+html body #checkoutModal .co-mbar .cow-bk{flex:0 0 52px!important;width:52px!important;height:52px!important;min-height:52px!important;padding:0!important;align-items:center!important;justify-content:center!important;border-radius:16px!important;font-size:17px;line-height:1;transition:transform .2s,background .2s}
+html body #checkoutModal .co-mbar .cow-bk i{display:block;line-height:1;margin:0}
+html body #checkoutModal .co-mbar .cow-bk:active{transform:scale(.94);background:#f3f4f6!important}
+html body #checkoutModal .co-mbar .t{flex:0 0 auto;min-width:78px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+html body #checkoutModal .co-mbar .t small{font-size:11px;line-height:1}
+html body #checkoutModal .co-mbar .t b{font-size:1.2rem;line-height:1.1;white-space:nowrap}
+html body #checkoutModal .co-mbar .cow-go{flex:1 1 auto!important;min-width:0}
+html body #checkoutModal .co-mbar .cow-go .cow-lb{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+</style>
+
+<style id="bana-co-pay">
+html body #checkoutModal .co-pm{display:flex;flex-direction:column;gap:10px;text-align:left}
+html body #checkoutModal .co-pm-amt{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:14px;background:#0D0D0D;color:#fff}
+html body #checkoutModal .co-pm-amt span{font-weight:800;font-size:13px;line-height:1.3}
+html body #checkoutModal .co-pm-amt small{display:block;font-weight:600;font-size:11px;color:#d1d5db;margin-top:2px}
+html body #checkoutModal .co-pm-amt b{color:#fff;font-size:22px;font-weight:800;white-space:nowrap}
+html body #checkoutModal .co-pm-steps>div{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.5;color:#334155}
+html body #checkoutModal .co-pm-steps i{flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:#0D0D0D;color:#fff;font-style:normal;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+html body #checkoutModal .co-pm-num{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:14px;background:#fff;border:1.5px solid #0D0D0D}
+html body #checkoutModal .co-pm-num small{display:block;font-size:11px;color:#64748b;font-weight:600}
+html body #checkoutModal .co-pm-num b{font-size:20px;letter-spacing:.04em;color:#0D0D0D;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+html body #checkoutModal .co-pm-num button{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;background:#0D0D0D;color:#fff;font-weight:800;font-size:12px}
+html body #checkoutModal .co-pm-note{font-size:11.5px;color:#64748b}
+</style>
 </body>
 </html>
