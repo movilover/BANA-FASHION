@@ -2253,13 +2253,13 @@ function payIcon(k,m){ if(k==='cod') return '<span class="co-ico co-ico-cod"><i 
   if(m&&m.logo){ const fb=badge.replace(/"/g,'&quot;'); return `<span class="co-ico co-ico-logo"><img src="${esc(m.logo)}" alt="${esc(c[1])}" loading="lazy" decoding="async" onerror="this.parentNode.outerHTML=this.dataset.fb" data-fb="${fb}"></span>`; }
   return badge; }
 /* delivery charge must be paid online first whenever it is > 0 and at least one wallet number is saved in admin */
-function advMandatory(){ const cfg=state.payCfg||{}; return shipCost()>0 && ['bkash','nagad','rocket','upay'].some(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false); }
+function advMandatory(){ return false; }   /* ডেলিভারি চার্জ অগ্রিম দেওয়া ঐচ্ছিক — বাধ্যতামূলক নয় */
 function renderPay(){ const cfg=state.payCfg||{}, ship=shipCost(), free=ship===0;
   const isOn=k=>!!(cfg[k]&&cfg[k].number&&cfg[k].on!==false);               /* number saved in admin panel */
   const mfs=['bkash','nagad'].concat(['rocket','upay'].filter(isOn));        /* bKash & Nagad cards always show */
   const act=mfs.filter(isOn);
   if(free&&state.payM&&state.payM!=='cod') state.payM='cod';
-  const req=!!(act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
+  const req=false; /* অগ্রিম ঐচ্ছিক: ক্যাশ অন ডেলিভারি সবসময় আছে */
   if(state.payM&&state.payM!=='cod'&&!act.includes(state.payM)) state.payM='cod';
   state.payM=state.payM||'cod';
   $('coPayOpts').innerHTML=(req?[]:['cod']).concat(mfs).map(k=>{
