@@ -1985,7 +1985,9 @@ window.hrTap=hrTap; window.hrHover=hrHover; window.hrOn=hrOn;
 function renderProducts(){
   if(window.__pgDown&&Date.now()-window.__pgDown<1500){ window.__pgPend=1; return; }   /* a press is in progress: redraw right after release, so the tap is never lost */
   const grid=$('productGrid'); renderEid();
-  if(FIREBASE_READY&&!state.loaded){ $('emptyState').classList.add('hidden'); grid.classList.remove('hidden'); grid.innerHTML=Array.from({length:8},()=>'<div class="rounded-2xl overflow-hidden bg-white border border-slate-200"><div class="aspect-[4/5] bg-slate-200 animate-pulse"></div><div class="p-4 space-y-2"><div class="h-3 w-2/3 bg-slate-200 rounded animate-pulse"></div><div class="h-3 w-1/3 bg-slate-200 rounded animate-pulse"></div></div></div>').join(''); return; }
+  if(FIREBASE_READY&&!state.loaded){ $('emptyState').classList.add('hidden'); grid.classList.remove('hidden'); grid.dataset.sk='1';
+    if(state.loadFailed){ grid.innerHTML='<div style="grid-column:1/-1" class="text-center py-10 text-slate-500 text-sm">পণ্যগুলো এখনো লোড হয়নি। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করা হচ্ছে…<div><button type="button" onclick="retryProducts()" class="mt-4 px-5 py-2 rounded-xl bg-ink-900 text-white text-xs font-bold">আবার চেষ্টা করুন</button></div></div>'; return; }
+    grid.innerHTML=Array.from({length:8},()=>'<div class="rounded-2xl overflow-hidden bg-white border border-slate-200"><div class="aspect-[4/5] bg-slate-200 animate-pulse"></div><div class="p-4 space-y-2"><div class="h-3 w-2/3 bg-slate-200 rounded animate-pulse"></div><div class="h-3 w-1/3 bg-slate-200 rounded animate-pulse"></div></div></div>').join(''); return; }
   /* admin "Show on Homepage": the default view (all categories, no search) lists only the selected products; if none is selected yet, everything shows */
   let base=state.products.filter(p=>!p._rail);
   if(state.cat==='all'&&!String(state.q||'').trim()){ const sel=base.filter(p=>p.home===true||p.home==='true'); if(sel.length) base=sel; }
@@ -2020,6 +2022,7 @@ function renderProducts(){
     </div>`;
   };
   state._list=list; state._card=cardHTML;
+  if(grid.dataset.sk){ delete grid.dataset.sk; if(!$('bfInCss')){ const st=document.createElement('style'); st.id='bfInCss'; st.textContent='#productGrid.bf-in>.pcard{animation:bfUp .55s cubic-bezier(.2,.7,.2,1) .2s both}@keyframes bfUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}'; document.head.appendChild(st); } grid.classList.add('bf-in'); setTimeout(()=>grid.classList.remove('bf-in'),1400); }
   grid.innerHTML=list.slice(0,state.limit).map(cardHTML).join('');
   updateLoadMore(); try{ renderHangerRail(base); }catch(e){}
 }
@@ -2082,25 +2085,29 @@ async function loadFirestoreProducts(){
     try{ const c=await Promise.race([PD.cache||Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),700))]);
       if(c&&c.items&&c.items.length){ state.products=c.items.map(_mk); state.loaded=true; _cs=_sig(state.products); renderProducts(); } }catch(e){}
     /* 2) fresh list, already downloading since the first byte (see PRODUCT PREFETCH in <head>) */
-    try{ const it=PD.net?await PD.net:null; if(it){ const oldM=new Map((state.products||[]).map(x=>[x.id,x])); state.products=it.map(x=>{ const q=_mk(x), o=oldM.get(q.id); if(o&&o.images&&o.images.length&&!(q.images&&q.images.length)) q.images=o.images; return q; }); state.fetchOk=true; state._fast=true; } }catch(e){}
-    /* 3) fallback: Firebase SDK, up to 3 attempts */
-    for(let tryN=0;tryN<3&&!state.fetchOk;tryN++){      /* up to 3 attempts so a flaky connection does not leave the shop empty */
+    try{ const it=PD.net?await PD.net:null; if(it&&it.length){ const oldM=new Map((state.products||[]).map(x=>[x.id,x])); state.products=it.map(x=>{ const q=_mk(x), o=oldM.get(q.id); if(o&&o.images&&o.images.length&&!(q.images&&q.images.length)) q.images=o.images; return q; }); state.fetchOk=true; state._fast=true; } }catch(e){}
+    /* 3) fallback: Firebase SDK. First wait (max 4s) for the anonymous sign-in, so the request carries the auth token that the rules may require; then up to 4 attempts */
+    if(!state.fetchOk){ try{ await Promise.race([authReady,new Promise(r=>setTimeout(r,4000))]); }catch(e){} }
+    for(let tryN=0;tryN<4&&!state.fetchOk;tryN++){
       try{
         const snap=await getDocs(collection(db,'products'));
         const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()}));
         state.products=items.map(p=>normProduct({rating:4.5,reviews:0,badge:null,description:'',oldPrice:null,...p})); state.fetchOk=true; state._fast=false; if(PD.save) PD.save(items);
-      }catch(e){ console.warn('Firestore products not loaded (try '+(tryN+1)+'):',e.message); state.products=state.products||[]; if(tryN<2) await new Promise(r=>setTimeout(r,900*(tryN+1))); }
+      }catch(e){ console.warn('Firestore products not loaded (try '+(tryN+1)+'):',e.message); state.products=state.products||[]; if(tryN<3) await new Promise(r=>setTimeout(r,1000*(tryN+1))); }
     }
   } else state.fetchOk=true;
   if(_cs!==null&&state.fetchOk) _same=(_cs===_sig(state.products));   /* nothing changed since the cached paint -> no re-render, no flicker */
-  state.loaded=true;
+  state.loadFailed=!state.fetchOk;
+  state.loaded=state.fetchOk||!!(state.products&&state.products.length);   /* a failed fetch never shows the 'no products' popup: placeholders stay and the load is retried */
   try{ if(RAIL.ready) railInject(); }catch(e){}
   /* drop cart / wishlist entries of deleted products and refresh price, title, image */
   if(state.fetchOk){ state.cart=state.cart.filter(i=>state.products.some(p=>p.id===i.id)).map(i=>{ const p=state.products.find(x=>x.id===i.id); return {...i,title:p.title,price:p.price,image:((i.image&&p.images&&p.images.includes(i.image))?i.image:((p.images&&p.images.length)?variantImg(p,i.size):''))||i.image||p.image||(p.images&&p.images[0])||''}; });
   state.wishlist=state.wishlist.filter(id=>state.products.some(p=>p.id===id)); save('bana_wish',state.wishlist); }
   if(!_same) renderProducts(); buildCatRow(); renderMenu(); updateCart(); updateWishlist(); openFromHash(); try{ if(state._fast) bfHydrate(); }catch(e){}
+  if(!state.fetchOk&&(state._retry=(state._retry||0)+1)<=8) setTimeout(loadFirestoreProducts,Math.min(8000,1500*state._retry));
 }
 
+window.retryProducts=()=>loadFirestoreProducts();
 /* ===== ADMIN BANNERS: admin panel 'banners' collection -> home slider (shown before the built-in banners) ===== */
 const BAN_CACHE='bana_banners_v1';
 function bnrSlideHTML(b){
