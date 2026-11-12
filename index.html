@@ -1849,6 +1849,7 @@ const state = { products:[],loaded:false,rvUnsub:null, cart:[], wishlist:[], cat
 const $ = id => document.getElementById(id);
 const money = n => 'Tk ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:(Number(n)%1?2:0),maximumFractionDigits:2});
 const esc = s => String((s&&typeof s==='object'&&!Array.isArray(s))?(s.bn||s.label||s.name||s.title||''):(s ?? '')).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const jsArg = v => esc(JSON.stringify(String(v ?? '')));
 const save = (k,v) => { try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} };
 const load = (k,d) => { try{const v=JSON.parse(localStorage.getItem(k)); return v ?? d}catch(e){return d} };
 /* show the admin's categories instantly from the last visit (the live list from the admin panel replaces them as soon as it loads) */
@@ -2181,7 +2182,7 @@ function buildCatRowCore(){ const r=$('catRow'); if(!r) return;
   _catSig=sig; delete r.dataset.sk;
   r.innerHTML=list.map((c,i)=>{ const name=catLabel(c)||String(c.id||''); const n=cnt(c);
     const pr=state.products.find(p=>p.category===c.id); const im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
-    return `<div onclick="goShop('${esc(c.id)}')" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
+    return `<div onclick="goShop(${jsArg(c.id)})" data-cid="${esc(c.id)}" style="--d:${(.1+i*.12).toFixed(2)}s;--f:${(i%6)*.35}s" class="cat-card group cursor-pointer"><span class="cat-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="${esc(name)}" onerror="this.remove()">`:''}</span><h3 class="cat-name">${esc(name)}</h3><span class="cat-cnt">${n?bnum(n)+'+ পণ্য':''}</span></div>`; }).join('');
   if(catsInView||_catsPlayed) playCats(); }
 /* ===== categories: 4 per row, 2 rows (8) first, then an "আরো দেখুন" button reveals the rest ===== */
 let _catExp=false;
@@ -2210,7 +2211,7 @@ function bfcList(){
 }
 function bfcItem(c,i){
   const name=catLabel(c)||String(c.id||''), pr=(state.products||[]).find(p=>inCategory(p,c.id)), im=c.image||(pr&&(pr.image||(pr.images&&pr.images[0])))||'';
-  return `<button type="button" class="bfc-item" style="--i:${i}" onclick="bfcPick('${esc(c.id)}')" aria-label="${esc(name)}"><span class="bfc-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span class="bfc-nm">${esc(name)}</span></button>`;
+  return `<button type="button" class="bfc-item" style="--i:${i}" onclick="bfcPick(${jsArg(c.id)})" aria-label="${esc(name)}"><span class="bfc-ic">${catIcon(c)}${im?`<img src="${esc(CLX(im,200))}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span class="bfc-nm">${esc(name)}</span></button>`;
 }
 function bfcFill(){ const g=$('bfsGrid'); if(g) g.innerHTML=_bfcAll.map(bfcItem).join(''); const t=$('bfsCount'); if(t) t.textContent=bnum(_bfcAll.length)+' টি ক্যাটাগরি'; }
 function bfcRender(){
@@ -2416,7 +2417,7 @@ function renderEid(){ const st=state.site||{}, list=state.products.filter(p=>p.e
   $('eidTitle').textContent=st.eidTitle||'ঈদ কালেকশন'; $('eidSub').textContent=st.eidSub||'Celebrate Eid in style - handpicked festive collection';
   $('eidGrid').innerHTML=list.map((p,i)=>`<div class="eid-card rounded-2xl overflow-hidden cursor-pointer reveal in" style="animation:fadeUp .6s ${(i%4)*.08}s backwards" onclick="openProduct('${p.id}')"><div class="aspect-[4/5] overflow-hidden relative bg-ink-800"><img src="${esc(CLX(p.image,800))}" alt="" loading="lazy" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700"><span class="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-gold-500 text-black font-extrabold text-[10px]"><i class="fa-solid fa-moon mr-1"></i>EID</span></div><div class="p-3"><div class="text-white font-bold text-sm truncate">${esc(p.title)}</div><div class="mt-1 flex items-center gap-2"><span class="text-gold-400 font-extrabold">${money(p.price)}</span>${p.oldPrice?`<span class="text-[11px] text-white/40 line-through">${money(p.oldPrice)}</span>`:''}</div></div></div>`).join(''); }
 function renderMenu(){ const nav=$('mobileNav'); if(!nav) return; const st=state.site||{};
-  const it=[['#hero','হোম','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'ঈদ কালেকশন','fa-moon','']]:[]),['#shop','সব পণ্য','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory('${c.id}');`]),['javascript:void(0)','আপনার অর্ডার','fa-receipt','openMyOrders();'],['javascript:void(0)','অর্ডার ট্র্যাক করুন','fa-truck-fast','openTrack();'],['#about','আমাদের কথা','fa-circle-info',''],['#helpline','হেল্পলাইন','fa-headset','']];
+  const it=[['#hero','হোম','fa-house',''],...(st.eidOn&&state.products.some(p=>p.eid)?[['#eid',st.eidTitle||'ঈদ কালেকশন','fa-moon','']]:[]),['#shop','সব পণ্য','fa-store',"filterCategory('all');"],...CATEGORIES.filter(c=>c.id!=='all').map(c=>['#shop',c.label,'fa-tag',`filterCategory(${jsArg(c.id)});`]),['javascript:void(0)','আপনার অর্ডার','fa-receipt','openMyOrders();'],['javascript:void(0)','অর্ডার ট্র্যাক করুন','fa-truck-fast','openTrack();'],['#about','আমাদের কথা','fa-circle-info',''],['#helpline','হেল্পলাইন','fa-headset','']];
   nav.innerHTML=it.map((x,i)=>`<a href="${x[0]}" onclick="${x[3]}toggleMobileMenu()" style="--i:${i}" class="mnav flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 hover:text-gold-400 ${x[0]==='#helpline'?'text-gold-400':''}"><i class="fa-solid ${x[2]} w-5 text-center text-gold-400/80"></i>${esc(x[1])}</a>`).join(''); }
 function flyToCart(src){
   const bag=$('cartBadge').parentElement, t=bag.getBoundingClientRect();
