@@ -1657,7 +1657,7 @@ html.bf-lock{overflow:hidden!important}
               <div class="co-field"><i class="fa-solid fa-mobile-screen-button fi"></i><input id="coSender" inputmode="tel" class="co-in" placeholder="আপনার সেন্ডার নম্বর (01XXXXXXXXX)"></div>
               <div class="co-field"><i class="fa-solid fa-hashtag fi"></i><input id="coTrx" class="co-in uc" placeholder="Transaction ID (TrxID)" oninput="chkTrx()"></div>
               <div id="coTrxErr" class="text-[11px] font-extrabold text-red-400"></div>
-              <div class="text-[11px] text-silver-400">পেমেন্টের TrxID দিন — আমরা পরে যাচাই করে নেব।</div>
+              <div class="text-[11px] text-silver-400">প্রতিটি TrxID শুধু একবার ব্যবহার করা যাবে।</div>
             </div>
           </div>
           <div class="co-tag"><i class="fa-solid fa-truck-fast text-gold-400 text-lg"></i><div class="leading-relaxed"><b>ডেলিভারি চার্জ</b><div class="mt-0.5">ঢাকার ভিতরে: <span id="noteIn" class="text-gold-400 font-bold"></span> &nbsp;|&nbsp; ঢাকার বাইরে: <span id="noteOut" class="text-gold-400 font-bold"></span></div><div id="noteFree" class="text-silver-400 mt-0.5"></div></div></div>
@@ -2253,13 +2253,13 @@ function payIcon(k,m){ if(k==='cod') return '<span class="co-ico co-ico-cod"><i 
   if(m&&m.logo){ const fb=badge.replace(/"/g,'&quot;'); return `<span class="co-ico co-ico-logo"><img src="${esc(m.logo)}" alt="${esc(c[1])}" loading="lazy" decoding="async" onerror="this.parentNode.outerHTML=this.dataset.fb" data-fb="${fb}"></span>`; }
   return badge; }
 /* delivery charge must be paid online first whenever it is > 0 and at least one wallet number is saved in admin */
-function advMandatory(){ return false; }   /* ডেলিভারি চার্জ অগ্রিম দেওয়া ঐচ্ছিক — বাধ্যতামূলক নয় */
+function advMandatory(){ const cfg=state.payCfg||{}; return shipCost()>0 && ['bkash','nagad','rocket','upay'].some(k=>cfg[k]&&cfg[k].number&&cfg[k].on!==false); }
 function renderPay(){ const cfg=state.payCfg||{}, ship=shipCost(), free=ship===0;
   const isOn=k=>!!(cfg[k]&&cfg[k].number&&cfg[k].on!==false);               /* number saved in admin panel */
   const mfs=['bkash','nagad'].concat(['rocket','upay'].filter(isOn));        /* bKash & Nagad cards always show */
   const act=mfs.filter(isOn);
   if(free&&state.payM&&state.payM!=='cod') state.payM='cod';
-  const req=false; /* অগ্রিম ঐচ্ছিক: ক্যাশ অন ডেলিভারি সবসময় আছে */
+  const req=!!(act.length&&!free); if(req&&(!state.payM||state.payM==='cod')) state.payM=act[0];
   if(state.payM&&state.payM!=='cod'&&!act.includes(state.payM)) state.payM='cod';
   state.payM=state.payM||'cod';
   $('coPayOpts').innerHTML=(req?[]:['cod']).concat(mfs).map(k=>{
@@ -2365,7 +2365,7 @@ function copyProdLink(id,btn,ev){
   const fallback=()=>{ const t=document.createElement('textarea'); t.value=url; t.setAttribute('readonly',''); t.style.cssText='position:fixed;top:0;left:0;opacity:0'; document.body.appendChild(t); t.focus(); t.select(); try{ t.setSelectionRange(0,url.length); }catch(e){} let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} t.remove(); if(ok) done(); else window.prompt('লিংকটি কপি করে নিন:',url); };
   if(navigator.clipboard&&window.isSecureContext) navigator.clipboard.writeText(url).then(done,fallback); else fallback();
 }
-let trxT; function chkTrx(){ clearTimeout(trxT); const el=$('coTrxErr'); if(el) el.textContent=''; /* any TrxID is accepted - it is verified manually later from the admin panel */ }
+let trxT; function chkTrx(){ clearTimeout(trxT); const el=$('coTrxErr'); if(el) el.textContent=''; /* no pre-check any more: the order is placed straight away; duplicate TrxID is still blocked at save time by the trx/{TrxID} write */ }
 async function verifyOrder(){ const id=new URLSearchParams(location.search).get('verify'); if(!id||!FIREBASE_READY) return; let r=null; try{ const sn=await getDoc(doc(db,'receipts',id)); if(sn.exists()) r=sn.data(); }catch(e){}
   const w=document.createElement('div'); w.className='fixed inset-0 z-[130] bg-black/85 flex items-center justify-center p-4';
   w.innerHTML=`<div class="pop bg-white rounded-3xl p-8 max-w-sm w-full text-center"><div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-3xl ${r?'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-500'}"><i class="fa-solid ${r?'fa-circle-check':'fa-circle-xmark'}"></i></div><h3 class="font-display font-extrabold text-xl mt-3">${r?'Order Verified':'Invalid Order'}</h3>${r?`<div class="mt-3 p-3 rounded-xl bg-slate-100 text-xs space-y-1"><div>অর্ডার আইডি: <b class="font-mono">${esc(r.orderId)}</b></div><div>কাস্টমার: <b>${esc(r.name||'')}</b></div><div>স্ট্যাটাস: <b class="uppercase text-gold-600">${esc(r.status)}</b></div><div>মোট: <b>${money(r.total)}</b></div></div>`:`<p class="text-xs text-slate-500 mt-2">No order found with this ID: ${esc(id)}</p>`}<button onclick="this.closest('.fixed').remove()" class="mt-5 w-full py-3 rounded-xl btn-gold font-extrabold text-xs">Close</button></div>`; document.body.appendChild(w); }
@@ -2842,7 +2842,7 @@ async function placeOrder(e){
   e.preventDefault(); if(!checkoutItems().length){ toast('আপনার ব্যাগ খালি',false); return; }
   const phone=validateOrderForm(); if(!phone) return;      /* wrong/missing phone or incomplete address -> pop-up, nothing is submitted */
   let pay=null; if(state.payM&&state.payM!=='cod'&&shipCost()>0){ const sender=$('coSender').value.replace(/[\s-]/g,''), trx=$('coTrx').value.trim().toUpperCase();
-    if(!/^01[3-9]\d{8}$/.test(sender)||!trx){ toast('আপনার সেন্ডার নম্বর ও TrxID দিন',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
+    if(!/^01[3-9]\d{8}$/.test(sender)||!/^[A-Z0-9]{6,20}$/.test(trx)){ toast('আপনার সেন্ডার নম্বর ও TrxID দিন',false); return; } pay={method:state.payM,sender,trxId:trx,amount:shipCost(),status:'pending'}; }
   const btn=$('coSubmit'); btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-2"></i>অর্ডার হচ্ছে...';
   /* wait for the (anonymous) Firebase session so the order is written with a real uid / auth */
   if(FIREBASE_READY){ try{ await Promise.race([authReady,new Promise(r=>setTimeout(r,4000))]); if(auth&&auth.currentUser) state.user={uid:auth.currentUser.uid,name:'',email:''}; }catch(e){} }
@@ -2851,7 +2851,7 @@ async function placeOrder(e){
   const order={orderId,uid,email:(state.user&&state.user.email)||'',customerName:$('coName').value.trim(),phone,area:$('coArea').value,district:$('coDist').value,division:$('coDiv').value,upazila:$('coUp').value,address:$('coAddress').value.trim(),geo:$('coLat').value?{lat:+$('coLat').value,lng:+$('coLng').value}:null,note:$('coNote').value.trim(),
     items:checkoutItems().map(i=>({id:i.id,title:i.title,size:i.size,qty:i.qty,price:i.price})),subtotal:sub,discount:disc,promo:(disc&&state.promo)?{code:state.promo.code,type:state.promo.type,value:state.promo.value}:null,delivery:ship,total:sub-disc+ship,payment:pay?'Delivery charge via '+pay.method+' + COD':'Cash on Delivery',pay,deliveryPaid:false,courier:null,status:'pending',currency:'BDT'};
   try{
-    if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); bt.set(doc(db,'rl',uid),{t:serverTimestamp()}); /* TrxID uniqueness registry removed: any TrxID is accepted, admin verifies later */ bt.set(doc(db,'receipts',orderId),{orderId,uid:uid,status:'pending',total:order.total,name:(order.customerName||'').split(' ')[0],createdAt:serverTimestamp()}); if(disc&&state.promo){ bt.update(doc(db,'promos',state.promo.code),{used:increment(1)}); bt.set(doc(db,'promoUses',state.promo.code+'_'+uid),{uid:uid,orderId,at:serverTimestamp()}); } await bt.commit(); }
+    if(FIREBASE_READY){ const bt=writeBatch(db), oref=doc(collection(db,'orders')); bt.set(oref,{...order,createdAt:serverTimestamp()}); bt.set(doc(db,'rl',uid),{t:serverTimestamp()}); if(pay) bt.set(doc(db,'trx',pay.trxId),{uid:uid,orderId,at:serverTimestamp()}); bt.set(doc(db,'receipts',orderId),{orderId,uid:uid,status:'pending',total:order.total,name:(order.customerName||'').split(' ')[0],createdAt:serverTimestamp()}); if(disc&&state.promo){ bt.update(doc(db,'promos',state.promo.code),{used:increment(1)}); bt.set(doc(db,'promoUses',state.promo.code+'_'+uid),{uid:uid,orderId,at:serverTimestamp()}); } await bt.commit(); }
     else { const all=load('bana_orders',[]); all.push({...order,createdAt:new Date().toISOString()}); save('bana_orders',all); }
     /* ---- order is saved in the database from here on ---- */
     try{
@@ -2863,7 +2863,7 @@ async function placeOrder(e){
     $('successSummary').innerHTML=order.items.map(i=>`<div class="flex justify-between gap-2"><span class="truncate">${esc(i.title)} <span class="text-slate-400">(${esc(i.size)}) ×${i.qty}</span></span><b>${money(i.price*i.qty)}</b></div>`).join('')+`<div class="border-t border-white/10 pt-1.5 flex justify-between"><span class="text-silver-400">ডেলিভারি</span><b>${ship?money(ship):'ফ্রি'}</b></div>`+(disc?`<div class="flex justify-between"><span class="text-emerald-400">ডিসকাউন্ট</span><b>-${money(disc)}</b></div>`:'')+`<div class="flex justify-between text-sm font-extrabold"><span>মোট</span><span>${money(order.total)}</span></div><div class="border-t border-white/10 pt-1.5 text-silver-400 leading-relaxed"><b class="text-white">${esc(order.customerName)}</b> · ${esc(order.phone)}<br>${esc(order.address)}, ${esc(order.upazila)}, ${esc(DBN[order.district]||order.district)}${order.division?', '+esc(DVBN[order.division]||order.division)+' বিভাগ':''} <span class="text-gold-400 font-bold">(${order.area==='dhaka'?'ঢাকার ভিতরে':'ঢাকার বাইরে'})</span><br>পেমেন্ট: ${esc(order.payment)}</div>`;
     if(!state.buyNow) state.cart=[]; updateCart(); closeCheckout(); $('checkoutForm').reset(); onDist(); $('coLat').value=''; $('coLng').value=''; state.promo=null; $('promoMsg').textContent=''; $('geoMsg').textContent='GPS দিয়ে জেলা, এলাকা ও ঠিকানা নিজে থেকে পূরণ হবে'; showConfirm(orderId);
     }catch(uiErr){ console.error('post-order UI:',uiErr); try{ if(!state.buyNow) state.cart=[]; updateCart(); }catch(_){} try{ $('successId').textContent=orderId; }catch(_){} try{ showConfirm(orderId); }catch(_){} }
-  }catch(err){ console.error(err); toast(err.code==='permission-denied'&&state.promo?'এই প্রোমো কোডটি আর বৈধ নয়। কোডটি সরিয়ে আবার চেষ্টা করুন।':('অর্ডার সেভ হয়নি, আবার চেষ্টা করুন অথবা 01353-808618 নম্বরে কল করুন'+(err&&err.code?' ['+err.code+(FIREBASE_READY&&!(auth&&auth.currentUser)?' | NO-AUTH':' | AUTH-OK')+']':'')),false); }
+  }catch(err){ console.error(err); if(pay&&err.code==='permission-denied') $('coTrxErr').textContent='এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!'; toast(err.code==='permission-denied'&&state.promo&&!pay?'এই প্রোমো কোডটি আর বৈধ নয়। কোডটি সরিয়ে আবার চেষ্টা করুন।':pay&&err.code==='permission-denied'?'এই ট্রানজেকশন আইডিটি ইতোমধ্যে ব্যবহৃত হয়েছে!':'অর্ডার সেভ হয়নি, আবার চেষ্টা করুন অথবা 01353-808618 নম্বরে কল করুন',false); }
   btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-lock mr-2"></i>অর্ডার কনফার্ম করুন';
 }
 
