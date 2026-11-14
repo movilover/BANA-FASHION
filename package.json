@@ -2,10 +2,14 @@
   "name": "bana-fashion-server",
   "version": "2.0.0",
   "private": true,
-  "description": "BANA FASHION — Railway API server (Steadfast, WhatsApp, SMS OTP, order lookup)",
+  "description": "BANA FASHION — API server (Steadfast, WhatsApp, SMS OTP, order lookup) — runs on Vercel or any Node host",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "compression": "^1.7.4",
     "express": "^4.19.2",
