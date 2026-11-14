@@ -1,8 +1,48 @@
 {
   "version": 2,
-  "rewrites": [{ "source": "/api/(.*)", "destination": "/api/index" }],
-  "functions": { "api/index.js": { "maxDuration": 30 }, "api/catalog.js": { "maxDuration": 15 } },
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin__3_.html"
+    }
+  ],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60
+    },
+    "api/catalog.js": {
+      "maxDuration": 15
+    }
+  },
   "headers": [
-    { "source": "/(.*)\\.(png|jpg|jpeg|ico|webp|svg|woff2)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] }
+    {
+      "source": "/(.*)\\.(png|jpg|jpeg|ico|webp|svg)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/(admin|admin__3_.html)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
   ]
 }
