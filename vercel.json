@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api/index" }],
+  "functions": { "api/index.js": { "maxDuration": 30 }, "api/catalog.js": { "maxDuration": 15 } },
+  "headers": [
+    { "source": "/(.*)\\.(png|jpg|jpeg|ico|webp|svg|woff2)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] }
+  ]
+}
