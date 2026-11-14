@@ -135,15 +135,19 @@ process.on('unhandledRejection', e => console.error('unhandledRejection:', e));
 /* অপ্রত্যাশিত ত্রুটির পর প্রক্রিয়া বিগড়ানো অবস্থায় চলতে দেওয়া হবে না; Railway নিজে restart করবে */
 process.on('uncaughtException', e => { console.error('uncaughtException:', e); process.exit(1); });
 
-const PORT = Number(process.env.PORT) || 3000;
-const server = app.listen(PORT, '0.0.0.0', () =>
-  console.log(`BANA FASHION server চালু — পোর্ট ${PORT}, অ্যাডমিন ফাইল: ${ADMIN_FILE}`));
-server.keepAliveTimeout = 65000;
-server.headersTimeout = 70000;
-server.requestTimeout = 30000;   // ধীরগতির/আটকে থাকা অনুরোধ ৩০ সেকেন্ডে বন্ধ
+/* ---- Railway / local: normal server. Vercel: the app is exported (api/index.js) and Vercel runs it per request, no listen() ---- */
+module.exports = app;
+if (require.main === module) {
+  const PORT = Number(process.env.PORT) || 3000;
+  const server = app.listen(PORT, '0.0.0.0', () =>
+    console.log(`BANA FASHION server চালু — পোর্ট ${PORT}, অ্যাডমিন ফাইল: ${ADMIN_FILE}`));
+  server.keepAliveTimeout = 65000;
+  server.headersTimeout = 70000;
+  server.requestTimeout = 30000;   // ধীরগতির/আটকে থাকা অনুরোধ ৩০ সেকেন্ডে বন্ধ
 
-process.on('SIGTERM', () => {
-  console.log('SIGTERM — বন্ধ হচ্ছে');
-  server.close(() => process.exit(0));
-  setTimeout(() => process.exit(0), 10000).unref();
-});
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM — বন্ধ হচ্ছে');
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 10000).unref();
+  });
+}
