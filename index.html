@@ -45,12 +45,23 @@
     if('mapValue' in v){ var o={}, f=v.mapValue.fields||{}; for(var k in f) o[k]=cv(f[k]); return o; }
     if('referenceValue' in v) return v.referenceValue; if('geoPointValue' in v) return v.geoPointValue; return null; }
   var FAST=['title','category','categories','badge','price','oldPrice','image','description','sizes','colors','rating','reviews','stock','home','eid','order','createdAt','brand','material','color'];
-  function net(fast){ var out=[], mask=fast?FAST.map(function(f){ return '&mask.fieldPaths='+f; }).join(''):'';
+  function netFs(fast){ var out=[], mask=fast?FAST.map(function(f){ return '&mask.fieldPaths='+f; }).join(''):'';
     function page(n,tok){ var u='https://firestore.googleapis.com/v1/projects/'+PID+'/databases/(default)/documents/products?pageSize=300&key='+KEY+mask+(tok?'&pageToken='+encodeURIComponent(tok):'');
       return fetch(u).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
         (j.documents||[]).forEach(function(d){ var f=d.fields||{}, o={id:d.name.split('/').pop()}; for(var k in f) o[k]=cv(f[k]); out.push(o); });
         return (j.nextPageToken&&n<20)?page(n+1,j.nextPageToken):out; }); }
     return page(0,'').catch(function(){ return null; }); }
+  /* Server catalog (/api/catalog, kept in the server's memory): products + hanger in ONE request -> ~0 Firestore reads per visitor.
+     Missing / failing -> the original Firestore REST path above runs unchanged. */
+  function net(fast){ return fetch('/api/catalog').then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
+      if(!j||!j.products||!j.products.length) throw 0;
+      if(j.hanger&&j.hanger.ids) W.__HGV=j.hanger;
+      if(W.__PD) W.__PD.merged=true;            /* full documents: no second "hydrate" download needed */
+      save(j.products); return j.products;
+    }).catch(function(){ return netFs(fast); }); }
+  /* hanger ("নির্বাচিত পণ্য") fallback fetch: used only when the catalog did not deliver it and no cached copy exists */
+  W.__HGF=function(){ return fetch('https://firestore.googleapis.com/v1/projects/'+PID+'/databases/(default)/documents/settings/hanger?key='+KEY)
+    .then(function(r){ return r.ok?r.json():null; }).then(function(d){ if(!d||!d.fields) return null; var o={}; for(var k in d.fields) o[k]=cv(d.fields[k]); return o; }).catch(function(){ return null; }); };
   /* READ SAVER: a cache younger than TTL is used as-is (0 reads); an older one is refreshed with ONE masked download whose images are merged from the cache
      (so the 2nd full download is skipped); the full download only happens for new/changed products or once per FULL_TTL. */
   var TTL=5*60*1000, FULL_TTL=6*60*60*1000;
@@ -2104,7 +2115,7 @@ function renderHangerRail(base){
 }
 let _hgUnsub=null, _hgTry=0;
 function hangerWatch(){ if(!FIREBASE_READY||_hgUnsub) return;
-  try{ _hgUnsub=onSnapshot(doc(db,'settings','hanger'),s=>{ state.hanger=s.exists()?s.data():{}; try{ if(state._hbase) renderHangerRail(state._hbase); }catch(e){} },
+  try{ _hgUnsub=onSnapshot(doc(db,'settings','hanger'),s=>{ state.hanger=s.exists()?s.data():{}; try{ localStorage.setItem('bana_hanger_v1',JSON.stringify(state.hanger)); }catch(e){} try{ if(state._hbase) renderHangerRail(state._hbase); }catch(e){} },
     err=>{ _hgUnsub=null; console.warn('hanger settings read failed - Firestore rules must allow read on /settings/hanger'); if(_hgTry++<3) setTimeout(hangerWatch,4000); }); }catch(e){} }
 function hrOn(el){ el.parentNode.querySelectorAll('.hr-item.on').forEach(x=>x.classList.remove('on')); el.classList.add('on'); }
 function hrHover(el){ if(window.matchMedia&&matchMedia('(hover:hover)').matches) hrOn(el); }
@@ -2209,6 +2220,7 @@ async function loadFirestoreProducts(){
         _sig=l=>l.map(p=>[p.id,p.title,p.price,p.oldPrice,p.stock,p.home,p.category,p.badge,(p.images&&p.images.length)||0,String(p.image||'').length].join('~')).join('|');
   let _cs=null, _same=false; const PD=window.__PD||{};
   if(FIREBASE_READY){
+    try{ const _h=JSON.parse(localStorage.getItem('bana_hanger_v1')||'null'); if(_h&&_h.ids) state.hanger=_h; }catch(e){}   /* last visit's hanger: first paint shows it with the products */
     /* 1) cached list from the last visit -> products appear immediately */
     try{ const c=await Promise.race([PD.cache||Promise.resolve(null),new Promise(r=>setTimeout(()=>r(null),700))]);
       if(c&&c.items&&c.items.length){ state.products=c.items.map(_mk); state.loaded=true; _cs=_sig(state.products); renderProducts(); } }catch(e){}
@@ -2218,6 +2230,10 @@ async function loadFirestoreProducts(){
         if(!(state.products&&state.products.length)){ const c=await PD.cache; if(c&&c.items&&c.items.length) state.products=c.items.map(_mk); }
         if(state.products&&state.products.length){ state.fetchOk=true; state._fast=false; } }
       else if(it&&it.length){ const oldM=new Map((state.products||[]).map(x=>[x.id,x])); state.products=it.map(x=>{ const q=_mk(x), o=oldM.get(q.id); if(o&&o.images&&o.images.length&&!(q.images&&q.images.length)) q.images=o.images; return q; }); state.fetchOk=true; state._fast=!PD.merged; } }catch(e){}
+    try{ const _ap=h=>{ if(h&&h.ids){ state.hanger=h; try{ localStorage.setItem('bana_hanger_v1',JSON.stringify(h)); }catch(e){} try{ if(state._hbase) renderHangerRail(state._hbase); }catch(e){} } };
+      if(window.__HGV) _ap(window.__HGV);                                              /* came with the catalog: no extra request */
+      else if(!(state.hanger&&state.hanger.ids)&&window.__HGF) window.__HGF().then(_ap);   /* no cache yet: fetch in parallel, never blocks the products */
+    }catch(e){}
     /* 3) fallback: Firebase SDK. First wait (max 4s) for the anonymous sign-in, so the request carries the auth token that the rules may require; then up to 4 attempts */
     if(!state.fetchOk){ try{ await Promise.race([authReady,new Promise(r=>setTimeout(r,4000))]); }catch(e){} }
     for(let tryN=0;tryN<4&&!state.fetchOk;tryN++){
