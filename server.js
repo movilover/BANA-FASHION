@@ -75,6 +75,7 @@ app.use('/api', require('./wa'));
 app.use('/api', require('./sms'));
 app.use('/api', require('./orders'));
 app.use('/api', require('./steadfast'));
+app.use('/api', require('./catalog'));   // পণ্য + হ্যাঙ্গার (মেমরি-ক্যাশ), index.html এটা আগে ডাকে
 app.use('/api', (req, res) => res.status(404).json({ error: 'not_found', message: 'এই API নেই' }));
 
 /* ---- শুধু GET/HEAD স্ট্যাটিক ফাইলে; বাকি মেথড বন্ধ ---- */
