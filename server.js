@@ -109,6 +109,12 @@ app.get(['/admin', /^\/admin[\w-]*\.html$/], sendRootFile(ADMIN_FILE, {
   'X-Robots-Tag': 'noindex, nofollow'
 }));
 
+/* Firebase SDK bundle, same-origin. Versioned filename => cached for a year. Only this exact file is public. */
+app.get('/vendor/fb-10.8.0.js', (req, res) => {
+  res.set({ 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=31536000, immutable' });
+  res.sendFile(path.join(ROOT, 'vendor', 'fb-10.8.0.js'), { dotfiles: 'deny' }, err => { if (err && !res.headersSent) res.status(404).send('Not found'); });
+});
+
 const ASSET = /^\/[A-Za-z0-9_-]+\.(?:png|jpe?g|webp|gif|svg|ico|webmanifest)$/i;
 const FILES = new Set(['/manifest.json', '/robots.txt', '/sitemap.xml']);
 app.use((req, res, next) => {
