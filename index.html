@@ -88,11 +88,11 @@
 <meta name="description" content="BANA FASHION - বাংলাদেশের প্রিমিয়াম মেনস ফ্যাশন ব্র্যান্ড। শাফিপুর বাজার, কালিয়াকৈর, গাজীপুর। শার্ট, টি-শার্ট, ডেনিম, পাঞ্জাবি ও আরও অনেক কিছু। সারা বাংলাদেশে ক্যাশ অন ডেলিভারি।">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <link rel="canonical" href="https://banafashion.shop/">
-<link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png?v=2">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="application-name" content="BANA FASHION">
 <meta name="apple-mobile-web-app-title" content="BANA FASHION">
@@ -1227,6 +1227,14 @@ html body #hero .bnr-wrap{aspect-ratio:16/9!important;width:min(calc(100% - 28px
     tm.push(setTimeout(check,100));
   })();
   setTimeout(function(){ if(window.__splash<2){ left=true; done(); } },MAX+1500);   /* safety net: the splash can never stay */
+  /* watchdog: if the app never started (page opened as a local file, blocked script ...) say so instead of showing an empty page */
+  setTimeout(function(){
+    if(window.__bfBoot) return;
+    var web=/^https?:$/.test(location.protocol), d=document.createElement('div');
+    d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:90;background:#111;color:#fff;border-radius:14px;padding:14px 16px;font:600 14px/1.5 system-ui,sans-serif;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.45)';
+    d.innerHTML=(web?'সাইট পুরোপুরি লোড হয়নি।':'এই ফাইলটি সরাসরি খুললে সাইট চলবে না। সাইটের ঠিকানা থেকে খুলুন।')+'<div style="margin-top:10px"><a href="'+(web?location.href:'https://banafashion.shop')+'" style="display:inline-block;background:#fff;color:#111;border-radius:10px;padding:8px 18px;text-decoration:none">'+(web?'আবার চেষ্টা করুন':'banafashion.shop খুলুন')+'</a></div>';
+    document.body.appendChild(d);
+  },9000);
 })();
 </script>
 
@@ -1822,6 +1830,7 @@ html body #hero .bnr-wrap{aspect-ratio:16/9!important;width:min(calc(100% - 28px
 /* ================= FIREBASE (v10 Web SDK) ================= */
 /* Firebase 10.8.0 (same SDK as before) is served from our own server: /vendor/fb-10.8.0.js */
 import { initializeApp, getFirestore, collection, getDocs, addDoc, serverTimestamp, doc, getDoc, setDoc, increment, query, where, writeBatch, onSnapshot, getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, signInAnonymously } from "/vendor/fb-10.8.0.js";
+window.__bfBoot=1;   /* the app started (used by the watchdog in the splash script) */
 let initializeAppCheck, ReCaptchaV3Provider, getAppCheckToken;   /* loaded lazily below, only when APPCHECK_SITE_KEY is set */
 
 /* >>> Replace the YOUR_... values with the keys from Firebase Console > Project Settings > Your apps (Web) <<< */
