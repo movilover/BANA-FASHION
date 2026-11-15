@@ -1,5 +1,5 @@
 'use strict';
-/* GET /api/catalog — পণ্য + হ্যাঙ্গার এক রিকোয়েস্টে, সার্ভারের মেমরি থেকে।
+/* GET /api/catalog — পণ্য + হ্যাঙ্গার + ক্যাটাগরি + সাইট সেটিংস এক রিকোয়েস্টে, সার্ভারের মেমরি থেকে।
    সার্ভার সবসময় চালু থাকে বলে Firestore-এর লাইভ লিসেনার ব্যবহার করা হয়:
    শুরুতে একবার সব পণ্য পড়ে, তারপর শুধু যেটা বদলায় সেটাই (Firestore রিড প্রায় শূন্য, অ্যাডমিনের পরিবর্তন সাথে সাথে)।
    কোনো কারণে না চললে সাইট আগের Firestore পথেই চলে (index.html-এ ফলব্যাক আছে)। */
@@ -8,7 +8,8 @@ const { db } = require('./firebase');
 
 const router = express.Router();
 const docs = new Map();
-let hanger = null, body = '', dirty = true, ready = false, readyAt = 0;
+const cats = new Map();
+let hanger = null, site = null, body = '', dirty = true, ready = false, readyAt = 0;
 let markReady; const readyP = new Promise(r => { markReady = r; });
 
 /* Firestore ভ্যালু → সাধারণ JSON (Timestamp → ISO স্ট্রিং, REST-এর মতোই) */
@@ -38,13 +39,28 @@ function watchHanger() {
   db.doc('settings/hanger').onSnapshot(s => { hanger = s.exists ? plain(s.data()) : null; dirty = true; },
     err => { console.error('catalog hanger listener:', err.message); setTimeout(watchHanger, 10000); });
 }
-if (process.env.CATALOG !== 'off') { watchProducts(); watchHanger(); }
+function watchCats() {
+  let first = true;
+  db.collection('categories').onSnapshot(snap => {
+    if (first) { first = false; const keep = new Set(snap.docs.map(d => d.id)); for (const id of [...cats.keys()]) if (!keep.has(id)) cats.delete(id); }
+    snap.docChanges().forEach(c => {
+      if (c.type === 'removed') cats.delete(c.doc.id);
+      else cats.set(c.doc.id, Object.assign({ id: c.doc.id }, plain(c.doc.data())));
+    });
+    dirty = true;
+  }, err => { console.error('catalog categories listener:', err.message); setTimeout(watchCats, 10000); });
+}
+function watchSite() {
+  db.doc('settings/site').onSnapshot(s => { site = s.exists ? plain(s.data()) : null; dirty = true; },
+    err => { console.error('catalog site listener:', err.message); setTimeout(watchSite, 10000); });
+}
+if (process.env.CATALOG !== 'off') { watchProducts(); watchHanger(); watchCats(); watchSite(); }
 
 router.get('/catalog', async (req, res) => {
   try {
     if (!ready) await Promise.race([readyP, new Promise(r => setTimeout(r, 8000))]);
     if (!ready) return res.status(503).json({ error: 'warming_up' });          // সাইট নিজে Firestore থেকে নেবে
-    if (dirty) { body = JSON.stringify({ products: [...docs.values()], hanger, t: Date.now() }); dirty = false; }
+    if (dirty) { body = JSON.stringify({ products: [...docs.values()], hanger, cats: [...cats.values()], site, t: Date.now() }); dirty = false; }
     res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=300');
     res.type('application/json').send(body);
   } catch (e) { res.status(500).json({ error: 'catalog_failed' }); }
